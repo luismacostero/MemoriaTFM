@@ -1,0 +1,20 @@
+# LaTeX
+*.bbl
+*.blg
+*.dvi
+*~
+*.ps
+*.aux
+*.log
+*.pdf
+*.bak
+*.toc
+*.lof
+*.lot
+*.out
+
+# TeXstudio
+*.synctex.gz
+
+# Plantilla sin modificar
+pizarradigital_base/
