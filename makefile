@@ -10,10 +10,6 @@ all:  $(PDFFILE)
 $(DVIFILE): $(TEXCODE) ${DOCS} 
 $(PDFFILE): $(TEXCODE) ${DOCS} 
 
-code/%.tex: code/%.cc
-	cpp2latex -h -s 0 -t 4 $< > code/$*.tex 
-	#lgrind -i -lc -t 4 $< > code/$*.tex
-
 %.pdf: %.tex
 	pdflatex --shell-escape $*
 	bibtex $*
