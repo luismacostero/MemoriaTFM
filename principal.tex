@@ -73,6 +73,8 @@
 %\usepackage{boxedminipage} % Boxed text can be produced
 %\usepackage{     setspace} % Controls line spacing via \begin{space}
 
+\usepackage{subcaption}
+
 \usepackage{amsxtra}
 \usepackage{amssymb}
 \usepackage{amsthm}
@@ -141,6 +143,26 @@
 \textheight     =  8.60in
 \textwidth      =  6.46in
 \oddsidemargin  =  0.02in
+
+
+
+% +--------------------------------------------------------------------+
+% | Comandos propios para facilitar la revision                        |
+% +--------------------------------------------------------------------+
+%% DEFINICIONES
+\usepackage{tikz}
+
+\let\oldmarginpar\marginpar
+\renewcommand{\marginpar}[3][rectangle,draw,fill=orange,rounded corners]{%
+  \oldmarginpar{%
+    \tikz \node at (0,0) [#1]{#2};
+  #3}%
+}
+
+\newcommand{\todo}[1]{{\large \color{red} \textbf{TODO: }#1 }}
+\newcommand{\comentario}[1]{\marginpar{Comentario}{#1}{}}
+\newcommand{\rev}[1]{{\color{green}#1}}
+
 
 % +--------------------------------------------------------------------+
 % | The document finally begins here.                                  |
