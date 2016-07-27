@@ -51,8 +51,9 @@ Para determinar si una tarea pertenece al camino crítico o no en tiempo de
 ejecución, botlev asigna una prioridad a cada tarea en el momento de la
 inserción en el grafo de dependencias. Una vez que la tarea está lista para
 ser ejecutada (es decir, cuando todas las tareas que tenían relación con la
-tarea mediante el grafo de dependencias han sido ejecutadas), se realiza la
-decisión de qué core va a ejecutar la tarea en función de la prioridad
+tarea mediante el grafo de dependencias han finalizado su ejecución), se
+realiza la decisión de qué core va a ejecutar la tarea en función de la
+prioridad
 asignada.\\
 La prioridad de una tarea viene dada por un número entero positivo, el cuál
 representa la longitud del camino más largo desde la tarea actual hasta una
@@ -93,7 +94,8 @@ futuro.
   \begin{subfigure}{.45\textwidth}
     \centering
     \includegraphics[width=1\linewidth]{Figures/botlev-colas.eps}
-    \caption{Evolución del tamaño de las colas de tareas listas.\todo{agrandar}}
+    \caption{Evolución del tamaño de las colas de tareas
+      listas.\todo{agrandar texto}}
     \label{s3:fig:botlev_colas}
   \end{subfigure}  
   
@@ -103,21 +105,22 @@ futuro.
 
 Una tarea puede ser ejecutada cuando todas sus tareas predecesoras han
 finalizado la ejecución. Cuando esto ocurre, Botlev inserta la tarea en una
-cola de tareas pendientes para ir ejecutándolas en orden en los diferentes
-cores que vayan finalizando la ejecución de las tareas previas. Según la
-prioridad de la tarea, Botlev distingue dos tipos de colas en las que
-insertar una tarea: la cola con las tareas pertenecientes al camino
-crítico, y la cola con el resto de tareas. Una tarea se considera que
-pertenece al camino crítico si posee una prioridad mayor a cualquiera de
-las prioridades de las tareas anteriores, o si es hija directa de una tarea
-que se ha considerado crítica y tiene una prioridad de una unidad menor (es
-decir, es el siguiente nodo del camino crítico). En la
-figura~\ref{s3:fig:botlev_colas} se puede ver la evolución del tamaño de
-las colas para una factorización de Cholesky sobre una matriz de $8\times8$
-bloques. La línea azul muestra el número de tareas no críticas listas para
-ser ejecutadas en función del momento de la ejecución del problema,
-mientras que la línea roja muestra el
-número de tareas críticas.\\
+cola de tareas pendientes para ir ejecutándolas en función de la prioridad
+asignada, o en orden de insercción en caso de empate. Estas tareas son
+asignadas a los diferentes cores según vayan finalizando la ejecución de
+las tareas previas. Según la prioridad de la tarea, Botlev distingue dos
+tipos de colas en las que insertar una tarea: la cola con las tareas
+pertenecientes al camino crítico, y la cola con el resto de tareas. Una
+tarea se considera que pertenece al camino crítico si posee una prioridad
+mayor a cualquiera de las prioridades de las tareas anteriores, o si es
+hija directa de una tarea que se ha considerado crítica y tiene una
+prioridad de una unidad menor (es decir, es el siguiente nodo del camino
+crítico). En la figura~\ref{s3:fig:botlev_colas} se puede ver la evolución
+del tamaño de las colas para una factorización de Cholesky sobre una matriz
+de $8\times8$ bloques. La línea azul muestra el número de tareas no
+críticas listas para ser ejecutadas en función del momento de la ejecución
+del problema, mientras que la línea roja muestra el
+número de tareas críticas.
 
 Cuando un core big finaliza la ejecución de una tarea, este ejecutará la
 siguiente tarea de la cola de tareas críticas, mientras que un core LITTLE
@@ -128,11 +131,11 @@ dependencias muy anchos, como puede ser el asociado a una factorización de
 Cholesky, el número de tareas críticas es mucho menor que el número de
 tareas no críticas, dando lugar a que los cores rápidos estén la mayor
 parte de tiempo ociosos. Para evitar esta situación, si un core big no
-dispone tareas críticas que ejecutar, ejecutará la siguiente tarea de la
-lista de tareas no críticas. El robo de tareas en sentido contrario (cores
-LITTLE ejecutando tareas críticas) es una parámetro adicional que se puede
-seleccionar en tiempo de ejecución, pero que se encuentra desactivado por
-defecto.
+dispone de tareas críticas que ejecutar, ejecutará la siguiente tarea de la
+lista de tareas no críticas. El robo de tareas en sentido contrario (es
+decir, que los cores LITTLE ejecuten tareas críticas) es una parámetro
+adicional que se puede seleccionar en tiempo de ejecución, pero que se
+encuentra desactivado por defecto.
 
 
 
