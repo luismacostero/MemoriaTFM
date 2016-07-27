@@ -9,9 +9,108 @@
 
 \subsection{Evaluación de rendimiento/eficiencia energética de las tareas}
 
+
 \section{Políticas de reducción de consumo}
 
 \subsection{P1}
+%%
+\comentario{Reescribir}%%
+Durante la ejecución de un programa paralelo mediante un paradigma basado
+en tareas, puede ocurrir el caso en el que la mayor parte de tareas listas
+para ser ejecutadas sean críticas, provocando que no existan más tareas
+listas hasta que estas acaben. Un ejemplo de aplicación con este
+comportamiento sería aquella cuyo árbol de dependencias se encogiera muy
+rápidamente en algún punto intermedio de la ejecución, para luego volverse
+a expandir rápidamente (un árbol con forma de diábolo). En este árbol, las
+tareas del cuello de botella del medio serían tareas críticas ya que son
+prioritarias para que la ejecución continúe su ejecución, y además, en el
+momento que esto ocurra, un gran número de tareas estarán listas para ser
+ejecutadas y
+poder continuar la ejecución del problema.\\
+Este problema aplicado al planificador botlev supondría que en el momento
+en el que el árbol se estreche, la cola de tareas no críticas tendría un
+tamaño mucho inferior al de tareas críticas, y por tanto los cores LITTLE
+tendrían mucha menor carga de trabajo que los cores big. Esto ocurriría
+mientras que los cores big finalicen la ejecución de sus tareas críticas y
+se preparen más tareas para ejecutar por los cores LITTLE.\\
+Aunque una forma de intentar paliar este problema sería obligar a que los
+cores lentos ejecutaran tareas críticas, esto podría provocar que se
+retrase la finalización de una tarea crítica, ya que aunque su ejecución
+puede comenzar antes (pues se disponen de más cores para distribuir el
+mismo número de tareas), el rendimiento de los cores LITTLE es mucho
+inferior que el de los cores big, provocando retrasos en la ejecución,
+incluso llegando a aumentar el problema del cuello de botella.\\
+
+La política P1 intenta reducir este problema desde un enfoque distinto. La
+idea principal que se encuentra detrás de esta política es la de aprovechar
+estos momentos en los que la carga de trabajo sobre los cores lentos es
+menor para intentar disminuir el consumo energético aplicando una reducción
+de frecuencia sobre el cluster LITTLE. Como se podía ver en la
+figura~\todo{ref}, reducir la frecuencia al cluster LITTLE implica que la
+potencia instantánea disminuye. Es cierto que al reducir la frecuencia de
+los cores el tiempo usado en ejecutar una tarea aumenta, pero como esta
+técnica únicamente se aplica en los momentos en los que la ejecución está
+limitada por el gran número de tareas críticas y el bajo número de tareas
+no críticas, se espera que el impacto final en el rendimiento no sea muy
+elevado.\\
+La forma de aplicar esta política sobre botlev consiste en monitorizar
+constantemente el número de tareas tanto críticas como no críticas listas
+para ser ejecutadas (reflejado en el tamaño de las colas internas al
+planificador), y actuar en función a la relación entre el tamaño de ambas
+colas. La figura~\ref{s5:fig:listing-p1} muestra un fragmento esquemático
+del código encargado de realizar esta tarea. Este método es invocado cada
+vez que el tamaño de una cola cambia (ya sea porque una tarea comienza su
+ejecución, o porque una tarea se encuentra lista para ser ejecutada y es
+introducida en una cola). Como se puede ver en la
+línea~\ref{s5:lst:p1-calculoPrincipal(a)}, la frecuencia a la que cambiar
+el cluster se calcula como una proporción directa entre el tamaño de ambas
+colas, así, si el número de tareas críticas es el doble que el de las
+tareas no críticas, la frecuencia se disminuye un escalón; si el tamaño es
+el triple, la frecuencia se disminuye hasta el tercer escalón de
+frecuencia, etc. Recordar que los valores de frecuencia que puede tomar el
+cluster están limitados por el kernel del sistema operativo, como se
+mencionó en la sección~\todo{poner referencia}. La
+línea~\ref{s5:lst:p1-calculoPrincipal(b)} asegura que la frecuencia final
+no es menor que la menor frecuencia soportada. Destacar que de esta manera
+se consigue que el cambio de frecuencia en el cluster se realice de manera
+escalonada según varía el tamaño de las colas.\\
+%%%
+\comentario{Cambiar el nombre de las ctes para ser mas autoexplicativo}
+\comentario{Comprobar el resultado final poniendo el label y caption
+  como opción de lstlisting, en vez de meterlo en una figura. Observar la
+  tableoffigures o equivalente}
+%%%
+\begin{figure}
+  \centering
+
+  \begin{lstlisting}[language=C++]
+int P1(int bigQueueSize, int littleQueueSize){
+  int nxtIdx;
+      
+  if( littleQueueSize==0 ) nxtIdx = FreqCfg::maxIdxLittle; |\label{s5:lst:p1-casoEsp1}|
+  else if( bigQueueSize==0 ) nxtIdx = 0;                   |\label{s5:lst:p1-casoEsp2}|
+  else
+    nxtIdx = min((bigQueueSize / littleQueueSize), |\label{s5:lst:p1-calculoPrincipal(a)}|
+                  FreqCfg::maxIdxLittle, );        |\label{s5:lst:p1-calculoPrincipal(b)}|
+
+  return changeLittleFreq(nxtIdx);
+}
+\end{lstlisting}
+
+  \caption{Fragmento de código esquemático para la política P1.}
+  \label{s5:fig:listing-p1}
+\end{figure}
+
+Adicionalmente al comportamiento general de esta política, hay que
+distinguir dos casos especiales que merecen ser mencionados: el caso en el
+que no exista ninguna tarea crítica lista para ser ejecutada, y el caso
+opuesto en el que todas las tareas listas sean críticas y los cores lentos
+estén totalmente ociosos. En estos casos, las
+líneas~\ref{s5:lst:p1-casoEsp1}-\ref{s5:lst:p1-casoEsp2} se encargan de
+aumentar la frecuencia al máximo directamente en caso de que todas las
+tareas sean no críticas, o de disminuir la frecuencia al mínimo en caso de
+que no exista ninguna tarea no crítica que ejecutar.
+
 
 \subsection{P2}
 
@@ -21,4 +120,13 @@
 
 \subsection{\ldots}
 
+
 \section{Resultados experimentales}
+
+
+
+%-- Configuraciones para emacs --
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "./principal.tex"
+%%% End:
