@@ -39,7 +39,7 @@ retrase la finalización de una tarea crítica, ya que aunque su ejecución
 puede comenzar antes (pues se disponen de más cores para distribuir el
 mismo número de tareas), el rendimiento de los cores LITTLE es mucho
 inferior que el de los cores big, provocando retrasos en la ejecución,
-incluso llegando a aumentar el problema del cuello de botella.\\
+incluso llegando a aumentar el problema del cuello de botella.
 
 La política P1 intenta reducir este problema desde un enfoque distinto. La
 idea principal que se encuentra detrás de esta política es la de aprovechar
@@ -55,7 +55,7 @@ no críticas, se espera que el impacto final en el rendimiento no sea muy
 elevado.\\
 La forma de aplicar esta política sobre botlev consiste en monitorizar
 constantemente el número de tareas tanto críticas como no críticas listas
-para ser ejecutadas (reflejado en el tamaño de las colas internas al
+para ser ejecutadas (reflejado en el tamaño de las colas internas del
 planificador), y actuar en función a la relación entre el tamaño de ambas
 colas. La figura~\ref{s5:fig:listing-p1} muestra un fragmento esquemático
 del código encargado de realizar esta tarea. Este método es invocado cada
@@ -75,7 +75,7 @@ no es menor que la menor frecuencia soportada. Destacar que de esta manera
 se consigue que el cambio de frecuencia en el cluster se realice de manera
 escalonada según varía el tamaño de las colas.\\
 %%%
-\comentario{Cambiar el nombre de las ctes para ser mas autoexplicativo}
+\comentario{La línea 8 es un poco desconcertante}
 \comentario{Comprobar el resultado final poniendo el label y caption
   como opción de lstlisting, en vez de meterlo en una figura. Observar la
   tableoffigures o equivalente}
@@ -85,15 +85,16 @@ escalonada según varía el tamaño de las colas.\\
 
   \begin{lstlisting}[language=C++]
 int P1(int bigQueueSize, int littleQueueSize){
-  int nxtIdx;
+  int nxtFreq;
       
-  if( littleQueueSize==0 ) nxtIdx = FreqCfg::maxIdxLittle; |\label{s5:lst:p1-casoEsp1}|
-  else if( bigQueueSize==0 ) nxtIdx = 0;                   |\label{s5:lst:p1-casoEsp2}|
-  else
-    nxtIdx = min((bigQueueSize / littleQueueSize), |\label{s5:lst:p1-calculoPrincipal(a)}|
-                  FreqCfg::maxIdxLittle, );        |\label{s5:lst:p1-calculoPrincipal(b)}|
-
-  return changeLittleFreq(nxtIdx);
+  if( littleQueueSize==0 ) nxtFreq = FreqCfg::minLittleFreq; |\label{s5:lst:p1-casoEsp1}|
+  else if( bigQueueSize==0 ) nxtFreq = FreqCfg::maxLittleFreq; |\label{s5:lst:p1-casoEsp2}|
+  else{
+    int idx = min((bigQueueSize / littleQueueSize), |\label{s5:lst:p1-calculoPrincipal(a)}|
+                   FreqCfg::maxIdxLittle );         |\label{s5:lst:p1-calculoPrincipal(b)}|
+    nxtFreq = FreqCfg::littleFreqs[idx];
+  }
+  return changeLittleFreq(nxtFreq);
 }
 \end{lstlisting}
 
