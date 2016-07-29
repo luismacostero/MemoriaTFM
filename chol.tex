@@ -255,67 +255,58 @@ encuentra desactivado por defecto.
 
 \subsubsection{Implementación multihebra de BLAS-3}
 
-An alternative to the runtime-based (i.e., task-parallel) approach to execute 
-DLA operations on multi-threaded architectures consists in relying on
-a library of specialized kernels that statically partitions the work among the computational resources, 
-or leverages a simple schedule mechanism such as those available, e.g.,
-in OpenMP. For DLA operations with few and/or simple data dependencies, as is the case of the BLAS-3, 
-and/or when the number of cores in the target
-architecture is small, this option can avoid the costly 
-overhead of a sophisticated task scheduler, providing a more efficient solution.
-Currently this is preferred option for all high performance implementations of the BLAS for multicore processors,
-being adopted in both commercial and open source packages such as, e.g., 
-AMD ACML, IBM ESSL, Intel MKL, GotoBLAS~\cite{Goto:2008:AHP}, OpenBLAS~\cite{OpenBLAS} and BLIS.
-%We next introduce the general principles underlying our library implementation of the BLAS-3, based on BLIS, for AMPs.
+A la hora de explotar el paralelismo potencial de una arquitectura, una segunda alternativa al efoque 
+basado en planificación a nivel de tareas (es decir, explotando paralelismo
+a nivel de tareas) consiste en el uso de kernels ya paralelizados, es decir, implementaciones
+de rutinas que particionan estáticamente el trabajo entre los recursos computacionales existentes, o 
+lo hacen aprovechando mecanismos sencillos de planificación como aquellos ofrecidos por OpenMP. Desde
+este punto de vista, el paralelismo no se extrae ya a nivel de tarea, sino a nivel de datos, de forma
+interna a cada tarea. Por ejemplo, en el ámbito del álgebra lineal, donde las dependencias de datos
+internos a cada tarea es sencilla, o cuando el número de núcleos en el sistema es reducido, esta 
+opción típicamente conlleva menos sobrecarga en tiempo de ejecución, y por tanto proporciona
+una solución más eficiente desde el punto de vista del rendimiento. A día de hoy, esta es la
+opción preferida y adoptada en bibliotecas comerciales y de software libre, como por ejemplo
+AMD ACML, IBM ESSL, Intel MKL, GotoBLAS~\cite{Goto:2008:AHP}, OpenBLAS~\cite{OpenBLAS} o BLIS~\cite{BLIS}.
 
-%BLIS mimics GotoBLAS to implement the Level-3 BLAS as three nested loops
-%around two packing routines, which accommodate the data in the higher levels of the cache hierarchy in a specific
-%manner, plus a macro-kernel in charge of performing the actual computations.  
-%In~\cite{asymBLIS}, we introduced an asymmetry-aware implementation of the matrix multiplication (\gemm) in BLIS, 
-%specifically tailored for the Exynos 5422 SoC.
-%The guidelines underlying our version of \gemm are
-%an architecture-aware configuration of the loop strides, in order to preserve an optimal utilization of the cache hierarchy,
-%and a dynamic scheduling of the macro-kernels to the cores that balances the workload.
+A modo de ejemplo, y dado que utilizaremos BLIS como biblioteca subyacente para la ejecución de tareas
+individuales durante el resto del trabajo, se describe brevemente su funcionamiento, así como la posibilidad
+de adaptar su paralelización a una arquitectura asimétrica.
 
-BLIS in particular mimics GotoBLAS to orchestrate all BLAS-3 kernels (including the matrix multiplication, \gemm) as three nested loops
-around two packing routines, which accommodate the data in the higher levels of the cache hierarchy,
-and a {\em macro-kernel} in charge of performing the actual computations.
-%BLIS mimics GotoBLAS to organize \gemm as three nested loops embedding two packing routines and
-%a {\em macro-kernel}~\cite{BLIS1}. 
-Internally, BLIS implements the macro-kernel as two additional loops around a {\em micro-kernel} that, in turn,
-boils down to a loop around a symmetric rank-1 update. For the purpose of the following discussion, we will only consider the three outermost loops 
-in the BLIS implementation of \gemm for the multiplication
-$C:=C+A\cdot B$, where $A,B,C$ are respectively $m \times k$, $k\times n$ and $m \times n$ matrices, stored
-in arrays {\tt A}, {\tt B} and {\tt C}; see Listing~\ref{lst:gemm}.
-In the code, {\tt mc}, {\tt nc}, {\tt kc} are cache configuration parameters that need to be adjusted for performance taking
-into account, among others, the latency of the floating-point units, number of vector
-registers, and size/associativity degree of the cache levels.
+BLIS implementa el enfoque algorítmico introducido por la biblioteca de álgebra lineal GotoBLAS, ampliamente
+utilizada a día de hoy en multitud de arquitecturas. Este enfoque plantea la implementación de todas las rutinas
+BLAS de nivel 3 (incluyendo el producto de matrices, \gemm) como tres bucles anidados sobre dos rutinas de 
+empaquetado de datos, cuya finalidad es dirigir bloques de los operandos fuente a través de la jerarquía
+de memoria, y un {\em macro-kernel} cuya función es la ejecución de las operaciones aritméticas asociadas
+a cada operación. Internamente, BLIS implementa dicho macro-kernel como dos bucles adicionales sobre un 
+{\em micro-kernel} que, a su vez, está formado por un bucle sobre una actualización de rango 1.
 
+Para la siguiente descripción, únicamente consideraremos los tres bucles externos en la implementación de 
+BLIS para \gemm, para el producto $C:=C+A\cdot B$, donde $A,B,C$ son matrices de dimensión $m \times k$, $k\times n$ 
+y $m \times n$ respectivamente, almacenadas en los arrays {\tt A}, {\tt B} y {\tt C}; véase el código de la Figura~\ref{lst:gemm}.
+En dicho código, {\tt mc}, {\tt nc}, {\tt kc} con parámetros de configuradción que necesitan ser sintonizados para cada
+arquitectura teniendo en cuenta, entre otros, factores como la latencia de las unidades de punto flotante, número
+de registros vectoriales y tamaño/grado de asociatividad de cada nivel de cache~\cite{BLIS4}.
 
-%\input{blis_gemm}
-\lstinputlisting[float=th!,frame=lines,caption=High performance implementation of \gemm in BLIS.,label=lst:gemm]{Codes/gemm.c}
+\lstinputlisting[float=th!,frame=lines,caption=Implementación de altas prestaciones de \gemm en BLIS.,label=lst:gemm]{Codes/gemm.c}
 
 \subsubsection{Implementación multihebra consciente de la asimetría}
 
-The implementation of \gemm in BLIS has been demonstrated to deliver high performance on a wide
-range of multicore and many-core SMPs~\cite{BLIS2,BLIS3}. These studies offered a few relevant
-insights that guided the parallelization of \gemm (and also other Level-3 BLAS) on the ARM big.LITTLE architecture under the GTS software execution model.
-Concretely, the architecture-aware 
-multi-threaded parallelization of \gemm in~\cite{asymBLIS} integrates the following three techniques:
+La implementación de \gemm\ en BLIS obtiene un rendimiento cercano al rendimiento pico de la arquitectura,
+como tanto en sistemas multinúcleo como sistemas aceleradores~\cite{BLIS2,BLIS3}. 
+Estos estudios han derivado en versiones de la implementación conscientes de la asimetría sobre arquitecturas ARM big.LITTLE
+bajo el modelo de ejecución GTS. Concretamente, versión multihebra consciente de la asimetría descrita en~\cite{asymBLIS} 
+integra las siguientes tres técnicas:
 \begin{itemize}
-\item A dynamic 1-D partitioning of the iteration space to distribute the workload in
-      either Loop~1 or Loop~3 of BLIS \gemm between the two clusters.
-\item A static 1-D partitioning of the iteration space that distributes the workload of one of the loops 
-      internal to the macro-kernel between the cores of the same cluster.
-\item A modification of the control tree that governs the multi-threaded parallelization of BLIS \gemm in order to
-      accommodate different loop strides for each type of core architecture.
+\item Un particionado dinámico 1-D del espacio de iteraciones para distribuir la carga de los bucles~1 y~3 sobre los dos
+	clusters (big y LITTLE).
+\item Un particionado estático 1-D del espacio de iteraciones para distribuir la carga de uno de los  bucles internos entre los núcleos
+	del mismo cluster.
+\item Una modificación de los árboles de control que gobiernan la paralelización multihebra en BLIS para utilizar distintos {\em strides} en 
+	los bucles, de modo que éstos se adapten a cada una de las arquitecturas subyacentes.
 \end{itemize}
 
-The strategy is general and can be applied to a generic AMP,
-consisting of any combination of fast/slow cores sharing the main memory, 
-as well as to all other Level-3 BLAS operations.
+En general, esta estrategia puede ser aplicada a AMPs genéricos, consistentes en cualquier combinación de núcleos lentos y rápidos, y a cualquiera
+de las rutinas BLAS implementadas en la biblioteca. Así, BLIS se convierte en una biblioteca que implementa rutinas básicas de álgebra lineal que,
+internamente, explotan la asimetría de la arquitectura subyacente; esta característica será aprovechada en el resto del trabajo en combinación
+con planificadores de tareas ``clásicos'' (no conscientes de la asimetría), como se describe en la siguiente sección.
 
-To close this section, we emphasize that 
-our work differs from~\cite{asymBLIS,OmpSsbigLITTLE} in that we address sophisticated DLA operations, 
-with a rich hierarchy of task dependencies, by leveraging a conventional runtime scheduler in combination with
-a data-parallel asymmetry-conscious implementation of the BLAS-3.
