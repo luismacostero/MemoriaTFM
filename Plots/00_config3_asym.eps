@@ -1,0 +1,495 @@
+%!PS-Adobe-3.0 EPSF-3.0
+%%Title: glps_renderer figure
+%%Creator: GL2PS 1.3.8, (C) 1999-2012 C. Geuzaine
+%%For: Octave
+%%CreationDate: Wed Apr 15 18:12:32 2015
+%%LanguageLevel: 3
+%%DocumentData: Clean7Bit
+%%Pages: 1
+%%BoundingBox: 0 0 560 420
+%%EndComments
+%%BeginProlog
+/gl2psdict 64 dict def gl2psdict begin
+0 setlinecap 0 setlinejoin
+/tryPS3shading false def % set to false to force subdivision
+/rThreshold 0.064 def % red component subdivision threshold
+/gThreshold 0.034 def % green component subdivision threshold
+/bThreshold 0.1 def % blue component subdivision threshold
+/BD { bind def } bind def
+/C  { setrgbcolor } BD
+/G  { 0.082 mul exch 0.6094 mul add exch 0.3086 mul add neg 1.0 add setgray } BD
+/W  { setlinewidth } BD
+/FC { findfont exch /SH exch def SH scalefont setfont } BD
+/SW { dup stringwidth pop } BD
+/S  { FC moveto show } BD
+/SBC{ FC moveto SW -2 div 0 rmoveto show } BD
+/SBR{ FC moveto SW neg 0 rmoveto show } BD
+/SCL{ FC moveto 0 SH -2 div rmoveto show } BD
+/SCC{ FC moveto SW -2 div SH -2 div rmoveto show } BD
+/SCR{ FC moveto SW neg SH -2 div rmoveto show } BD
+/STL{ FC moveto 0 SH neg rmoveto show } BD
+/STC{ FC moveto SW -2 div SH neg rmoveto show } BD
+/STR{ FC moveto SW neg SH neg rmoveto show } BD
+/FCT { FC translate 0 0 } BD
+/SR  { gsave FCT moveto rotate show grestore } BD
+/SBCR{ gsave FCT moveto rotate SW -2 div 0 rmoveto show grestore } BD
+/SBRR{ gsave FCT moveto rotate SW neg 0 rmoveto show grestore } BD
+/SCLR{ gsave FCT moveto rotate 0 SH -2 div rmoveto show grestore} BD
+/SCCR{ gsave FCT moveto rotate SW -2 div SH -2 div rmoveto show grestore} BD
+/SCRR{ gsave FCT moveto rotate SW neg SH -2 div rmoveto show grestore} BD
+/STLR{ gsave FCT moveto rotate 0 SH neg rmoveto show grestore } BD
+/STCR{ gsave FCT moveto rotate SW -2 div SH neg rmoveto show grestore } BD
+/STRR{ gsave FCT moveto rotate SW neg SH neg rmoveto show grestore } BD
+/P  { newpath 0.0 360.0 arc closepath fill } BD
+/LS { newpath moveto } BD
+/L  { lineto } BD
+/LE { lineto stroke } BD
+/T  { newpath moveto lineto lineto closepath fill } BD
+/STshfill {
+      /b1 exch def /g1 exch def /r1 exch def /y1 exch def /x1 exch def
+      /b2 exch def /g2 exch def /r2 exch def /y2 exch def /x2 exch def
+      /b3 exch def /g3 exch def /r3 exch def /y3 exch def /x3 exch def
+      gsave << /ShadingType 4 /ColorSpace [/DeviceRGB]
+      /DataSource [ 0 x1 y1 r1 g1 b1 0 x2 y2 r2 g2 b2 0 x3 y3 r3 g3 b3 ] >>
+      shfill grestore } BD
+/Tm { 3 -1 roll 8 -1 roll 13 -1 roll add add 3 div
+      3 -1 roll 7 -1 roll 11 -1 roll add add 3 div
+      3 -1 roll 6 -1 roll 9 -1 roll add add 3 div C T } BD
+/STsplit {
+      4 index 15 index add 0.5 mul
+      4 index 15 index add 0.5 mul
+      4 index 15 index add 0.5 mul
+      4 index 15 index add 0.5 mul
+      4 index 15 index add 0.5 mul
+      5 copy 5 copy 25 15 roll
+      9 index 30 index add 0.5 mul
+      9 index 30 index add 0.5 mul
+      9 index 30 index add 0.5 mul
+      9 index 30 index add 0.5 mul
+      9 index 30 index add 0.5 mul
+      5 copy 5 copy 35 5 roll 25 5 roll 15 5 roll
+      4 index 10 index add 0.5 mul
+      4 index 10 index add 0.5 mul
+      4 index 10 index add 0.5 mul
+      4 index 10 index add 0.5 mul
+      4 index 10 index add 0.5 mul
+      5 copy 5 copy 40 5 roll 25 5 roll 15 5 roll 25 5 roll
+      STnoshfill STnoshfill STnoshfill STnoshfill } BD
+/STnoshfill {
+      2 index 8 index sub abs rThreshold gt
+      { STsplit }
+      { 1 index 7 index sub abs gThreshold gt
+        { STsplit }
+        { dup 6 index sub abs bThreshold gt
+          { STsplit }
+          { 2 index 13 index sub abs rThreshold gt
+            { STsplit }
+            { 1 index 12 index sub abs gThreshold gt
+              { STsplit }
+              { dup 11 index sub abs bThreshold gt
+                { STsplit }
+                { 7 index 13 index sub abs rThreshold gt
+                  { STsplit }
+                  { 6 index 12 index sub abs gThreshold gt
+                    { STsplit }
+                    { 5 index 11 index sub abs bThreshold gt
+                      { STsplit }
+                      { Tm }
+                      ifelse }
+                    ifelse }
+                  ifelse }
+                ifelse }
+              ifelse }
+            ifelse }
+          ifelse }
+        ifelse }
+      ifelse } BD
+tryPS3shading
+{ /shfill where
+  { /ST { STshfill } BD }
+  { /ST { STnoshfill } BD }
+  ifelse }
+{ /ST { STnoshfill } BD }
+ifelse
+end
+%%EndProlog
+%%BeginSetup
+/DeviceRGB setcolorspace
+gl2psdict begin
+%%EndSetup
+%%Page: 1 1
+%%BeginPageSetup
+%%EndPageSetup
+mark
+gsave
+1.0 1.0 scale
+1 1 1 C
+492.722 44.9167 492.722 377.708 492.722 44.9167 T
+492.722 44.9167 492.722 377.708 492.722 377.708 T
+70.7778 377.708 492.722 377.708 70.7778 377.708 T
+70.7778 377.708 492.722 377.708 492.722 377.708 T
+70.7778 377.708 492.722 44.9167 70.7778 44.9167 T
+70.7778 377.708 492.722 377.708 492.722 44.9167 T
+0.5 W
+[16 0] 0 setdash
+0 0 0 C
+70.7778 44.9167 LS
+492.722 44.9167 LE
+70.7778 377.708 LS
+492.722 377.708 LE
+70.7778 377.708 LS
+492.722 377.708 LE
+70.7778 44.9167 LS
+492.722 44.9167 LE
+70.7778 44.9167 LS
+70.7778 377.708 LE
+492.722 44.9167 LS
+492.722 377.708 LE
+492.722 44.9167 LS
+492.722 377.708 LE
+70.7778 44.9167 LS
+70.7778 377.708 L
+70.7778 377.708 LE
+492.722 377.708 LS
+492.722 377.708 LE
+492.722 44.9167 LS
+492.722 44.9167 LE
+70.7778 44.9167 LS
+70.7778 44.9167 LE
+[0 3 1 3 1 3 1 3 1 0] 0 setdash
+70.7778 44.9167 LS
+70.7778 377.708 LE
+98.9074 44.9167 LS
+98.9074 377.708 LE
+127.037 44.9167 LS
+127.037 377.708 LE
+155.167 44.9167 LS
+155.167 377.708 LE
+183.296 44.9167 LS
+183.296 377.708 LE
+211.426 44.9167 LS
+211.426 377.708 LE
+239.556 44.9167 LS
+239.556 377.708 LE
+267.685 44.9167 LS
+267.685 377.708 LE
+295.815 44.9167 LS
+295.815 377.708 LE
+323.944 44.9167 LS
+323.944 377.708 LE
+352.074 44.9167 LS
+352.074 377.708 LE
+380.204 44.9167 LS
+380.204 377.708 LE
+408.333 44.9167 LS
+408.333 377.708 LE
+436.463 44.9167 LS
+436.463 377.708 LE
+464.593 44.9167 LS
+464.593 377.708 LE
+492.722 44.9167 LS
+492.722 377.708 LE
+[16 0] 0 setdash
+70.7778 44.9167 LS
+70.7778 49.1335 LE
+70.7778 377.708 LS
+70.7778 373.492 LE
+98.9074 44.9167 LS
+98.9074 49.1335 LE
+98.9074 377.708 LS
+98.9074 373.492 LE
+127.037 44.9167 LS
+127.037 49.1335 LE
+127.037 377.708 LS
+127.037 373.492 LE
+155.167 44.9167 LS
+155.167 49.1335 LE
+155.167 377.708 LS
+155.167 373.492 LE
+183.296 44.9167 LS
+183.296 49.1335 LE
+183.296 377.708 LS
+183.296 373.492 LE
+211.426 44.9167 LS
+211.426 49.1335 LE
+211.426 377.708 LS
+211.426 373.492 LE
+239.556 44.9167 LS
+239.556 49.1335 LE
+239.556 377.708 LS
+239.556 373.492 LE
+267.685 44.9167 LS
+267.685 49.1335 LE
+267.685 377.708 LS
+267.685 373.492 LE
+295.815 44.9167 LS
+295.815 49.1335 LE
+295.815 377.708 LS
+295.815 373.492 LE
+323.944 44.9167 LS
+323.944 49.1335 LE
+323.944 377.708 LS
+323.944 373.492 LE
+352.074 44.9167 LS
+352.074 49.1335 LE
+352.074 377.708 LS
+352.074 373.492 LE
+380.204 44.9167 LS
+380.204 49.1335 LE
+380.204 377.708 LS
+380.204 373.492 LE
+408.333 44.9167 LS
+408.333 49.1335 LE
+408.333 377.708 LS
+408.333 373.492 LE
+436.463 44.9167 LS
+436.463 49.1335 LE
+436.463 377.708 LS
+436.463 373.492 LE
+464.593 44.9167 LS
+464.593 49.1335 LE
+464.593 377.708 LS
+464.593 373.492 LE
+492.722 44.9167 LS
+492.722 49.1335 LE
+492.722 377.708 LS
+492.722 373.492 LE
+(128) 70.7778 39.9198 9 /Helvetica STC
+(384) 98.9074 39.9198 9 /Helvetica STC
+(640) 127.037 39.9198 9 /Helvetica STC
+(896) 155.167 39.9198 9 /Helvetica STC
+(1152) 183.296 39.9198 9 /Helvetica STC
+(1408) 211.426 39.9198 9 /Helvetica STC
+(1664) 239.556 39.9198 9 /Helvetica STC
+(1920) 267.685 39.9198 9 /Helvetica STC
+(2176) 295.815 39.9198 9 /Helvetica STC
+(2432) 323.944 39.9198 9 /Helvetica STC
+(2688) 352.074 39.9198 9 /Helvetica STC
+(2944) 380.204 39.9198 9 /Helvetica STC
+(3200) 408.333 39.9198 9 /Helvetica STC
+(3456) 436.463 39.9198 9 /Helvetica STC
+(3712) 464.593 39.9198 9 /Helvetica STC
+(3968) 492.722 39.9198 9 /Helvetica STC
+[0 3 1 3 1 3 1 3 1 0] 0 setdash
+70.7778 44.9167 LS
+492.722 44.9167 LE
+70.7778 95.3396 LS
+492.722 95.3396 LE
+70.7778 145.763 LS
+492.722 145.763 LE
+70.7778 196.186 LS
+492.722 196.186 LE
+70.7778 246.609 LS
+492.722 246.609 LE
+70.7778 297.032 LS
+492.722 297.032 LE
+70.7778 347.455 LS
+492.722 347.455 LE
+[16 0] 0 setdash
+70.7778 44.9167 LS
+74.9966 44.9167 LE
+492.722 44.9167 LS
+488.503 44.9167 LE
+70.7778 95.3396 LS
+74.9966 95.3396 LE
+492.722 95.3396 LS
+488.503 95.3396 LE
+70.7778 145.763 LS
+74.9966 145.763 LE
+492.722 145.763 LS
+488.503 145.763 LE
+70.7778 196.186 LS
+74.9966 196.186 LE
+492.722 196.186 LS
+488.503 196.186 LE
+70.7778 246.609 LS
+74.9966 246.609 LE
+492.722 246.609 LS
+488.503 246.609 LE
+70.7778 297.032 LS
+74.9966 297.032 LE
+492.722 297.032 LS
+488.503 297.032 LE
+70.7778 347.455 LS
+74.9966 347.455 LE
+492.722 347.455 LS
+488.503 347.455 LE
+(0) 65.7784 44.9167 9 /Helvetica SCR
+(5) 65.7784 95.3396 9 /Helvetica SCR
+(10) 65.7784 145.763 9 /Helvetica SCR
+(15) 65.7784 196.186 9 /Helvetica SCR
+(20) 65.7784 246.609 9 /Helvetica SCR
+(25) 65.7784 297.032 9 /Helvetica SCR
+(30) 65.7784 347.455 9 /Helvetica SCR
+(Problem size) 281.75 27.9198 9 /Helvetica STC
+(GFLOPS) 90 49.7784 211.312 9 /Helvetica SBCR
+(BLIS on ODROID-XU - Asymmetric using 4 fast and 4 slow cores) 281.75 387.708 9 /Helvetica SBC
+2 W
+[] 0 setdash
+0 0 1 C
+70.7778 81.7658 LS
+98.9074 266.848 L
+127.037 317.06 L
+155.167 343.683 L
+183.296 348.554 L
+211.426 358.346 L
+239.556 355.603 L
+267.685 362.692 L
+295.815 359.768 L
+323.944 366.091 L
+352.074 364.578 L
+380.204 364.387 L
+408.333 363.388 L
+436.463 368.935 L
+464.593 367.069 L
+492.722 366.988 LE
+0 0.5 0 C
+70.7778 66.8506 LS
+98.9074 234.689 L
+127.037 296.406 L
+155.167 331.299 L
+183.296 337.209 L
+211.426 351.408 L
+239.556 350.994 L
+267.685 358.84 L
+295.815 356.632 L
+323.944 364.034 L
+352.074 361.341 L
+380.204 366.464 L
+408.333 365.093 L
+436.463 367.765 L
+464.593 366.999 L
+492.722 368.047 LE
+1 0 0 C
+70.7778 79.6178 LS
+98.9074 254.696 L
+127.037 305.13 L
+155.167 337.551 L
+183.296 339.901 L
+211.426 353.102 L
+239.556 351.186 L
+267.685 360.464 L
+295.815 358.487 L
+323.944 364.477 L
+352.074 362.239 L
+380.204 364.608 L
+408.333 363.913 L
+436.463 367.261 L
+464.593 363.529 L
+492.722 365.879 LE
+0 0.75 0.75 C
+70.7778 65.8321 LS
+98.9074 190.619 L
+127.037 246.367 L
+155.167 286.624 L
+183.296 312.854 L
+211.426 332.469 L
+239.556 334.304 L
+267.685 344.147 L
+295.815 347.767 L
+323.944 351.62 L
+352.074 354.12 L
+380.204 358.699 L
+408.333 359.627 L
+436.463 361.089 L
+464.593 357.448 L
+492.722 359.496 LE
+0.75 0 0.75 C
+70.7778 64.9648 LS
+98.9074 194.239 L
+127.037 245.096 L
+155.167 287.118 L
+183.296 312.209 L
+211.426 330.795 L
+239.556 334.415 L
+267.685 344.591 L
+295.815 346.638 L
+323.944 352.618 L
+352.074 352.981 L
+380.204 357.378 L
+408.333 360.07 L
+436.463 362.38 L
+464.593 362.198 L
+492.722 361.17 LE
+0.75 0.75 0 C
+70.7778 65.7111 LS
+98.9074 207.924 L
+127.037 278.698 L
+155.167 310.323 L
+183.296 322.677 L
+211.426 332.66 L
+239.556 340.95 L
+267.685 345.196 L
+295.815 348.12 L
+323.944 352.356 L
+352.074 355.633 L
+380.204 356.571 L
+408.333 358.628 L
+436.463 360.978 L
+464.593 361.059 L
+492.722 359.365 LE
+1 1 1 C
+490.131 47.5074 490.131 133.052 490.131 47.5074 T
+490.131 47.5074 490.131 133.052 490.131 133.052 T
+390.984 133.052 490.131 133.052 390.984 133.052 T
+390.984 133.052 490.131 133.052 490.131 133.052 T
+390.984 133.052 490.131 47.5074 390.984 47.5074 T
+390.984 133.052 490.131 133.052 490.131 47.5074 T
+0.5 W
+[16 0] 0 setdash
+0 0 0 C
+390.984 47.5074 LS
+490.131 47.5074 LE
+390.984 133.052 LS
+490.131 133.052 LE
+390.984 133.052 LS
+490.131 133.052 LE
+390.984 47.5074 LS
+490.131 47.5074 LE
+390.984 47.5074 LS
+390.984 133.052 LE
+490.131 47.5074 LS
+490.131 133.052 LE
+490.131 47.5074 LS
+490.131 133.052 LE
+390.984 47.5074 LS
+390.984 133.052 L
+390.984 133.052 LE
+490.131 133.052 LS
+490.131 133.052 LE
+490.131 47.5074 LS
+490.131 47.5074 LE
+390.984 47.5074 LS
+390.984 47.5074 LE
+(SGEMM NN) 415.596 125.923 9 /Helvetica SCL
+(SHERK LT) 415.596 111.666 9 /Helvetica SCL
+(SHER2K LNN) 415.596 97.4085 9 /Helvetica SCL
+(STRMM LLNN) 415.596 83.151 9 /Helvetica SCL
+(STRMM3 LLNNN) 415.596 68.8936 9 /Helvetica SCL
+(STRSM LLNN) 415.596 54.6362 9 /Helvetica SCL
+[] 0 setdash
+0 0 1 C
+393.575 125.923 LS
+413.005 125.923 LE
+0 0.5 0 C
+393.575 111.666 LS
+413.005 111.666 LE
+1 0 0 C
+393.575 97.4085 LS
+413.005 97.4085 LE
+0 0.75 0.75 C
+393.575 83.151 LS
+413.005 83.151 LE
+0.75 0 0.75 C
+393.575 68.8936 LS
+413.005 68.8936 LE
+0.75 0.75 0 C
+393.575 54.6362 LS
+413.005 54.6362 LE
+grestore
+showpage
+cleartomark
+%%PageTrailer
+%%Trailer
+end
+%%EOF
