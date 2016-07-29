@@ -2,7 +2,7 @@ En esta seccion se describen brevemente distintos enfoques software tanto a nive
 en tiempo de ejecución como de bibliotecas matemáticas, específicamente desarrollados para arquitecturas 
 asimétricas (o heterogéneas).
 
-\section{Planificación en tiempo de ejecución de operaciones complejas}
+\section{Planificación de tareas en tiempo de ejecución}
 
 \subsection{Planificación de tareas en la Factorización de Cholesky}
 
@@ -14,7 +14,7 @@ conclusiones extraídas sobre ella pueden ser aplicadas a otro tipo de operacion
 utilizadas en ciencia e ingeniería.
 %
 La Factorización de Cholesky descompone una matriz simétrica definida positiva
-$A$ en el producto $A=U^TU$, donde el factor de Cholesky $U$ de dimensión $n \times n$ $U$ es una matriz triangular
+$A$ en el producto $A=U^TU$, donde el factor de Cholesky $U$ de dimensión $n \times n$ es una matriz triangular
 superior~\cite{GVL3}. 
 
 \lstinputlisting[float=th!,frame=lines,caption=Implementación en lenguaje C de la factorización de Cholesky orientada a bloques.,label=lst:chol]{Codes/cholesky.c}
