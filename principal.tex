@@ -57,6 +57,7 @@
 \usepackage[spanish]{babel}
 \selectlanguage{spanish}
 \usepackage{eurosym}
+\usepackage{xspace}
 
 % +--------------------------------------------------------------------+
 % | Now, we add in all external packages that we will use throughout   |
@@ -178,6 +179,17 @@
 \newcommand{\Todo}[1]{{\large \color{red} \textbf{TODO: }#1 }}
 \newcommand{\comentario}[1]{\marginpar{Comentario}{#1}{}}
 \newcommand{\rev}[1]{{\color{green}#1}}
+
+%%%%%%%%%%%%%%%%%%%%  MACROS  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\input{macros}
+\newcommand{\gemm}{{\sc gemm}\xspace}
+\newcommand{\syrk}{{\sc syrk}\xspace}
+\newcommand{\trsm}{{\sc trsm}\xspace}
+\newcommand{\Jc}{{\cal J}_c}
+\newcommand{\Pc}{{\cal P}_c}
+\newcommand{\Ic}{{\cal I}_c}
+%%%%%%%%%%%%%%%%%%%%  END MACROS  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 
 % +--------------------------------------------------------------------+
