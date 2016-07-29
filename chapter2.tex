@@ -45,6 +45,34 @@ de la carga computacional asociada a cada uno de ellos y la disponibilidad de n�
 
 \end{description}
 
+\begin{figure}%[tbh!]
+ \centering
+  \begin{subfigure}{.75\textwidth}
+   \centering
+   \includegraphics[width=0.4\textwidth]{Figures/Models/clustered.pdf}
+   \caption{CSM}
+  \end{subfigure}
+
+	\medskip
+
+  \begin{subfigure}{.75\textwidth}
+   \centering
+   \includegraphics[width=0.45\textwidth]{Figures/Models/iks.pdf}
+   \caption{CPUM}
+  \end{subfigure}
+
+	\medskip
+
+  \begin{subfigure}{.75\textwidth}
+   \centering
+   \includegraphics[width=0.6\textwidth]{Figures/Models/gts.pdf}
+   \caption{GTS}
+  \end{subfigure}
+   \caption{Modos de operación de las arquitecturas big.LITTLE actuales.}
+   \label{fig:modes}
+\end{figure}
+
+
 La Figura~\ref{fig:modes} ofrece una visión esquemática de estos tres modelos de ejecución
 sobre arquitecturas big.LITTLE modernas. GTS es la solución más flexible, ya que permite al planificador
 del sistema operativo asignar hebras a cualquiera de los núcleos disponibles, es decir, todos
