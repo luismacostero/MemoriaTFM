@@ -265,7 +265,7 @@ Table~\ref{tab:optimal_bs_sym} and the performance of BLIS reported in Figure~\r
 of problem dimensions, the optimal block size is significantly smaller, and both BLIS implementations attain similar
 performance rates.
 
-\begin{figure}[t]
+\begin{figure}%[t]
 \centering
 \includegraphics[width=0.49\textwidth]{Plots/Orig_runtime/plot_1_th}
 \includegraphics[width=0.49\textwidth]{Plots/Orig_runtime/plot_2_th}
@@ -472,6 +472,253 @@ a revamp of the runtime task scheduler for AMPs. In addition, our approach rende
 gains which are, for all problems cases, comparable with those of ad-hoc asymmetry-conscious schedulers; 
 for medium to large matrices, it clearly outperforms the efficiency attained with a conventional 
 asymmetry-oblivious scheduler.
+
+\subsection{Extended performance analysis}
+
+We next provide further details on the performance behavior of each one of the aforementioned runtime configurations.
+The execution traces in this section have all been extracted with the {\tt Extrae} instrumentation
+tool and analyzed with the visualization package {\tt Paraver}~\cite{Paraver}. 
+The results correspond to the Cholesky factorization of a single problem with matrix dimension {\tt n}~=~6,144 and 
+block size {\tt b}~=~448.
+
+\subsubsection{General task execution overview.}
+
+Figure~\ref{fig:traces_tasks} reports complete execution traces for each runtime configuration. 
+At a glance, a number of coarse remarks can be
+extracted from the trace:
+\begin{itemize}
+\item From the perspective of total execution time (i.e., {\em time-to-solution}), the conventional OmpSs runtime combined with 
+      the asymmetric BLIS implementation attains the best results, followed by the Botlev-OmpSs runtime configuration. It is worth pointing out that
+      an asymmetry-oblivious runtime which spawns 8~worker threads, with no further considerations, yields the worst performance by far. In this case, the
+      load imbalance and long idle periods, especially as the amount of concurrency decreases in the final part of the trace, entail
+      a huge performance penalty. 
+\item The flag marks indicating task initialization/completion reveal that 
+      the asymmetric BLIS implementation (which employs the combined resources from a VC) requires less time per task than 
+      the two alternatives based on a sequential BLIS. An effect to note specifically in the Botlev-OmpSs configuration is the
+      difference in performance between tasks of the same type, when
+      executed by a big core (worker threads~5 to~8) or a LITTLE one (worker threads~1 to~4).
+\item The Botlev-OmpSs task scheduler embeds a (complex) scheduling strategy that includes priorities,
+      advancing the execution of tasks in the critical path and, whenever possible, assigning them to fast cores (see, for 
+      example, the tasks for the factorization of diagonal blocks, 
+      colored in yellow). This yields an execution timeline that is more compact during the first stages of the parallel execution, 
+      at the cost of longer idle times when the degree of concurrency decreases (last iterations of the factorization). 
+      Although possible, a priority-aware technique has not been applied in our experiments with the conventional OmpSs setups
+      and remains part of future work.
+\end{itemize}
+
+
+\begin{figure}%[t]
+\centering
+	\begin{subfigure}{\textwidth}
+   \includegraphics[width=\textwidth]{Plots/Traces/sym_8cores_tasks.png}
+		\caption{OmpSs - Sequential BLIS (8 worker threads)} 
+	\end{subfigure}
+	\begin{subfigure}{\textwidth}
+   \includegraphics[width=\textwidth]{Plots/Traces/sym_tasks.png}
+ \caption{OmpSs - Sequential BLIS (4 worker threads)} 
+	\end{subfigure}
+	\begin{subfigure}{\textwidth}
+   \includegraphics[width=\textwidth]{Plots/Traces/asym_tasks.png}
+		\caption{OmpSs - Asymmetric BLIS (4 worker threads)}
+	\end{subfigure}
+	\begin{subfigure}{\textwidth}
+   \includegraphics[width=\textwidth]{Plots/Traces/botlev_tasks.png}
+		\caption{Botlev-OmpSs - Sequential BLIS (8 worker threads, 4+4)}
+	\end{subfigure}
+\caption{Execution traces of the three runtime configurations for the Cholesky factorization ({\tt n}~=~6,144, 
+{\tt b}~=~448). 
+%Task colors match with those in Figure~\ref{fig:dag}. Sections in light blue correspond to idle time. 
+The timeline in each row collects the tasks executed by a single worker thread. 
+Tasks are colored following the convention in Figure~\ref{fig:dag};
+phases colored in white between tasks represent idle times.
+The green flags mark task initialization/completion. 
+%ENRIQUE, FIJATE EN VARIAS COSAS: LA DIFERENCIA EN TIEMPOS DE EJECUCION DE LAS TAREAS EN BOTLEV ENTRE LOS CUATRO PRIMEROS CORES -LENTOS- Y LOS CUATRO ULTIMOS -RAPIDOS- (he
+%anyadido banderitas para que se vea mejor). MIRA
+%TAMBIEN COMO ADELANTA CHOLESKY: AQUI HAY PRIORIDADES, EN LAS OTRAS DOS CONFIGURACIONES, AUNQUE PODRIA, NO LAS HAY. FIJATE TAMBIEN EN COMO BOTLEV COMPACTA
+%TANTO LAS TAREAS QUE PENALIZA MUCHISIMO EN LA FASE FINAL DE LA EJECUCION, CUANDO NO QUEDA PARALELISMO. SI NO FUERA POR ESO, BARRERIA EN RENDIMIENTO AL RESTO.
+}
+\label{fig:traces_tasks}
+\end{figure}
+
+We next provide a quantitative analysis on the task duration and a more detailed study of 
+the scheduling strategy integrated in each configuration.
+
+\subsubsection{Task duration.}
+ 
+Table~\ref{tab:2dp_tasks} reports the average execution time per type of task for each worker thread.
+%In the conventional runtime setups, 
+These results show that the execution time per individual type of task is considerably shorter
+for our multithreaded/asymmetric BLIS implementation than for the alternatives based on a sequential
+version of BLIS. The only exception is the factorization of the diagonal block ({\tt dpotrf}) as this is
+an LAPACK-level routine, and therefore it is not available in BLIS. Inspecting the task execution time of
+the Botlev-OmpSs configuration, we observe a remarkable difference depending
+on the type of core tasks are mapped to. For example, the average execution times for {\tt dgemm}
+range from more than 400~ms on a LITTLE core, to roughly 90~ms on a big core. This
+behavior is reproduced for all types of tasks.
+
+%To illustrate these facts, Figure~\ref{fig:traces_task_duration} represents a detailed histogram of the execution times 
+%for the {\tt dgemm} task instantiations in the task-parallel executions. Each bin corresponds to the amount of tasks
+%with a given execution time while rows correspond to different worker threads. Comparing conventional runtimes (traces (a) and (b)), 
+%there is a clear deviation in the average execution times towards faster executions, that is, the average time to execute a task
+%using the asymmetry-aware BLIS implementation is shorter. The histogram for Botlev (trace (c)) 
+%exhibits two different peaks, corresponding to tasks executed on the big or on the LITTLE cores, respectively. Note that tasks executing on the fast
+%cores do it at the same performance rate as those for the conventional runtime setup using a sequential BLIS implementation. 
+%A similar behavior has been observed for the rest of the BLAS-3 tasks involved in the computation.
+
+%\begin{figure}%[t]
+%\centering
+ %\subfigure[OmpSs + Symmetric BLIS]{
+   %\includegraphics[width=\textwidth]{Plots/Traces/sym_task_duration_histogram.png}
+%}
+ %\subfigure[OmpSs + Asymmetric BLIS]{
+   %\includegraphics[width=\textwidth]{Plots/Traces/asym_task_duration_histogram.png}
+%}
+ %\subfigure[Botlev-OmpSs - 4+4 threads]{
+   %\includegraphics[width=\textwidth]{Plots/Traces/botlev_task_duration_histogram.png}
+%}
+%\caption{Task time duration histogram for {\tt dgemm} tasks on the three studied runtime configurations for the Cholesky factorization ({\tt n}~=~6,144, {\tt b}~=~448).  
+%Rows correspond to worker threads in the execution. Columns correspond to time bins. Gradient color indicates the number of tasks in the corresponding bin (ranging
+%from light green to dark blue).}
+%\label{fig:traces_task_duration}
+%\end{figure}
+
+
+\begin{table}%[t]
+\centering
+\caption{Average time (in ms) per task and worker thread in the Cholesky factorization  ({\tt n}~=~6,144, 
+{\tt b}~=~448), for the three runtime configurations.}
+\label{tab:2dp_tasks}
+
+\ra{1.2}
+\ca{2pt}
+
+\renewcommand{\fg}[1]{{#1}} 
+\renewcommand{\br}[1]{{#1}} 
+
+{\scriptsize
+\begin{tabular}{crrrrrrrrrrrrrrr} 
+   	\toprule
+                 & \phantom{a} & \multicolumn{4}{c}{OmpSs - Seq. BLIS} & \phantom{ab} & \multicolumn{4}{c}{OmpSs - Asym. BLIS} & \phantom{ab} & \multicolumn{4}{c}{Botlev-OmpSs - Seq. BLIS} \\ 
+                 & \phantom{a} & \multicolumn{4}{c}{(4 worker threads)} & \phantom{ab} & \multicolumn{4}{c}{(4 worker threads)} & \phantom{ab} & \multicolumn{4}{c}{(8 worker threads, 4+4)} \\ 
+                                          \cmidrule{3-6}                                         \cmidrule{8-11}                                      \cmidrule{13-16}
+                       & \phantom{a} &    {\tt dgemm} & {\tt dtrsm}& {\tt dsyrk}& {\tt dpotrf}  & \phantom{ab} & {\tt dgemm}  & {\tt dtrsm} & {\tt dsyrk} & {\tt dpotrf}& \phantom{ab} & {\tt dgemm} & {\tt dtrsm} & {\tt dsyrk} & {\tt dpotrf}         \\ \hline 
+	 {\sc wt 0}    & \phantom{a} &    \br{89.62} & \fg{48.12} & \fg{47.14} & \fg{101.77}    & \phantom{ab} & \fg{79.82}  & \fg{42.77}  & \fg{44.42}  & \fg{105.77}  & \phantom{ab} & \fg{406.25} & \fg{216.70} & \fg{--} & \fg{--}    \\ \cline{3-16}
+	 {\sc wt 1}    & \phantom{a} &    \br{88.96} & \br{48.10} & \fg{47.14} & \fg{--}      & \phantom{ab} & \fg{78.65}  & \fg{42.97}  & \fg{44.56}  & \fg{76.35}  & \phantom{ab} & \fg{408.90} & \fg{207.41} & \fg{212.55} & \fg{--}    \\ \cline{3-16}
+	 {\sc wt 2}    & \phantom{a} &    \br{89.02} & \br{48.36} & \br{47.18} & \fg{87.22}    & \phantom{ab} & \fg{79.14}  & \fg{43.14}  & \fg{44.60}  & \fg{85.98}  & \phantom{ab} & \fg{415.31} & \fg{230.07} & \fg{212.56} & \fg{--}    \\ \cline{3-16}
+	 {\sc wt 3}    & \phantom{a} &    \br{90.11} & \br{48.51} & \br{47.42} & \fg{--}      & \phantom{ab} & \fg{79.28}  & \fg{43.10}  & \fg{44.59}  & \fg{67.73}  & \phantom{ab} & \fg{410.84} & \fg{216.95} & \fg{216.82} & \fg{137.65}    \\ \cline{3-16}
+	 {\sc wt 4}    & \phantom{a} &    \br{--} & \br{--} & \br{--} & \fg{--} & \phantom{ab} & \fg{--}  & \fg{--} & \fg{--} & \fg{--} & \phantom{ab} & \fg{90.97} & \fg{48.97} & \fg{48.36} & \fg{--}    \\ \cline{3-16}
+	 {\sc wt 5}    & \phantom{a} &    \br{--} & \br{--} & \br{--} & \fg{--} & \phantom{ab} & \fg{--}  & \fg{--} & \fg{--} & \fg{--} & \phantom{ab} & \fg{90.61} & \fg{48.86} & \fg{48.16} & \fg{90.78}    \\ \cline{3-16}
+	 {\sc wt 6}    & \phantom{a} &    \br{--} & \br{--} & \br{--} & \fg{--} & \phantom{ab} & \fg{--}  & \fg{--} & \fg{--} & \fg{--} & \phantom{ab} & \fg{91.28} & \fg{49.43} & \fg{47.97} & \fg{89.58}    \\ \cline{3-16}
+	 {\sc wt 7}    & \phantom{a} &    \br{--} & \br{--} & \br{--} & \fg{--} & \phantom{ab} & \fg{--}  & \fg{--} & \fg{--} & \fg{--} & \phantom{ab} & \fg{91.60} & \fg{49.49} & \fg{48.62} & \fg{95.43}    \\ \bottomrule
+	 %{\sc TOTAL}   & \phantom{a} &    \br{25.57} & \br{3.76} & \br{3.68} & \fg{1.24} & \phantom{ab} & \fg{22.65}  & \fg{3.35} & \fg{3.47} & \fg{1.26} & \phantom{ab} & \fg{44.07} & \fg{6.51} & \fg{6.12} & \fg{3.14}    \\ \bottomrule
+	 {\sc Avg.}     & \phantom{a} &    \br{89.43} & \br{48.27} & \br{47.22} & \fg{94.49} & \phantom{ab} & \fg{79.22}   & \fg{42.99} & \fg{44.54} & \fg{83.96} & \phantom{ab} & \fg{250.72} & \fg{133.49} & \fg{119.29} & \fg{103.36}    \\ \bottomrule
+\end{tabular}
+}
+
+\end{table}
+
+\subsubsection{Task scheduling policies and idle times.}
+
+Figure~\ref{fig:traces_task_number} illustrates the task execution order determined by the Nanos++ task scheduler. 
+Here tasks are depicted using a color gradient, attending to the order in which they are encountered in the sequential code, 
+from the earliest to the latest.
+
+At runtime, the task scheduler in Botlev-OmpSs issues tasks to execution out-of-order depending on their criticality. 
+The main idea behind this scheduling policy is to track the criticality of each task and, when possible, 
+advance the execution of critical tasks assigning them to the fast Cortex-A15 cores. 
+Conformally with this strategy, an out-of-order execution reveals itself more frequently in the timelines for the big cores 
+than in those for the LITTLE cores. 
+With the conventional runtime, the out-of-order execution is only dictated 
+by the order in which data dependencies for tasks are satisfied.
+
+From the execution traces, we can observe that the Botlev-OmpSs alternative suffers a remarkable
+performance penalty due to the existence of idle periods in the final part of the factorization, 
+when the concurrency in the factorization is greatly diminished. 
+This problem is not present in the conventional scheduling policies.
+In the first stages of the factorization, however, the use of a priority-aware policy for the Botlev-OmpSs scheduler
+effectively reduces idle times. 
+Table~\ref{tab:th_state} reports the percentage of time each worker
+thread is in {\tt running} or {\tt idle} state. In general, the relative amount of time spent in idle state is much 
+higher for Botlev-OmpSs than for the conventional implementations (17\% vs. 5\%, respectively). 
+Note also the remarkable difference in the percentage of idle time between 
+the big and LITTLE cores (20\% and ~13\%, respectively), which drives to the conclusion that the fast cores stall waiting for
+completion of tasks executed on the LITTLE cores. This fact can be confirmed in the final stages of the Botlev-OmpSs trace.
+
+The previous observations pave the road to a combination of scheduling policy and execution model for AMPs, 
+in which asymmetry is exploited through {\em ad-hoc} scheduling policies during the first stages of the factorization 
+--when the potential parallelism is massive--, and this is later replaced with the use 
+of asymmetric-aware kernels and coarse-grain VCs
+in the final stages of the execution, when the concurrency is scarce. Both approaches are not mutually exclusive, 
+but complementary depending on the level of task concurrency available at a given execution stage.
+
+\begin{figure}%[t]
+\centering
+	\begin{subfigure}{\textwidth}
+   \includegraphics[width=\textwidth]{Plots/Traces/sym_8cores_task_number.png}
+		\caption{OmpSs - Sequential BLIS (8 worker threads)}
+	\end{subfigure}
+	\begin{subfigure}{\textwidth}
+   \includegraphics[width=\textwidth]{Plots/Traces/sym_task_number.png}
+		\caption{OmpSs - Sequential BLIS (4 worker threads)} 
+	\end{subfigure}
+	\begin{subfigure}{\textwidth}
+   \includegraphics[width=\textwidth]{Plots/Traces/asym_task_number.png}
+		\caption{OmpSs - Asymmetric BLIS (4 worker threads)} 
+	\end{subfigure}
+	\begin{subfigure}{\textwidth}
+   \includegraphics[width=\textwidth]{Plots/Traces/botlev_task_number.png}
+		\caption{Botlev-OmpSs - Sequential BLIS (8 worker threads, 4+4)} 
+	\end{subfigure}
+\caption{Task execution order of the three studied runtime configurations for the Cholesky factorization 
+({\tt n}~=~6,144, {\tt b}~=~448). In the trace, tasks are ordered
+according to their appearance in the sequential code, 
+and depicted using a color gradient, with light green indicating early tasks, and dark blue for the late
+tasks. 
+%ENRIQUE, FIJATE COMO SE NOTA
+%MAS LA EJECUCION FUERA DE ORDEN EN BOTLEV, ESPECIALMENTE EN LOS CORES RAPIDOS (Y MIRA POR EJEMPLO COMO ADELANTA CHOLESKY). BOTLEV USA PRIORIDADES. LAS OTRAS DOS CONFIGURACIONES, AUNQUE PODRIAN, NO LO HACEN EN NUESTRA CONFIGURACION, LO CUAL
+%ES UN PUNTO A FAVOR.
+}
+\label{fig:traces_task_number}
+\end{figure}
+
+\begin{table}
+\centering
+\caption{Percentage of time per worker thread in idle or running state for different runtime configurations for the Cholesky factorization 
+({\tt n}~=~6,144, {\tt b}~=~448).
+Note that {\sc wt 0} is the master thread, and thus is never idle; for it, the rest of the time till
+100\% percentage is devoted to {\tt synchronization}, {\tt scheduling} and {\tt thread creation}. For the rest of threads, this amount of time is devoted to {\tt runtime overhead}.}
+\label{tab:th_state}
+
+\ra{1.2}
+\ca{2pt}
+
+\renewcommand{\fg}[1]{{#1}} 
+\renewcommand{\br}[1]{{#1}} 
+
+{\scriptsize
+\begin{tabular}{crrrrrrrrr} 
+   	\toprule
+                 & \phantom{a} & \multicolumn{2}{c}{OmpSs - Seq. BLIS} & \phantom{ab} & \multicolumn{2}{c}{OmpSs - Asym. BLIS} & \phantom{ab} & \multicolumn{2}{c}{Botlev-OmpSs - Seq. BLIS} \\ 
+                 & \phantom{a} & \multicolumn{2}{c}{(4 worker threads)} & \phantom{ab} & \multicolumn{2}{c}{(4 worker threads)} & \phantom{ab} & \multicolumn{2}{c}{(8 worker threads, 4+4)} \\ 
+                 %& \phantom{a} & \multicolumn{4}{c}{OmpSs - Seq. BLIS} & \phantom{ab} & \multicolumn{4}{c}{OmpSs - Asym. BLIS} & \phantom{ab} & \multicolumn{4}{c}{Botlev-OmpSs - Seq. BLIS} \\ 
+                 %& \phantom{a} & \multicolumn{4}{c}{(4 worker threads)} & \phantom{ab} & \multicolumn{4}{c}{(4 worker threads)} & \phantom{ab} & \multicolumn{4}{c}{(8 worker threads, 4+4)} \\ 
+                                          \cmidrule{3-4}                                         \cmidrule{6-7}                                      \cmidrule{9-10}
+                       & \phantom{a} &    {\tt idle}& {\tt running}& \phantom{ab}  & {\tt idle}& {\tt running}& \phantom{ab} & {\tt idle}  & {\tt running} \\ \hline 
+	 {\sc wt 0}    & \phantom{a} &    \fg{--}   & \fg{98.41}   & \phantom{ab}  & \fg{--}   & \fg{97.85}   & \phantom{ab} & \fg{--}     & \fg{86.53}    \\ \cline{3-10}
+	 {\sc wt 1}    & \phantom{a} &    \br{5.59} & \fg{94.22}   & \phantom{ab}  & \fg{5.51} & \fg{94.29}   & \phantom{ab} & \fg{13.63}  & \fg{86.28}    \\ \cline{3-10}
+	 {\sc wt 2}    & \phantom{a} &    \br{3.14} & \fg{96.67}   & \phantom{ab}  & \fg{5.27} & \fg{94.53}   & \phantom{ab} & \fg{13.94}  & \fg{85.98}    \\ \cline{3-10}
+	 {\sc wt 3}    & \phantom{a} &    \br{5.77} & \fg{94.07}   & \phantom{ab}  & \fg{5.17} & \fg{94.62}   & \phantom{ab} & \fg{13.43}  & \fg{86.47}    \\ \cline{3-10}
+	 {\sc wt 4}    & \phantom{a} &    \br{--}   & \fg{--}      & \phantom{ab}  & \fg{--}   & \fg{--}      & \phantom{ab} & \fg{19.26}  & \fg{80.51}    \\ \cline{3-10}
+	 {\sc wt 5}    & \phantom{a} &    \br{--}   & \fg{--}      & \phantom{ab}  & \fg{--}   & \fg{--}      & \phantom{ab} & \fg{21.12}  & \fg{78.69}    \\ \cline{3-10}
+	 {\sc wt 6}    & \phantom{a} &    \br{--}   & \fg{--}      & \phantom{ab}  & \fg{--}   & \fg{--}      & \phantom{ab} & \fg{20.84}  & \fg{78.97}    \\ \cline{3-10}
+	 {\sc wt 7}    & \phantom{a} &    \br{--}   & \fg{--}      & \phantom{ab}  & \fg{--}   & \fg{--}      & \phantom{ab} & \fg{20.09}  & \fg{79.70}    \\ \bottomrule
+	 %{\sc TOTAL}   & \phantom{a} &    \br{13.87} & \fg{384.31}    & \phantom{ab}  & \fg{16.97}  & \fg{379.60}    & \phantom{ab} & \fg{73.81}  & \fg{715.16}   \\ \bottomrule
+	 {\sc Avg.}     & \phantom{a} &    \br{4.84} & \fg{95.89}    & \phantom{ab} & \fg{5.32} & \fg{94.90}   & \phantom{ab} & \fg{17.47}  & \fg{82.89}    \\ \bottomrule
+\end{tabular}
+}
+
+\end{table}
+
 
 
 %-- Configuraciones para emacs --
