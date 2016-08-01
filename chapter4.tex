@@ -14,7 +14,10 @@
 %
 %\section{Combinación de BLIS asimétrico con OmpSs}
 %
-\section{Planteamiento general}
+\section{Planteamiento y objetivos generales}
+
+(Plantear objetivos e idea general. En el capítulo 5, copiaremos esta estructura, con la
+misma sección inicial de motivación/objetivos).
 
 In this section, we initially perform an evaluation 
 of the task-parallel Cholesky routine in Listings~\ref{lst:chol}--\ref{lst:chol_tasks},
@@ -24,59 +27,59 @@ motivates the development effort and experiments presented in the remainder of t
 
 \subsection{Evaluación de runtimes convencionales en AMPs}
 
-Figure~\ref{fig:ompss_blis_oversubscription} reports the performance,
-in terms of GFLOPS (billions of flops per second), attained with the conventional OmpSs runtime,
-when the number of worker threads varies from~1 to~8, and the mapping of worker threads to cores is delegated to the OS. 
-We evaluated a range of block sizes
-({\tt b} in Listing~\ref{lst:chol}), but for simplicity we report only the results obtained with the value {\tt b} that optimized
-the GFLOPS rate for each problem dimension.
-All the experiments hereafter employed {\sc ieee} double precision. Furthermore,
-we  ensured that the cores operate at the highest possible frequency by setting the appropriate {\em cpufreq} governor.
-The conventional runtime of OmpSs corresponds to release 15.06 of the Nanos++ runtime task scheduler.
-For this experiment, it is lined with the ``sequential'' implementation of BLIS in release 0.1.5.
-(For the experiments with the multi-threaded/asymmetric version of BLIS in the later sections, 
-we will use specialized versions of the codes in~\cite{asymBLIS} for slow+fast VCs.)
-
-%
-The results in the
-Figure reveal the increase in performance as the number of worker threads is raised from 1 to 4, which the OS maps
-to the (big) Cortex-A15 cores. However, when the number of threads exceeds the amount of fast cores, the OS starts binding the threads
-to the slower Cortex-A7 cores, and the improvement rate is drastically reduced, 
-%(in part, due to the lower peak performance of the Cortex-A7 compared with the Cortex-A14) 
-in some cases even showing a performance drop. This
-is due to load imbalance, as tasks of uniform granularity, possibly laying in the critical path,
-are assigned to slow cores. %Clearly, some type of asymmetry-awareness is necessary in the runtime task scheduler 
-%(or the underlying libraries) in order to tackle this source of inefficiency.
+La Figura~\ref{fig:ompss_blis_oversubscription} muestra el rendimiento, en términos de GFLOPS (miles de millones de
+operaciones en coma flotante por segundo), mostrado por el runtime convencional de OmpSs para la factorización
+de Cholesky, variando el número de \wts entre~1 y~8 sobre la plataforma asimétrica \odroid; en el 
+experimento, se delega la asignación de \wts a núcleos al planificador del sistema operativo. En otras palabras,
+se está utilizando una versión no consciente de la asimetría del planificador de tareas en OmpSs.
+Para este experimento, se ha evaluado un rango lo suficientemente amplio de tamaños de bloque 
+({\tt b} en el código de la Figura~\ref{lst:chol}), aunque por simplicidad se reporta únicamente los
+resultados obtenidos para el valor de {\tt b} que optimiza el ratio de GFLOPS para cada dimensión
+del problema\footnote{En este capítulo, todos los exprimentos se han realizado utilizando doble precisión.}.
 
 \begin{figure}
 \centering
 \includegraphics[width=0.70\textwidth]{Plots/Orig_runtime/plot_1to8_th}
-\caption{Performance of the Cholesky factorization using the conventional OmpSs runtime and a sequential implementation
-                 of BLIS on the Exynos 5422 SoC.}
+\caption{Rendimiento de la factorización de Cholesky utilizando el runtime OmpSs convencional y una implementación secuencial
+	de BLIS sobre el SoC Exynos 5422.}
 \label{fig:ompss_blis_oversubscription}
 \end{figure}
 
-Stimulated by this first experiment, we recognize that an obvious solution to this problem consists in 
-adapting the runtime task scheduler (more specifically, the scheduling policy) to exploit the 
-SoC asymmetry~\cite{OmpSsbigLITTLE}.
-Nevertheless, we part ways with this
-solution, exploring an architecture-aware alternative
-that leverages a(ny) conventional runtime task scheduler combined with an underlying asymmetric library. 
-We discuss this option in more detail in the following section.
+%All the experiments hereafter employed {\sc ieee} double precision. Furthermore,
+%we  ensured that the cores operate at the highest possible frequency by setting the appropriate {\em cpufreq} governor.
+%The conventional runtime of OmpSs corresponds to release 15.06 of the Nanos++ runtime task scheduler.
+%For this experiment, it is lined with the ``sequential'' implementation of BLIS in release 0.1.5.
+%(For the experiments with the multi-threaded/asymmetric version of BLIS in the later sections, 
+%we will use specialized versions of the codes in~\cite{asymBLIS} for slow+fast VCs.)
 
-%%\subsection{Combining conventional runtimes with asymmetric libraries}
+Los resultados experimentales revelan un incremento en el rendimiento a medida que el número de \wts aumenta entre~1 y~4,
+casos en los que el planificador del sistema operativo asigna su ejecución a los núcleos rápidos (Cortex-A15) disponibles.
+Sin embargo, cuando el número de \wts excede la cantidad de núcleos rápidos, el sistema operativo se ve forzado a asignar
+\wts a núcleos lentos (Cortex-A7), en cuyo caso el aumento en prestaciones desaparece, e incluso éstas disminuyen drásticamente 
+a medida que el número de \wts aumenta. La principal causa de este decremento en las prestaciones es el desequilibrio de carga,
+ya que tareas con granularidad univorme, posiblemente pertenecientes al camino crítico, son asignadas a núcleos lentos.
+
+Este experimento revela la principal motivación por la que es necesario un planificador de tareas consciente de la
+arquitectura y adaptado a ella~\cite{OmpSsbigLITTLE}. Sin embargo, en el presente capítulo, se desarrollará un enfoque alternativo
+a la hora de explotar la asimetría de la arquitectura subyacente: se utilizará un planificador de tareas convencional en combinación
+con una biblioteca asimétrica para la ejecución de tareas, como se describe a continuación.
+
 \section{Combinación de runtimes convencionales con bibliotecas asimétricas}
 
-\subsection{General view}
-Our proposal operates under the GTS model but is inspired in CPUM. Concretely,
-our task scheduler regards
-the computational resources as four {\em truly} symmetric VCs, each composed of a fast and a slow core. For this purpose, 
-unlike CPUM, {\em both} physical cores within each VC remain active and collaborate to execute a given task.
-Furthermore, our approach exploits concurrency at two levels: {\em task-level parallelism} is extracted by the runtime in order
-to schedule tasks to the four symmetric VCs;
-and each task/kernel is internally divided to 
-expose {\em data-level parallelism}, distributing its workload between the two asymmetric physical cores within the VC
-in charge of its execution.
+\subsection{Visión general de la propuesta}
+
+La propuesta de operación introducida en el presente capítulo opera bajo el modelo GTS, pero está en cierto modo 
+inspirada en el modelo CPUM (véase Sección~\ref{sec:models}). Más concretamente, el objetivo es que el planificador
+de tareas considere la arquitectura \odroid (por ejemplo) como una arquitectura verdaderamente simétrica, formada por 
+cuatro VCs (núcleos virtuales, o {\em Virtual Cores}), cada uno de ellos compuesto por un núcleo rápido y un núcleo
+lento. Para ello, a diferencia del modelo CPUM, {\em ambos} núcleos físicos dentro de cada VC se mantendrán activos y 
+colaborarán en la ejecución de una determinada tarea. Así, la propuesta explota dos niveles de concurrencia: el {\em paralelismo
+a nivel de tareas} es extraído por el planificador para asignar tareas a cda uno de los cuatro VCs idénticos disponibles en
+el sistema, e internamente, cada tarea/kernel se divide internamente para exponer {\em paralalismo a nivel de datos}, 
+distribuyendo la carga de trabajo entre los dos núcleos físicos asimétricos dentro del VC que está a cargo de la ejecución
+de dicha tarea.
+
+Esta solución requiere únicamente un planificador de tareas convencional (es decir, no consciente de la asimetría de la arquitectura).
 
 Our solution thus only requires a conventional 
 (and thus asymmetry-agnostic) runtime task scheduler, e.g. the conventional version of OmpSs, where instead of spawning one worker thread
@@ -95,7 +98,8 @@ is the smallest (basic) computational resource from the point of view of the sch
 and tasks are further divided into smaller units, and executed in parallel by the physical cores inside the VCs.
 %and parallel/asymmetric tasks are the minimum unit of work.
 
-\subsection{Comparison with other approaches}
+\subsection{Comparación con otras alternativas}
+
 %Provided an underlying asymmetry-aware library is available to the developer, it is possible to combine this 
 %with an existing conventional runtime task scheduler in order to exploit the underlying architecture. 
 %In the enhanced version of OmpSs in~\cite{OmpSsbigLITTLE}, tasks were actually invocations to a {\em sequential} 
@@ -124,7 +128,7 @@ fundamental kernels becomes mandatory in order to fully exploit the underlying a
 
 %The implications and support necessary for this approach are explained next.
 
-\subsection{Requisites on the BLAS-3}
+\subsection{Requisitos a nivel de tarea (BLAS-3)}
 
 We finally note that certain requirements are imposed on a multi-threaded implementation of BLIS that operates under the 
 CPUM mode. 
@@ -242,7 +246,7 @@ mimicking the behavior of the underlying BLIS.
 \end{figure}
 
 
-\subsection{Integration of asymmetric BLIS in a conventional task scheduler}
+\subsection{Integración de BLIS asimétrico con un planificador de tareas convencional}
 
 %\begin{itemize}
 	%\item En esta seccion comparamos runtime convencional, usando BLIS secuencial (1--4 worker threads OmpSs) y BLIS asimetrico (1+1 cores) por debajo del runtime. 
@@ -421,7 +425,7 @@ core, to 0.243~GFLOPS, when simultaneously using all four slow cores.
 %\end{tabular}
 %\end{table}
 
-\subsection{Performance comparison versus asymmetry-aware task scheduler}
+\subsection{Comparativa de rendimiento con un planificador consciente de la asimetría}
 \label{sec:comparative}
 
 Our last round of experiments aims to assess the performance advantages of different task-parallel executions
@@ -473,7 +477,7 @@ gains which are, for all problems cases, comparable with those of ad-hoc asymmet
 for medium to large matrices, it clearly outperforms the efficiency attained with a conventional 
 asymmetry-oblivious scheduler.
 
-\subsection{Extended performance analysis}
+\subsection{Análisis detallado de rendimiento}
 
 We next provide further details on the performance behavior of each one of the aforementioned runtime configurations.
 The execution traces in this section have all been extracted with the {\tt Extrae} instrumentation
