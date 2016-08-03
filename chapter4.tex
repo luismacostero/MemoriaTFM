@@ -75,30 +75,31 @@ cuatro VCs (núcleos virtuales, o {\em Virtual Cores}), cada uno de ellos compue
 lento. Para ello, a diferencia del modelo CPUM, {\em ambos} núcleos físicos dentro de cada VC se mantendrán activos y 
 colaborarán en la ejecución de una determinada tarea. Así, la propuesta explota dos niveles de concurrencia: el {\em paralelismo
 a nivel de tareas} es extraído por el planificador para asignar tareas a cda uno de los cuatro VCs idénticos disponibles en
-el sistema, e internamente, cada tarea/kernel se divide internamente para exponer {\em paralalismo a nivel de datos}, 
+el sistema, e internamente, cada tarea/kernel divide su carga de forma correcta para exponer {\em paralalismo a nivel de datos}, 
 distribuyendo la carga de trabajo entre los dos núcleos físicos asimétricos dentro del VC que está a cargo de la ejecución
 de dicha tarea.
 
-Esta solución requiere únicamente un planificador de tareas convencional (es decir, no consciente de la asimetría de la arquitectura).
+Esta solución requiere únicamente un planificador de tareas convencional (es decir, no consciente de la asimetría de la arquitectura, o lo
+que es lo mismo, orientado a arquitecturas SMT), como por ejemplo el planificador de tareas convencional proporcionado por OmpSs, donde, 
+en lugar de crear un \wt\ por núcleo físico del sistema, se sigue una filosofía similar a la propuesta por el modelo CPUM, creando 
+{\em un único worker thread por VC}. Internamente, cuando una tareai es elegida para ser ejecutada por un \wt disponible, dicha tarea
+se ejecutará, de forma ya no secuencial, sino paralela sobre cada uno de los núcleos que componen el VC, explotando, en este caso,
+la asimetría interna de dicha abstracción. Por ejemplo, en el caso de \odroid, equipada con cuatro núcleos rápidos y cuatro lentos, 
+la propuesta desarrollada desplegará únicamente cuatro \wt; para cualquier tarea básica o kernel de álgebra lineal a ejecutar, dicha
+rutina explotará la asimetría internamente, siempre bajo la condición de que existe una implementación de la misma optimizada para
+este tipo de paralelismo asimétrico.
 
-Our solution thus only requires a conventional 
-(and thus asymmetry-agnostic) runtime task scheduler, e.g. the conventional version of OmpSs, where instead of spawning one worker thread
-per core in the system, we adhere to the CPUM model, creating only one worker thread per VC.
-Internally, whenever a ready task is selected to be executed by a worker thread, 
-the corresponding routine from BLIS internally spawns two threads, 
-binds them to the appropriate pair of Cortex-A15+Cortex-A7 cores, 
-and asymmetrically divides the work between the fast and the slow physical cores in the VC.
-Following this idea, the architecture exposed to the runtime is {\em symmetric}, 
-and the kernels in the BLIS library configure a ``black box'' that abstracts the 
-architecture asymmetry from the runtime scheduler. 
+Siguiendo esta idea, la arquitectura expuesta al planificador de tareas es completamente {\em simétrica}, y los kernels en BLIS
+(o en cualquier otra biblioteca utilizada para la ejecución de las tareas) configuran una ``caja negra'' que abstrae del carácter
+asimétrico al planificador.
 
-In summary, in a conventional setup, the core is the basic computational resource for the task scheduler, 
-and the ``sequential'' tasks are the minimum work unit to be assigned to these resources. Compared with this, in our approach the VC 
-is the smallest (basic) computational resource from the point of view of the scheduler;
-and tasks are further divided into smaller units, and executed in parallel by the physical cores inside the VCs.
-%and parallel/asymmetric tasks are the minimum unit of work.
+En resumen, si en una configuración convencional el núcleo es el recurso mínimo de computación para el planificador de tareas,
+y éstas son totalmente secuenciales, en la solución propuesta el VC es el recurso básico de computación de cara al planificador,
+mientras que la implementación de las tareas pasa a ser no sólo paralela, sino adaptada para la correcta explotación del paralelismo
+existente dentro de cada VC.
 
-\subsection{Comparación con otras alternativas}
+\subsection{Comparación y ventajas frente a otras alternativas}
+
 
 %Provided an underlying asymmetry-aware library is available to the developer, it is possible to combine this 
 %with an existing conventional runtime task scheduler in order to exploit the underlying architecture. 
@@ -108,32 +109,34 @@ and tasks are further divided into smaller units, and executed in parallel by th
 %To accommodate this, tasks are cast in terms of 
 %invocations to a multi-threaded asymmetry-aware library (in our case, BLIS). 
 
-Our approach features a number of advantages for the developer:
+La solución desarrollada reúne un conjunto de ventajas de cara al desarrollador:
+
 \begin{itemize}
-\item The runtime is not aware of asymmetry, and thus a conventional task scheduler 
-      will work transparently with no special modifications.
-\item Any existing scheduling policy (e.g. cache-aware mapping or work stealing)
-      in an asymmetry-agnostic runtime, or any enhancement technique, will directly impact the performance attained on an AMP.
-\item Any improvement in the asymmetry-aware BLIS implementation will directly impact the performance on an AMP. 
-      This applies to different ratios of big/LITTLE cores within a VC, operating frequency, or even to the introduction further levels
-      of asymmetry (e.g. cores with a capacity between fast and slow).
+\item El planificador de tareas no es consciente de la asimetría, por lo que cualquier versión convencional 
+      del mismo podrá trabajar sobre este tipo de sistemas sin modificaciones específicas. 
+\item Cualquier política de planificación (por ejemplo, {\em work stealing}, planificación consciente de la localidad de datos,
+      implementación de caches por software, \ldots) ya desarrollada para arquitecturas simétricas, o cualquier futura mejora,
+      tendrá también un impacto directo en el rendimiento sobre el sistema asimétrico.
+\item Cualquier mejora en la implementación de las bibliotecas asimétricas subyacentes (por ejemplo, BLIS) tendrá un impacto directo
+      sobre el AMP. Esta observación se aplica a arquitecturas con distinto número de núcleos lentos/rápidos dentro del VC, ratios
+      en las frecuencias de funcionamiento, o incluso ante la introducción de más niveles de asimetría (esto es, núcleos con rendimiento
+      intermedio).
 \end{itemize}
 
-Obviously, there is also a drawback in our proposal
-as a tuned asymmetry-aware DLA library must exist in order to 
-reuse conventional runtimes. 
-In the scope of DLA, this drawback is easily tackled with BLIS. We recognize that, in more general domains, 
-an ad-hoc implementation of the application's 
-fundamental kernels becomes mandatory in order to fully exploit the underlying architecture.
+Obviamente, existe una dificultad adicional intrínseca a la solución propuesta, y que se convierte en un requisito fundamental de cara
+a su viabilidad: debe existir, necesariamente, una versión conscente de la asimería para cada tarea a ejecutar (por ejemplo, una implementación
+completa de las rutinas BLAS). En el ámbito del álgebra lineal densa, este requisito se cumple a través de la versión asimétrica de BLIS, aunque
+en otros ámbitos, el desarrollo específico de este tipo de implementaciones es todavía escaso.
 
-%The implications and support necessary for this approach are explained next.
+\subsection{Requisitos a nivel de tarea en el ámbito del álgebra lineal}
 
-\subsection{Requisitos a nivel de tarea (BLAS-3)}
+Por último, cabe destacar que son necesarios ciertos requisitos adicionales en la implementación multihebra de BLIS
+que opera sobre el modelo propuesto. Considérese el kernel \gemm y la descripción de alto nivel proporcionada en la~\ref{lst:gemm}. 
+Como se ha descrito anteriormente, resulta necesario\ldots
 
-We finally note that certain requirements are imposed on a multi-threaded implementation of BLIS that operates under the 
-CPUM mode. 
-To illustrate this, consider the \gemm kernel and the high-level description of its implementation
-in Listing~\ref{lst:gemm}. For our objective,
+\comentario{AQUI}
+
+For our objective,
 we still have to distribute the iteration space between the Cortex-A15 and the Cortex-A7 but, since there is only one resource of each type per VC,
 there is no need to partition the loops internal to the macro-kernel. 
 Furthermore, we note that the optimal strides for Loop~1 are in practice quite
