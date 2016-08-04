@@ -130,14 +130,21 @@ en otros ámbitos, el desarrollo específico de este tipo de implementaciones es
 
 \subsection{Requisitos a nivel de tarea en el ámbito del álgebra lineal}
 
+\comentario{Hay que reescribir esta sección}.
+
 Por último, cabe destacar que son necesarios ciertos requisitos adicionales en la implementación multihebra de BLIS
-que opera sobre el modelo propuesto. Considérese el kernel \gemm y la descripción de alto nivel proporcionada en la~\ref{lst:gemm}. 
-Como se ha descrito anteriormente, resulta necesario\ldots
+que opera sobre el modelo propuesto. Considérese el kernel \gemm y la descripción de alto nivel proporcionada en la Figura~\ref{lst:gemm}. 
+Como se ha descrito anteriormente, resulta necesario distribuir el espacio de iteraciones de alguno de los bucles entre los dos tipos de núcleos
+que conforman un VC; siguiendo las directivas de paralelización descritas en~\cite{BLIS3}, se distinguen a continuación dos escenarios de reparto posibles:
 
-\comentario{AQUI}
+\begin{itemize}
+	\item En arquitecturas donde cada VC está compuesto por igual número de núcleos de cada tipo (por ejemplo, \odroid) \ldots
 
-For our objective,
-we still have to distribute the iteration space between the Cortex-A15 and the Cortex-A7 but, since there is only one resource of each type per VC,
+	\item En arquitecturas donde cada VC está compuesto por distinto número de núcleos de cada tipo (por ejemplo, \juno) \ldots
+
+\end{itemize}
+
+For our objective, we still have to distribute the iteration space between the Cortex-A15 and the Cortex-A7 but, since there is only one resource of each type per VC,
 there is no need to partition the loops internal to the macro-kernel. 
 Furthermore, we note that the optimal strides for Loop~1 are in practice quite
 large ({\tt nc} is in the order of a few thousands for ARM big.LITTLE cores), while the optimal values for Loop~3 are much more reduced
@@ -149,46 +156,27 @@ VCs, which we can expect to easily yield a proper workload balancing.
 
 \section{Resultados experimentales}
 
-Let us start by reminding that, at execution time, OmpSs decomposes the routine for the Cholesky factorization into a collection of tasks 
-that operate on sub-matrices (blocks) with a granularity 
-dictated by the block size {\tt b}; see Listing~\ref{lst:chol}. 
-These tasks typically perform invocations to a fundamental kernel of the BLAS-3, 
-in our case provided by BLIS, or LAPACK; see Listing~\ref{lst:chol_tasks}.  
+\subsection{Estudio experimental del tamaño de bloque óptimo}
+
+En tiempo de ejecución, OmpSs descompone la rutina para la implementación de la factorización de Cholesky en una colección de tareas
+que operan en submatrices (bloques) con una granularidad que viene definida por el tamaño de bloque {\tt b}, véase el código en la 
+Figura~\ref{lst:chol}. Estas tareas típicamente se reducen a invocaciones a kernels elementales a nivel de BLAS (en nuestro caso,
+BLIS) o LAPACK, véase el código proporcionado en la Figura~\ref{lst:chol_tasks}.  
 
 \newcommand{\bopt}{b^{\mbox{\rm \scriptsize opt}}\xspace}
 
-The first step in our evaluation aims to provide a realistic estimation of the potential performance benefits
-of our approach (if any) on the target Exynos 5422 SoC. 
-A critical factor from this perspective is the range of block sizes, say $\bopt$,
-that are optimal for the conventional OmpSs runtime. In particular, the efficiency 
-of our hybrid task/data-parallel approach is strongly determined by the performance 
-attained with the asymmetric BLIS implementation when compared against that of its sequential counterpart,
-for problem dimensions {\tt n} that are in the order of $\bopt$.
-%the optimal {\tt b} using the conventional OmpSs runtime.
+El primer paso en nuestra evaluación radica en proporcionar una estimación realista de la ganancia de rendimiento
+potencial proporcionada por la solución propuesta (en caso de haberla). Un factor crítico desde este punto de vista es
+el rango de tamaños de bloque que resultan óptimos para el runtime convencional de OmpSs ante una determinada operación
+(en adelante $\bopt$). En particular, la eficiencia de la solución propuesta vendrá determinada por el rendimiento obtenido
+por las implementaciones BLIS de cada una de las tareas que componen la operación, comparada con su implementación secuencial
+equivalente para dimensiones del problema {\tt n} en el orden de dimensión $bopt$.
 
-Table~\ref{tab:optimal_bs_sym} reports the optimal block sizes $\bopt$ 
-for the Cholesky factorization, with problems of increasing matrix dimension, using the conventional
-OmpSs runtime linked with the sequential BLIS, and~1 to~4 worker threads.
-Note that, except for smallest problems, the observed optimal block sizes
-are between 192 and 448. These dimensions offer a 
-fair compromise, exposing enough task-level parallelism
-while delivering high ``sequential'' performance for the execution of each individual task
-via the sequential implementation of BLIS.
-
-%\begin{table}
-	%\centering
-	%\caption{Optimal block sizes for the Cholesky factorization using the sequential BLIS.}
-	%\label{tab:optimal_bs_sym}
-	%\begin{tabular}{|c||c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|} 
-		%\hline
-		%Th. &     512 & 1024 & 1536 & 2048 & 2560 & 3072 & 3584 & 4096 & 4608 & 5120 & 5632 & 6144 & 6656 & 7168 & 7680 \\ \hline \hline
-		%1   &     192 & 384 & 320 & 448 & 448 & 448 & 384 & 320 & 320 & 448 & 448 & 448 & 448 & 384 & 448 \\ \hline
-		%2   &     192 & 192 & 320 & 192 & 448 & 448 & 384 & 320 & 320 & 448 & 448 & 448 & 448 & 384 & 448 \\ \hline
-		%3   &     128 & 192 & 320 & 192 & 384 & 448 & 320 & 320 & 320 & 448 & 448 & 448 & 448 & 384 & 448 \\ \hline
-		%4   &     128 & 128 & 192 & 192 & 192 & 320 & 320 & 320 & 320 & 448 & 320 & 448 & 448 & 384 & 448 \\ \hline
-	%\end{tabular}
-%
-%\end{table}
+La Tabla~\ref{tab:optimal_bs_sym} muestra los tamaños de bloque óptimos $\bopt$ para la factorización de Cholesky y tamaños
+de problema crecientes, utilizando el planificador OmpSs convencional enlazado con una versión secuencial de BLIS y un número
+creciente de \wts entre~1 y~4. Obsérvese como, excepto para los menores tamaños de problema, los tamaños de bloque óptimos están
+en el rango entre 192 y 448. Estos tamaños de bloque resultan óptimos al ofrecer un equilibrio entre el paralelismo a nivel de tareas
+potencial y la eficiencia interna de las ejecuciones secuenciales de cada tarea individual.
 
 \newcommand{\ra}[1]{\renewcommand{\arraystretch}{#1}}
 \newcommand{\ca}[1]{\renewcommand{\tabcolsep}{#1}}
@@ -198,13 +186,13 @@ via the sequential implementation of BLIS.
 
 \begin{table}
 	\centering
-	\caption{Optimal block sizes for the Cholesky factorization using the conventional 
-                 OmpSs runtime and a sequential implementation of BLIS on the Exynos 5422 SoC.}
+	\caption{Tamaños de bloque óptimos para la factorización de Cholesky utilizando el planificador convencional
+	         de OmpSs y una implementación secuencial de BLIS sobre \odroid.}
 	\label{tab:optimal_bs_sym}
 {\scriptsize
 \begin{tabular}{crrrrrrrrrrrrrrrr} 
 \toprule
-  & \phantom{a} & \multicolumn{14}{c}{Problem dimension ({\tt n})} \\ 
+  & \phantom{a} & \multicolumn{14}{c}{Tamaño del problema ({\tt n})} \\ 
 \cmidrule{3-17} 
   & \phantom{a} &     512 & 1,024 & 1,536 & 2,048 & 2,560 & 3,072 & 3,584 & 4,096 & 4,608 & 5,120 & 5,632 & 6,144 & 6,656 & 7,168 & 7,680 \\ \hline
 
@@ -216,47 +204,44 @@ via the sequential implementation of BLIS.
 }
 \end{table}
 
-The key insight to take away from this experiments is that,
-in order to extract good performance from a combination of the conventional OmpSs runtime task scheduler 
-with a multi-threaded asymmetric version of BLIS, the kernels in this instance of the asymmetric library must outperform
-their sequential counterparts, for matrix dimensions in the order of the block sizes in Table~\ref{tab:optimal_bs_sym}.  
-Figure~\ref{fig:cross_blis} shows the performance attained
-with the three BLAS-3 tasks involved in the Cholesky factorization (\gemm, \syrk and \trsm) for our range of dimensions of interest. 
-There, the multi-threaded asymmetry-aware kernels run concurrently on one Cortex-A15 plus one Cortex-A7 core, while
-the sequential kernels operate exclusively on a single Cortex-A15 core. 
-In general, the three BLAS-3 routines exhibit a similar trend: the kernels from the sequential BLIS
-outperform their asymmetric counterparts for small problems (up to 
-approximately {\tt m}, {\tt n}, {\tt k } = 128); but,
-from that dimension, the use of the slow core starts paying off. The interesting aspect here is that
-the cross-over threshold between both performance curves is in the range, (usually at an early point,) 
-of $\bopt$; see Table~\ref{tab:optimal_bs_sym}. This implies 
-that the asymmetric BLIS can potentially improve the performance of the overall computation. 
-Moreover, the gap in performance grows with the problem size, 
-stabilizing at problem sizes around {\tt m}, {\tt n}, {\tt k } $\approx~400$. 
-Given that this value is in the range of the optimal block size for the task-parallel Cholesky implementation, 
-we can expect a performance increment in the order of 0.3--0.5 GFLOPS per added slow core, 
-mimicking the behavior of the underlying BLIS.
+La principal conclusión extraída tras el análisis de los resultados es la siguiente: para elevar el rendimiento de un planificador
+de tareas combinado con una versión asimétrica de BLIS, cada uno de los kernels que componen la operación implementados en dicha
+versión asimétrica debe exhibir mayor rendimiento que las respectivas implementaciones secuenciales, para dimensiones de matrices 
+que estén en el orden de los tamaños de bloque mostrados en la Tabla~\ref{tab:optimal_bs_sym}.  
+
+La Figura~\ref{fig:cross_blis} muestra el rendimiento alcanzado para las tres rutinas básicas BLAS que componen la factorización
+de Cholesky (\gemm, \syrk y \trsm) para el rango de dimensiones de interés sobre la plataforma \odroid.  
+El experimento compara la versión secuencial de BLIS sobre un único núcleo Cortex-A15 con la versión asimétrica de BLIS
+que combina un Cortex-A15 y un Cortex-A7. Es decir, compara la ejecución de las tareas que componen la factorización sobre un
+único núcleo físico (rápido) y sobre un VC (combinando un núcleo rápido y otro lento).
+
+En general, las tres rutinas BLAS muestran una tendencia similar: los kernels de la versión secuencial de BLIS
+consiguen mejor rendimiento que sus respectivas implementaciones asimétricas para tamaños de problema pequeños (hasta
+aproximadamente {\tt m}, {\tt n}, {\tt k } = 128); sin embargo, 
+a partir de dicha dimensión, el uso de un núcleo lento comienza a hacer que el rendimiento mejore. 
+El aspecto más importante radica en el hecho de que el punto de corte entre ambas curvas está en el rango (e incluso 
+es típicamente menor) de $\bopt$, véase Tabla~\ref{tab:optimal_bs_sym}. 
+Esto implica que la versión asimétrica de BLIS puede, potencialmente, mejorar el rendimiento general de la factorización, 
+incluso usando un planificador de tareas convencional.
+Además, la mejora en rendimento aumenta con el tamaño de problema, estabilizándose para dimensiones alrededor de 
+{\tt m}, {\tt n}, {\tt k } $\approx~400$. Dado que este valor está en el randgo del tamaño de bloque óptimo para
+la factorización de Cholesky, sobre esta arquitectura es esperable una mejora en el orden de 0.3--0.5 GFLOPS por núcleo lento
+añadido.
+%mimicking the behavior of the underlying BLIS.
 
 \begin{figure}[t]
 \centering
 \includegraphics[width=0.49\textwidth]{Plots/BLIS_small/blis_dgemm_sym_asym}
 \includegraphics[width=0.49\textwidth]{Plots/BLIS_small/blis_dsyrk_sym_asym}
 \includegraphics[width=0.49\textwidth]{Plots/BLIS_small/blis_dtrsm_sym_asym}
-\caption{Performance of the BLAS-3 kernels in the sequential and the multi-threaded/asymmetric implementations of
-         BLIS, using respectively one Cortex-A15 core and one Cortex-A15 plus one Cortex-A7 core
-         of the Exynos 5422 SoC.}
+\caption{Rendimiento de los kernels BLAS-3 en las implementaciones secuencial y asimétrica de BLIS, utilizando, respectivamente
+         un núcleo Cortex-A15 y un núcleo Cortex-A15 más un núcleo Cortex-A7 sobre \odroid.}
 \label{fig:cross_blis}
 \end{figure}
 
 
 \subsection{Integración de BLIS asimétrico con un planificador de tareas convencional}
 
-%\begin{itemize}
-	%\item En esta seccion comparamos runtime convencional, usando BLIS secuencial (1--4 worker threads OmpSs) y BLIS asimetrico (1+1 cores) por debajo del runtime. 
-	%\item Mostrar rendimiento de ambas soluciones usando 1--4 worker threads.
-	%\item Incidir en el aumento de rendimiento. En las tablas mostramos rendimiento neto ganado por nuestra solucion, y rendimiento por core anyadido. Este ultimo deberia
-		%estar en el orden del rendimiento ganado por BLIS asimetrico contra BLIS simetrico mostrado en las graficas de la Figura~\ref{fig:cross_blis}.
-%\end{itemize}
 
 In order to analyze the actual benefits of our proposal, we next evaluate the conventional 
 OmpSs task scheduler linked with either the sequential implementation of BLIS or its multi-threaded asymmetry-aware version. 
