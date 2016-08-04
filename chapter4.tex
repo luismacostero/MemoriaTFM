@@ -242,20 +242,19 @@ añadido.
 
 \subsection{Integración de BLIS asimétrico con un planificador de tareas convencional}
 
-
-In order to analyze the actual benefits of our proposal, we next evaluate the conventional 
-OmpSs task scheduler linked with either the sequential implementation of BLIS or its multi-threaded asymmetry-aware version. 
-Hereafter, the BLIS kernels from first configuration always run using one Cortex-A15 core while, in the second case,
-they exploit one Cortex-A15 plus one Cortex-A7 core.
+Con el fin de analizar los beneficios reales de la solución propuesta en términos de rendimiento, comparamos a continuación
+el rendimiento del planificador OmpSs enlazado con {\em (a)} una versión secuencial de BLIS, y {\em (b)} con la versión asimétrica de BLIS. 
+En todos los experimentos, los kernels BLIS en la primera configuración utlilizarán exclusivamente un núcleo Cortex-A15, mientras
+que en el segundo caso se utlizará un núcleo Cortex-A15 más un núcleo Cortex-A7 para la ejecución de las tareas.
 %
-Figure~\ref{fig:ompss_blis} reports the results for both setups, using an increasing number 
-of worker threads from~1 to~4. For simplicity, we only report the results obtained with the optimal block size. 
-In all cases, the solution based on the multi-threaded asymmetric library outperforms the sequential implementation for 
-relatively large matrices (usually for dimensions {\tt n}~$>$~2,048) while, for smaller problems, the GFLOPS rates are 
-similar. The reason for this behavior can be derived from the optimal block sizes reported in  
-Table~\ref{tab:optimal_bs_sym} and the performance of BLIS reported in Figure~\ref{fig:cross_blis}: for that range 
-of problem dimensions, the optimal block size is significantly smaller, and both BLIS implementations attain similar
-performance rates.
+La Figura~\ref{fig:ompss_blis} muestra los resultados obtenidos para ambas configuraciones, utilizando un número creciente
+de \wts, entre~1 y~4. Por simplicidad, únicamente se reportan los resultados obtenidos considerando el tamaño de bloque óptimo
+para cada tamaño de problema. En todos los casos, la solución basada en la utilización de una bilioteca asimétrica mejora
+el rendimiento de la implementación secuencial para matrices relativamente grandes (típicamente con dimensiones {\tt n}~$>$~2,048)
+mientras que, para tamaños de problema menores, el ratio de GFLOPS obtenido en ambos casos es similar. 
+La razón de este comportamiento viene marcada por el tamaño de bloque óptimo reportado en la Tabla~\ref{tab:optimal_bs_sym}
+y el rendimento de BLIS mostrado en la Figura~\ref{fig:cross_blis}: para dicho rango de dimensiones de problema,
+el tamaño óptimo de bloque es significativamente menor, y ambas implementaciones BLIS obtienen resultados de rendimiento similares.
 
 \begin{figure}%[t]
 \centering
@@ -263,10 +262,8 @@ performance rates.
 \includegraphics[width=0.49\textwidth]{Plots/Orig_runtime/plot_2_th}
 \includegraphics[width=0.49\textwidth]{Plots/Orig_runtime/plot_3_th}
 \includegraphics[width=0.49\textwidth]{Plots/Orig_runtime/plot_4_th}
-\caption{Performance of the Cholesky factorization using the conventional OmpSs runtime linked with either
-         the sequential or the multi-threaded/asymmetric implementations of
-         BLIS %, using respectively one Cortex-A15 core and one Cortex-A15 plus one Cortex-A7 core,
-         in the Exynos 5422 SoC.}
+\caption{Rendimiento de la factorización de Cholesky utilizando el planificador convencional de OmpSs, enlazado
+         con la versión secuencial y asimétrica de BLIS.}
 \label{fig:ompss_blis}
 \end{figure}
 
