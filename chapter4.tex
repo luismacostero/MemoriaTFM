@@ -285,28 +285,26 @@ el tamaño óptimo de bloque es significativamente menor, y ambas implementacion
 %
 %\end{table}
 
-The quantitative difference in performance between both approaches is
-reported in Tables~\ref{tab:improvement_absolute} and~\ref{tab:improvement_percore}. 
-%In both tables, we
-%report the difference in performance introduced by the use of an asymmetric BLIS implementation compared with the same setup using sequential BLIS. Table~\ref{tab:improvement_absolute} 
-The first table illustrates the raw (i.e., absolute) gap, while the second
-one shows the difference per Cortex-A7 core introduced in the experiment. 
-Let us consider, for example, the problem size {\tt n}~=~6,144. 
-In that case, the performance roughly improves by 0.975 GFLOPS when the 4~slow cores are added to help the base 4~Cortex-A15 cores. 
-This translates into a performance raise of 0.243 GFLOPS per slow core, which is slightly under the 
-improvement that could be expected from results experiments in the previous section. 
-Note, however, that the performance per Cortex-A7 core is reduced from 0.340~GFLOPS, when adding just one
-core, to 0.243~GFLOPS, when simultaneously using all four slow cores.
+La diferencia cuantitativa en términos de rendimiento entre ambos enfoques se muestra
+en las Tablas~\ref{tab:improvement_absolute} y~\ref{tab:improvement_percore}. 
+La primera tabla muestra la diferencia absoluta en rendimiento, mientras que la segunda 
+muestra la diferencia en rendimiento por cada núcleo lento (Cortex-A7) introducido en
+el experimento. Consideremos, por ejemplo, el tamaño de problema {\tt n}~=~6,144. 
+En este caso, el rendimiento meora en 0.975 GFLOPS cuando se añaden los 4~núcleos lentos para 
+dar soporte a los 4~núcleos Cortex-A15. Este hecho se traduce en una ganancia de rendimiento de
+0.243 GFLOPS por core lento, ligeramente por debajo de la mejora que podría esperarse a partir de
+los resultados experimentales observados en la anterior sección. Nótese, sin embargo, cómo el 
+rendimiento por Cortex-A7 añadido se reduce desde 0.340~GFLOPS al añadir únicamente un núcleo,
+hasta 0.243~GFLOPS, al utilizar los cuatro núcleos lentos.
 
 \newcommand{\fg}[1]{\textcolor{ForestGreen}{#1}} % Verde
 \newcommand{\br}[1]{\textcolor{BrickRed}{#1}} % Rojo
 
 \begin{table}
 	\centering
-\caption{Absolute performance improvement (in GFLOPS) for the Cholesky factorization using
-         the conventional OmpSs runtime linked with 
-         the multi-threaded/asymmetric BLIS with respect to the same runtime linked with the sequential BLIS in
-         the Exynos 5422 SoC.}
+\caption{Mejora de rendimento absoluta (en GFLOPS) para la factorización de Cholesky utilizando
+         el planificador OmpSs convencional enlazado con una versión asimétrica de BLIS, con respecto
+	 al mismo planificador enlazado con la versión secuencial de BLIS sobre \odroid.}
 	 \label{tab:improvement_absolute}
 
 %\begin{tabular}{|c||c|c|c|c|c|c|c|c|c|c|c|c|c|} 
@@ -325,7 +323,7 @@ core, to 0.243~GFLOPS, when simultaneously using all four slow cores.
 {\scriptsize
 \begin{tabular}{crrrrrrrrrrrrr} 
    	\toprule
-                 & \phantom{a} & \multicolumn{12}{c}{Problem dimension ({\tt n})} \\ 
+                 & \phantom{a} & \multicolumn{12}{c}{Dimensión del problema ({\tt n})} \\ 
 \cmidrule{3-14} 
      & \phantom{a} &       512      & 1,024        & 2,048          & 2,560        & 3,072        & 4,096        & 4,608        & 5,120        & 5,632        & 6,144        & 6,656         & 7,680 \\ \hline 
 {\sc 1 wt} & \phantom{a} &    \br{-0.143} & \fg{0.061}  & \fg{0.218}    & \fg{0.289}  & \fg{0.326}  & \fg{0.267}  & \fg{0.259}  & \fg{0.313}  & \fg{0.324}  & \fg{0.340}  & \fg{0.348}   & \fg{0.300} \\ \cline{3-14}
@@ -356,10 +354,9 @@ core, to 0.243~GFLOPS, when simultaneously using all four slow cores.
 
 \begin{table}
 \centering
-\caption{Performance improvement per slow core (in GFLOPS) for the Cholesky factorization using
-         the conventional OmpSs runtime linked with 
-         the multi-threaded/asymmetric BLIS with respect to the same runtime linked with the sequential BLIS in
-         the Exynos 5422 SoC.}
+\caption{Mejora de rendimiento por núcleo lento (in GFLOPS) para la factorización de Cholesky utilizando
+         el planificador OmpSs convencional enlazado con una versión asimétrica de BLIS, con respecto
+	 al mismo planificador enlazado con la versión secuencial de BLIS sobre \odroid.}
 \label{tab:improvement_percore}
 
 \ra{1.2}
@@ -367,7 +364,7 @@ core, to 0.243~GFLOPS, when simultaneously using all four slow cores.
 {\scriptsize
 \begin{tabular}{crrrrrrrrrrrrr} 
    	\toprule
-                 & \phantom{a} & \multicolumn{12}{c}{Problem dimension ({\tt n})} \\ 
+                 & \phantom{a} & \multicolumn{12}{c}{Dimensión del problema ({\tt n})} \\ 
 \cmidrule{3-14} 
      & \phantom{a} &       512      & 1,024        & 2,048          & 2,560        & 3,072        & 4,096        & 4,608        & 5,120        & 5,632        & 6,144        & 6,656         & 7,680 \\ \hline 
 	 {\sc 1 wt}    & \phantom{a} &    \br{-0.143} & \fg{0.061}  & \fg{0.218}  & \fg{0.289} & \fg{0.326}  & \fg{0.267} & \fg{0.259} & \fg{0.313} & \fg{0.324} & \fg{0.340} & \fg{0.348} & \fg{0.300}    \\ \cline{3-14}
@@ -413,86 +410,97 @@ core, to 0.243~GFLOPS, when simultaneously using all four slow cores.
 \subsection{Comparativa de rendimiento con un planificador consciente de la asimetría}
 \label{sec:comparative}
 
-Our last round of experiments aims to assess the performance advantages of different task-parallel executions
-of the Cholesky factorization via OmpSs. Concretely, we consider 
-(1) the conventional task scheduler linked with the sequential BLIS (``OmpSs - Seq. BLIS''); 
-(2) the conventional task scheduler linked with our multi-threaded asymmetric BLIS that views the SoC as four symmetric {\em virtual cores}
-(``OmpSs - Asym. BLIS''); and 
-(3) the criticality-aware task scheduler in Botlev-OmpSs linked with the sequential BLIS
-(``Botlev-OmpS - Seq. BLIS''). 
-In the executions, we use all four Cortex-A15 cores and 
-evaluate the impact of adding an increasing number of Cortex-A7 cores, from~1 to~4, for Botlev-OmpSs. 
+El último conjunto de experimentos tiene como objetivo ofrecer una visión global de las ventajas en términos
+de rendimiento de disintas configuraciones en la ejecución paralela a nivel de tareas de la factorización de
+Cholesky utilizando el planificador de OmpSs. Más concretamente, se consideran a continuación las siguientes
+alternativas:
 
-Figure~\ref{fig:comparative} shows the performance attained by the aforementioned alternatives on the Exynos 5422 SoC.
-The results can be divided into groups along three problem dimensions:
+\begin{enumerate}
+
+	\item El planificador convencional OmpSs enlazado con una implementación secuencial de BLIS (``OmpSs - Seq. BLIS'').
+	\item El planificador convencional OmpSs enlazado con la versión asimétrica de BLIS que considera el SoC como cuatro {\em núcleos virtuales (VC)} (``OmpSs - Asym. BLIS'').
+	\item La versión consciente de la asimetría ({\em criticality-aware, o botlev}) de OmpSs, enlazada con la versión secuencial de BLIS (``Botlev-OmpS - Seq. BLIS''). 
+
+\end{enumerate}
+
+En las ejecuciones, se utilizan los cuatro núcleos Cortex-A15 y se evalua el impacto de añadir núcleos 
+Cortex-A7 a la configuración (entre 1 y 4) para el planificador Botlev.
+
+
+La Figura~\ref{fig:comparative} muestra el rendimiento obtenido por cada una de las configuraciones
+anteriormente descritas sobre la plataforma \odroid. Los resultados pueden ser analizados si se dividen 
+en tres grandes grupos, atendiendo a la dimensión del problema:
+
 \begin{itemize}
- \item For small matrices ({\tt n}~=~512, 1,024), the conventional runtime using exclusively the four big cores (that is,
-linked with a sequential BLIS library for task execution) attains the best results in terms of performance. This was
-expected and was already observed in Figure~\ref{fig:ompss_blis}; the main reason is the small optimal block size,
-enforced by the reduced problem size, that is necessary in order to expose enough task-level parallelism. This invalidates the
-use of our asymmetric BLIS implementation due to the low performance for very small matrices;
-see Figure~\ref{fig:cross_blis}. We note that the ad-hoc Botlev-OmpSs does not attain
-remarkable performances either for this dimension range, regardless the amount of Cortex-A7 cores used.
+	\item Para matrices pequeñas ({\tt n}~=~512, 1,024), el planificador convencional utilizando exclusivamente cuatro núcleos rápidos (esto es,
+		enlazado con la versión secuencial de BLIS para la ejecución de tareas) obtiene los mejores resultados en términos de rendimiento.
+		Esta es una observación esperada y ya fue observada en la Figura~\ref{fig:ompss_blis}; la principal causa radica en el pequeño tamaño óptimo
+		de bloque para este rango de dimensiones de problema, necesario para exponer el suficiente paralelismo a nivel de tareas. Esta necesidad invalida
+		el uso de la implementación asimétrica de BLIS dado su bajo rendimiento sobre matrices de muy reducidas dimensiones; véase Figura~\ref{fig:cross_blis}. 
+		Además, cabe destacar que el planificador OmpSs adaptado a la asimetría (Botlev) no obtiene ratios de rendimiento elevados para este rango de 
+		dimensiones, independientemente del número de núcleos Cortex-A7 introducidos en el experimento.
 
- \item For medium-sized matrices ({\tt n}~=~2,048, 4,096), the gap in performance between the different approaches is reduced. 
-The variant that relies on the asymmetric BLIS implementation commences to outperform the alternative implementations for
-{\tt n}=4,096 by a short margin. For this problem range, Botlev-OmpSs is competitive, and also outperforms the conventional setup.
+ \item Para matrices de tamaño intermedio ({\tt n}~=~2,048, 4,096), la diferencia de rendimiento entre los diferentes enfoques se reduce.
+	 La variante que utiliza la versión asimétrica de BLIS comienza a obtener mejores rendimientos que las implementaciones alternativas para
+{\tt n}=4,096. Para este rango de dimensiones, Botlev-OmpSs es competitivo, y también obtiene mejores rendimientos que la configuración convencional.
 
- \item For large matrices ({\tt n}~=~6,144, 7,680) this trend is consolidated, and both asymmetry-aware approaches deliver
-remarkable performance gains with respect to the conventional setup. Comparing both asymmetry-aware solutions, our
-mechanism attains better performance rate, even when considering the usage of all available cores for the Botlev-OmpSs
-runtime version.
+ \item Para matrices de grandes dimensiones ({\tt n}~=~6,144, 7,680) la anterior tendencia se consolida, y ambos enfoques conscientes de la arquitectura muestran
+	 ganancias de rendimiento considerables. Comparando ambos enfoques conscientes de la arquitectura, nuestra solución
+obtiene mejor rendimiento, incluso considreando la utilización de todos los núcleos lentos para el planificador Botlev-OmpSs.
 
 \end{itemize}
 
 \begin{figure}
 \centering
 \includegraphics[width=0.70\textwidth]{Plots/Comparative/comparative}
-\caption{Performance (in GFLOPS) for the Cholesky factorization using
-         the conventional OmpSs runtime linked with 
-         either the sequential BLIS or the multi-threaded/asymmetric BLIS, and the {\em ad-hoc} asymmetry-aware version of the
-         OmpSs runtime (Botlev-OmpSs) linked with the sequential BLIS in 
-         the Exynos 5422 SoC. The labels of the form ``4+x'' refer to an execution with 4 Cortex-A15 cores and x Cortex-A7 cores.}
+\caption{Rendimiento (en GFLOPS) para la factorización de Cholesky utilizando 
+el planificador convencional de OmpSs enlazado con la versión secuencial de BLIS, la implementación asimétrica de BLIS, y 
+la implementación consciente de la arquitectura Botlev de OmpSs enlazado con la versión secuencial de BLIS sobre \odroid. 
+Las etiquetas con la forma ``4+x'' indican una ejecución con 4~núcleos Cortex-A15 utilizando x núcleos Cortex-A7.}
 \label{fig:comparative}
 \end{figure}
 
-To summarize, our proposal to exploit asymmetry improves portability and programmability by avoiding
-a revamp of the runtime task scheduler for AMPs. In addition, our approach renders performance
-gains which are, for all problems cases, comparable with those of ad-hoc asymmetry-conscious schedulers; 
-for medium to large matrices, it clearly outperforms the efficiency attained with a conventional 
-asymmetry-oblivious scheduler.
+En conclusión, nuestro enfoque para explotar la asimetría mejora tanto la portabilidad como la facilidad de
+programación y desarrollo de planificadores de tareas, evitando el desarrollo de políticas específicas de planificación
+conscientes de la asimetría. Además, el rendimiento obtenido es comparable con éstos para cualquier tamaño de problema; para
+matrices de tamaño medio/grande, mejora además de forma sustancial el rendimiento conseguido por un planificador no consciente de la
+asimetría.
 
 \subsection{Análisis detallado de rendimiento}
 
-We next provide further details on the performance behavior of each one of the aforementioned runtime configurations.
-The execution traces in this section have all been extracted with the {\tt Extrae} instrumentation
-tool and analyzed with the visualization package {\tt Paraver}~\cite{Paraver}. 
-The results correspond to the Cholesky factorization of a single problem with matrix dimension {\tt n}~=~6,144 and 
-block size {\tt b}~=~448.
+A continuación, se proporcionan más detalles sobre el comportamiento, en términos de rendimiento, de cada una de las 
+configuraciones anteriormente descritas.Las trazas de ejecución mostradas en esta sección han sido extraídas con la
+heramienta de instrumentación {\tt Extrae}~\cite{Extrae} y visualizadas a través de la herramienta {\tt Paraver}~\cite{Paraver}.
+Los resultados corresponden a un caso concreto de la factorización de Cholesky, con matriz de entrada de dimensión
+{\tt n}~=~6,144 y tamaño de bloque {\tt b}~=~448.
 
-\subsubsection{General task execution overview.}
+\subsubsection{Visión genral de la ejecución de tareas}
 
-Figure~\ref{fig:traces_tasks} reports complete execution traces for each runtime configuration. 
-At a glance, a number of coarse remarks can be
-extracted from the trace:
+La Figura~\ref{fig:traces_tasks} muestra una traza completa de ejecución para cada configuración del planificador OmpSs. A grandes rasgos, es posible
+extraer un conjunto de observaciones generales:
+
 \begin{itemize}
-\item From the perspective of total execution time (i.e., {\em time-to-solution}), the conventional OmpSs runtime combined with 
-      the asymmetric BLIS implementation attains the best results, followed by the Botlev-OmpSs runtime configuration. It is worth pointing out that
-      an asymmetry-oblivious runtime which spawns 8~worker threads, with no further considerations, yields the worst performance by far. In this case, the
-      load imbalance and long idle periods, especially as the amount of concurrency decreases in the final part of the trace, entail
-      a huge performance penalty. 
-\item The flag marks indicating task initialization/completion reveal that 
-      the asymmetric BLIS implementation (which employs the combined resources from a VC) requires less time per task than 
-      the two alternatives based on a sequential BLIS. An effect to note specifically in the Botlev-OmpSs configuration is the
-      difference in performance between tasks of the same type, when
-      executed by a big core (worker threads~5 to~8) or a LITTLE one (worker threads~1 to~4).
-\item The Botlev-OmpSs task scheduler embeds a (complex) scheduling strategy that includes priorities,
-      advancing the execution of tasks in the critical path and, whenever possible, assigning them to fast cores (see, for 
-      example, the tasks for the factorization of diagonal blocks, 
-      colored in yellow). This yields an execution timeline that is more compact during the first stages of the parallel execution, 
-      at the cost of longer idle times when the degree of concurrency decreases (last iterations of the factorization). 
-      Although possible, a priority-aware technique has not been applied in our experiments with the conventional OmpSs setups
-      and remains part of future work.
+\item Desde el punto de vista del tiempo total de ejecución, el planificador convencional de OmpSs combinado con una versión asimétrica
+	de BLIS obtiene los mejores resultados, seguido por la implementación Botlev del planificador. Es necesario destacar que
+		la versión no consciente de la asimetría de OmpSs, con 8 \wt y sin ninguna modificación adicional, obtiene los peores
+		resultados con diferencia. En este caso, el desequilibrio de carga y los largos periodos de inactividad en la
+		ejecución de tareas, especialmente a medida que el paralelismo de tareas disponible disminuye (en las últimas etapas
+		de la ejecución) conllevan una penalización de rendimiento muy considerable.
+
+\item Las marcas de inicio/finalización de cada tarea revelan que la versión asimétrica de BLIS (que utliza los recursos combinados
+	en cada VC) requiere menor tiempo de ejecución por tarea que las dos alternativas basadas en BLIS secuencial. Un efecto a observar
+		es la lógica diferencia en rendimiento en la versión Botlev del planificador en la ejecución de las tareas sobre núcleos
+		rápidos (\wts entre el 5 y el 8) y lentos (\wts entre el 1 y el 4). Este fenómeno no se observa en nuestra solución, ya
+		que, para el planificador, cualquiera de los 4 \wts disponibles observa unidades de procesamiento (VCs) homogéneos.
+
+\item El planificador Botlev-OmpSs incluye políticas complejas de planificación que incluyen el tratamiento de prioridades,
+	avanzando la ejecución de tareas en el camino cŕitico y, cuando sea posible, asignando éstas a núcleos rápidos (véanse,
+		por ejemplo, las tareas correspondientes a factorizaciones de los bloques diagonales, coloreadas en amarillo). Esta
+		política induce una planificación más compactadurante las primeras fases de la ejecución paralela, pero 
+		con mayores problemas a medida que el grado de concurrencia disminuye (en las últimas iteraciones de la 
+		factorización). Aunque es posible, no se ha activado este tipo de gestíon de prioridades en la versión convencional
+		de OmpSs utlilizada en el resto de experimentos, y su interacción con una implementación asimétrica de las tareas
+		se plantea como trabajo futuro.
 \end{itemize}
 
 
@@ -500,76 +508,76 @@ extracted from the trace:
 \centering
 	\begin{subfigure}{\textwidth}
    \includegraphics[width=\textwidth]{Plots/Traces/sym_8cores_tasks.png}
-		\caption{OmpSs - Sequential BLIS (8 worker threads)} 
+		\caption{OmpSs - BLIS secuencial (8 worker threads)} 
 	\end{subfigure}
 	\begin{subfigure}{\textwidth}
    \includegraphics[width=\textwidth]{Plots/Traces/sym_tasks.png}
- \caption{OmpSs - Sequential BLIS (4 worker threads)} 
+ \caption{OmpSs - BLIS secuencial (4 worker threads)} 
 	\end{subfigure}
 	\begin{subfigure}{\textwidth}
    \includegraphics[width=\textwidth]{Plots/Traces/asym_tasks.png}
-		\caption{OmpSs - Asymmetric BLIS (4 worker threads)}
+		\caption{OmpSs - BLIS asimétrico (4 worker threads)}
 	\end{subfigure}
 	\begin{subfigure}{\textwidth}
    \includegraphics[width=\textwidth]{Plots/Traces/botlev_tasks.png}
-		\caption{Botlev-OmpSs - Sequential BLIS (8 worker threads, 4+4)}
+		\caption{Botlev-OmpSs - BLIS secuencial (8 worker threads, 4+4)}
 	\end{subfigure}
-\caption{Execution traces of the three runtime configurations for the Cholesky factorization ({\tt n}~=~6,144, 
+\caption{Trazas de ejecución para las tres configuraciones estudiadas en la factorización de Cholesky ({\tt n}~=~6,144, 
 {\tt b}~=~448). 
-%Task colors match with those in Figure~\ref{fig:dag}. Sections in light blue correspond to idle time. 
-The timeline in each row collects the tasks executed by a single worker thread. 
-Tasks are colored following the convention in Figure~\ref{fig:dag};
-phases colored in white between tasks represent idle times.
-The green flags mark task initialization/completion. 
-%ENRIQUE, FIJATE EN VARIAS COSAS: LA DIFERENCIA EN TIEMPOS DE EJECUCION DE LAS TAREAS EN BOTLEV ENTRE LOS CUATRO PRIMEROS CORES -LENTOS- Y LOS CUATRO ULTIMOS -RAPIDOS- (he
-%anyadido banderitas para que se vea mejor). MIRA
-%TAMBIEN COMO ADELANTA CHOLESKY: AQUI HAY PRIORIDADES, EN LAS OTRAS DOS CONFIGURACIONES, AUNQUE PODRIA, NO LAS HAY. FIJATE TAMBIEN EN COMO BOTLEV COMPACTA
-%TANTO LAS TAREAS QUE PENALIZA MUCHISIMO EN LA FASE FINAL DE LA EJECUCION, CUANDO NO QUEDA PARALELISMO. SI NO FUERA POR ESO, BARRERIA EN RENDIMIENTO AL RESTO.
+La línea de tiempo en cada fila recoge las tareas ejecutadas por un único \wt.
+Las tareas se han coloreado siguiendo la convención de la Figura~\ref{fig:dag};
+las fases coloreadas en color blanco representan etapas sin actividad. Las marcas en color
+	verde denotan puntos de inicialización de la ejecución de cada tarea.
 }
 \label{fig:traces_tasks}
 \end{figure}
 
-We next provide a quantitative analysis on the task duration and a more detailed study of 
-the scheduling strategy integrated in each configuration.
 
-\subsubsection{Task duration.}
+Se proporciona a continuación un análisis cuantitativo de la duración temporal de las tareas y un estudio
+más detallado de la estrategia de planificación integrada en cada configuración.
+
+\subsubsection{Duración de las tareas}
  
-Table~\ref{tab:2dp_tasks} reports the average execution time per type of task for each worker thread.
-%In the conventional runtime setups, 
-These results show that the execution time per individual type of task is considerably shorter
-for our multithreaded/asymmetric BLIS implementation than for the alternatives based on a sequential
-version of BLIS. The only exception is the factorization of the diagonal block ({\tt dpotrf}) as this is
-an LAPACK-level routine, and therefore it is not available in BLIS. Inspecting the task execution time of
-the Botlev-OmpSs configuration, we observe a remarkable difference depending
-on the type of core tasks are mapped to. For example, the average execution times for {\tt dgemm}
-range from more than 400~ms on a LITTLE core, to roughly 90~ms on a big core. This
-behavior is reproduced for all types of tasks.
+La Tabla~\ref{tab:2dp_tasks} muestra el tiempo medio de ejecución por tipo de tarea para cada \wt.
+Los resultados muestran como el tiempo de ejecución para cada tipo de tarea es considerablemente menor
+en la versión asimétrica de BLIS que en las alternativas basadas en ejecuciones secuenciales de las
+tareas. La única excepción es la factorización de los bloques diagonales (rutina {\tt dpotrf}), ya que
+se trata de una rutina perteneciente a LAPACK, y por tanto no disponible en BLIS y no paralelizada de forma
+consciente de la asimetría). Inspecionando la duración de las tareas en la configuración Botlev-OmpSs, 
+se observa una notable diferencia en función del tipo de núcleo sobre el que el planificador mapea las tareas. Por
+ejemplo, el tiempo medio de ejecución para {\tt dgemm} varía entre más de 400~ms en un núcleo lento, hasta prácticamente
+90~ms en un núcleo rápido. Este comportamiento se reproduce para todos los tipos de tareas.
 
-%To illustrate these facts, Figure~\ref{fig:traces_task_duration} represents a detailed histogram of the execution times 
-%for the {\tt dgemm} task instantiations in the task-parallel executions. Each bin corresponds to the amount of tasks
-%with a given execution time while rows correspond to different worker threads. Comparing conventional runtimes (traces (a) and (b)), 
-%there is a clear deviation in the average execution times towards faster executions, that is, the average time to execute a task
-%using the asymmetry-aware BLIS implementation is shorter. The histogram for Botlev (trace (c)) 
-%exhibits two different peaks, corresponding to tasks executed on the big or on the LITTLE cores, respectively. Note that tasks executing on the fast
-%cores do it at the same performance rate as those for the conventional runtime setup using a sequential BLIS implementation. 
-%A similar behavior has been observed for the rest of the BLAS-3 tasks involved in the computation.
+Para ilustrar más claramente estas observaciones, la Figura~\ref{fig:traces_task_duration} representa un histograma
+detallado de los tiempos de ejecución para las distintas instancias de la tarea {\tt dgemm} durante la ejecución
+paralela. Cada casilla corresponde al número de tareas con un tiempo de ejecución dado, mietras que las filas corresponden
+a cada \wt en ejecución.
+Comparando las configuraciones que utilizan planificadores convencionales (trazas (a) y (b)),
+existe una clara desviación en el tiempo medio de ejecución hacia mayores rendimientos al utilizar
+BLIS asimétrico, esto es, el tiempo medio de ejecución de una tarea es claramente menor en este caso. El histograma para Botlev (traza (c))
+muestra dos zonas diferenciadas, que corresponden a tareas ejecutadas sobre núcleos rápidos y núcleos lentos, respetivamente. Nótese que
+las tareas ejecutadas sobre núcleos rápidos obitnen el mismo rendimiento que las equivalentes en una configuración convencional
+usando BLIS secuencial. Se ha observado un comportamiento similar para el resto de tareas BLAS ejecutadas durante el experimento.
 
-%\begin{figure}%[t]
-%\centering
- %\subfigure[OmpSs + Symmetric BLIS]{
-   %\includegraphics[width=\textwidth]{Plots/Traces/sym_task_duration_histogram.png}
-%}
- %\subfigure[OmpSs + Asymmetric BLIS]{
-   %\includegraphics[width=\textwidth]{Plots/Traces/asym_task_duration_histogram.png}
-%}
- %\subfigure[Botlev-OmpSs - 4+4 threads]{
-   %\includegraphics[width=\textwidth]{Plots/Traces/botlev_task_duration_histogram.png}
-%}
-%\caption{Task time duration histogram for {\tt dgemm} tasks on the three studied runtime configurations for the Cholesky factorization ({\tt n}~=~6,144, {\tt b}~=~448).  
-%Rows correspond to worker threads in the execution. Columns correspond to time bins. Gradient color indicates the number of tasks in the corresponding bin (ranging
-%from light green to dark blue).}
-%\label{fig:traces_task_duration}
-%\end{figure}
+\begin{figure}%[t]
+\centering
+	\begin{subfigure}{\textwidth}
+   \includegraphics[width=\textwidth]{Plots/Traces/sym_task_duration_histogram.png}
+ \caption{OmpSs + Symmetric BLIS}
+	\end{subfigure}
+	\begin{subfigure}{\textwidth}
+   \includegraphics[width=\textwidth]{Plots/Traces/asym_task_duration_histogram.png}
+		\caption{OmpSs + Asymmetric BLIS}
+	\end{subfigure}
+	\begin{subfigure}{\textwidth}
+   \includegraphics[width=\textwidth]{Plots/Traces/botlev_task_duration_histogram.png}
+ \caption{Botlev-OmpSs - 4+4 threads}
+	\end{subfigure}
+\caption{Histograma de duración de tareas para la tarea {\tt dgemm} sobre las tres configuraciones de planificador utilizadas para la factorización de Cholesky ({\tt n}~=~6,144, {\tt b}~=~448).  
+	Las filas corresponden a los \wts en ejecución. Las columnas corresponden a intervalos de tiempo de ejecución medio. Los colores (en gradiente) indican el número de tareas en el 
+	intervalo correspondiente (desde verde claro hasta azul oscuro, en un rango de menor a mayor número de tareas).}
+\label{fig:traces_task_duration}
+\end{figure}
 
 
 \begin{table}%[t]
@@ -607,75 +615,72 @@ behavior is reproduced for all types of tasks.
 \end{table}
 
 \subsubsection{Task scheduling policies and idle times.}
+\subsubsection{Políticas de planificación y tiempos sin actividad}
 
-Figure~\ref{fig:traces_task_number} illustrates the task execution order determined by the Nanos++ task scheduler. 
-Here tasks are depicted using a color gradient, attending to the order in which they are encountered in the sequential code, 
-from the earliest to the latest.
 
-At runtime, the task scheduler in Botlev-OmpSs issues tasks to execution out-of-order depending on their criticality. 
-The main idea behind this scheduling policy is to track the criticality of each task and, when possible, 
-advance the execution of critical tasks assigning them to the fast Cortex-A15 cores. 
-Conformally with this strategy, an out-of-order execution reveals itself more frequently in the timelines for the big cores 
-than in those for the LITTLE cores. 
-With the conventional runtime, the out-of-order execution is only dictated 
-by the order in which data dependencies for tasks are satisfied.
+La Figura~\ref{fig:traces_task_number} ilustra el orden de ejecución de tareas determinado por el planificador de OmpSs. 
+En ella, las tareas se muestran utilizando un gradiente de color, atendiendo exclusivamente al orden en el que son encontradas
+en el código secuencial (Figura~\ref{lst:chol}), desde la primera hasta la última.
 
-From the execution traces, we can observe that the Botlev-OmpSs alternative suffers a remarkable
-performance penalty due to the existence of idle periods in the final part of the factorization, 
-when the concurrency in the factorization is greatly diminished. 
-This problem is not present in the conventional scheduling policies.
-In the first stages of the factorization, however, the use of a priority-aware policy for the Botlev-OmpSs scheduler
-effectively reduces idle times. 
-Table~\ref{tab:th_state} reports the percentage of time each worker
-thread is in {\tt running} or {\tt idle} state. In general, the relative amount of time spent in idle state is much 
-higher for Botlev-OmpSs than for the conventional implementations (17\% vs. 5\%, respectively). 
-Note also the remarkable difference in the percentage of idle time between 
-the big and LITTLE cores (20\% and ~13\%, respectively), which drives to the conclusion that the fast cores stall waiting for
-completion of tasks executed on the LITTLE cores. This fact can be confirmed in the final stages of the Botlev-OmpSs trace.
+En tiempo de ejecución, el planificador de tareas Botlev-OmpSs lanza tareas a ejecución fuera de orden, dependiendo de
+su criticalidad, y las asigna, a ser posible, sobre núcleos rápidos. De acuerdo con esta estrategia, la ejecución fuera de
+orden se revela más frecuentemente en las líneas de timepo para los núcleos rápidos que para los lentos. Con el planificador
+convencional, la ejecución fuera de orden sólo viene dictada por el cumplimiento de las dependencias de datos en tiempo de ejecución.
 
-The previous observations pave the road to a combination of scheduling policy and execution model for AMPs, 
-in which asymmetry is exploited through {\em ad-hoc} scheduling policies during the first stages of the factorization 
---when the potential parallelism is massive--, and this is later replaced with the use 
-of asymmetric-aware kernels and coarse-grain VCs
-in the final stages of the execution, when the concurrency is scarce. Both approaches are not mutually exclusive, 
-but complementary depending on the level of task concurrency available at a given execution stage.
+A la vista de las trazas de ejecución, es posible observar cómo el planificador Botlev-OmpSs muestra una penalización
+en el rendimiento muy aprecialbe debida a la existencia de periodos ociosos en la parte final de la factorización, cuando
+la concurrencia disponible disminuye. Este problema no se da utilizando políticas de planificación convencionales. Sin embargo,
+en las primeras fases de la factorización, el uso de una política consciente de la criticalidad de las tareas (implementada en 
+Botlev-OmpSs), reduce de forma efectiva los períodos de tiempo en los que los \wts permanecen ociosos.
+
+La Tabla~\ref{tab:th_state} muestra el porcentaje de tiempo en el que cada \wt permanece en estado 
+{\tt running} (ejecutando tareas) o {\tt idle} (sin ejecutar tareas). En general, la cantidad de tiempo transcurrido en estado
+{\tt idle} es mucho mayor para Botlev-OmpSs que para las implementaciones convencionales
+(17\% contra 5\%, respectivamente). 
+Nótese también la notable diferencia en el procentaje de tiempo ocioso entre núcleos rápidos y lentos
+(20\% y~13\%, respectivamente), lo que lleva a la conclusión de que los núcleos rápidos deben eseprar 
+a la finalización de tareas ejecutadas en núcleos lentos. En otras palabras, en estas configuraciones, los núcleos lentos ``frenan'' a los
+rápidos. Este hecho es también constatable en las etapas finales de la traza obtenida con la configuración Botlev-OmpSs.
+
+Las anteriores observaciones sugieren la combinación de distintas configuraciones sobre una misma ejecución si
+se utilizan procesadores asimétricos; en este enfoque, la asimetría podría ser explotada a través de políticas de planificación
+conscientes de la arquitectura durante las primeras fases de la factorización --cuando el paralelismo de tareas disponible es elevado--,
+y reemplazar el enfoque por el uso de tareas conscientes de la arquitectura y VCs en las fases finales de la ejecución, cuando la
+concurrencia es escasa. Ambos enfoques no son mutuamente exclusivos, sino complementarios en función del nivel de concurrencia disponible
+en un punto determinado de la ejecución. Estas ideas se plantean como líneas de investigación futuras al presente trabajo.
 
 \begin{figure}%[t]
 \centering
 	\begin{subfigure}{\textwidth}
    \includegraphics[width=\textwidth]{Plots/Traces/sym_8cores_task_number.png}
-		\caption{OmpSs - Sequential BLIS (8 worker threads)}
+		\caption{OmpSs - BLIS secuencial (8 worker threads)}
 	\end{subfigure}
 	\begin{subfigure}{\textwidth}
    \includegraphics[width=\textwidth]{Plots/Traces/sym_task_number.png}
-		\caption{OmpSs - Sequential BLIS (4 worker threads)} 
+		\caption{OmpSs - BLIS secuencial (4 worker threads)} 
 	\end{subfigure}
 	\begin{subfigure}{\textwidth}
    \includegraphics[width=\textwidth]{Plots/Traces/asym_task_number.png}
-		\caption{OmpSs - Asymmetric BLIS (4 worker threads)} 
+		\caption{OmpSs - BLIS asimétrico (4 worker threads)} 
 	\end{subfigure}
 	\begin{subfigure}{\textwidth}
    \includegraphics[width=\textwidth]{Plots/Traces/botlev_task_number.png}
-		\caption{Botlev-OmpSs - Sequential BLIS (8 worker threads, 4+4)} 
+		\caption{Botlev-OmpSs - BLIS secuencial (8 worker threads, 4+4)} 
 	\end{subfigure}
-\caption{Task execution order of the three studied runtime configurations for the Cholesky factorization 
-({\tt n}~=~6,144, {\tt b}~=~448). In the trace, tasks are ordered
-according to their appearance in the sequential code, 
-and depicted using a color gradient, with light green indicating early tasks, and dark blue for the late
-tasks. 
-%ENRIQUE, FIJATE COMO SE NOTA
-%MAS LA EJECUCION FUERA DE ORDEN EN BOTLEV, ESPECIALMENTE EN LOS CORES RAPIDOS (Y MIRA POR EJEMPLO COMO ADELANTA CHOLESKY). BOTLEV USA PRIORIDADES. LAS OTRAS DOS CONFIGURACIONES, AUNQUE PODRIAN, NO LO HACEN EN NUESTRA CONFIGURACION, LO CUAL
-%ES UN PUNTO A FAVOR.
-}
+\caption{Orden de ejecución de tareas para las tres configuraciones estudiadas sobre la factorización de Cholesky
+({\tt n}~=~6,144, {\tt b}~=~448). En las trazas, las tareas se ordenan según su orden de aparición
+en el código secuencial, y son mostradas usando un gradiente de color, correspondiendo el color verde claro a tareas
+	tempranas, y azul oscuro a tareas tardías.}
 \label{fig:traces_task_number}
 \end{figure}
 
 \begin{table}
 \centering
-\caption{Percentage of time per worker thread in idle or running state for different runtime configurations for the Cholesky factorization 
+	\caption{Porentaje de tiempo por \wt en estado {\tt idle} o {\tt running} para distintas configuraciones de planificador para la factorización de Cholesky
 ({\tt n}~=~6,144, {\tt b}~=~448).
-Note that {\sc wt 0} is the master thread, and thus is never idle; for it, the rest of the time till
-100\% percentage is devoted to {\tt synchronization}, {\tt scheduling} and {\tt thread creation}. For the rest of threads, this amount of time is devoted to {\tt runtime overhead}.}
+	Nótese que {\sc wt 0} es el hilo principal, y por tanto nunca permanece en estado {\tt idle} dadas las características de OmpSs; 
+	para él, el resto del tiempo hasta el 100\% se dedica a sincronización, planificación y creación de la hebra. Para el resto de las hebras, esta cantidad
+	de tiempo se considera sobrecoste de planificación ({\tt runtime overhead}).}
 \label{tab:th_state}
 
 \ra{1.2}
