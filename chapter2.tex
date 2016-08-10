@@ -8,20 +8,60 @@
 \subsection{Introducción a las arquitecturas asimétricas}
 \label{sec:arch_asym}
 
-Ideas para esta subsección:
+Desde la aparición de los procesadores multinúcleo, y tras su auge durante la pasada
+década como respuesta a las limitaciones en el incremento de la frecuencia de reloj
+impuestas por la tecnología, este tipo de arquitecturas se han convertido en un pilar
+clave en el desarrollo de arquitecturas de altas prestaciones, reuniendo a la vez
+una gran capacidad de cálculo y una eficiencia energética notable.
 
-\begin{itemize}
+Históricamente, los procesadores multinúcleo han estado formados por varias 
+Unidades de Procesamiento (PUs), típicamente con idénticas características entre ellas.
+Sin embargo, a medida que la ley de escalabilidad de Dennard~\cite{Den74} comienza a 
+ver su fin, los sistemas heterogéneos se han convertido en las arquitecturas más 
+atractivas en el campo de la computación de altas prestaciones. Este tipo de sistemas,
+típicamente equipados con núcleos de procesamiento de propósito general y aceleradores
+hardware de propósito específico, exhiben características, tanto desde el punto de vista
+de las prestaciones como del consumo energético, que responden a las necesidades actuales
+exigidas por los grandes problemas que surgen en diversos ámbitos de la ciencia y la
+ingeniería.
 
-\item Multi-cores heterogéneos. Motivaciones y uso (básicamente en entornos móviles).
+Dentro de los sistemas heterogéneos se puede hacer una segunda clasificación en función de que los
+distintos núcleos dispongan de distintos repertorios de instrucciones ({\em heterogeneous-ISA}) o
+o utilicen el mismo repertorio de instrucciones ({\em single-ISA}). Estos últimos se denominan
+habitualmente procesadores asimétricos ({\em asymmetric single-ISA CMP o ASISA-CMP}). [Survey-
+asimetricos].
 
-\item ¿Qué es una arquitectura asimétrica? Tomar, por ejemplo, el caso de Samsung Exynos. Procesador rápido, fuera de orden; procesador lento, en orden.
+En un procesador multinúcleo asimétrico (AMP), las diferencias entre los distintos núcleos se
+deben a distinta microarquitecturas (asimetría física) o se trata de procesadores con la misma
+microarquitectura pero distinta frecuencia o tamaño de cache (asimetría virtual). En ocasiones,
+se usan técnicas de escalado dinámico de voltaje y frecuencia (DVFS) para emular procesadores 
+asimétricos a partir de núcleos simétricos, consiguiendo así un sistema con asimetría virtual. Las
+ventajas de este tipo de arquitecturas dependen del escenario en el que son utilizadas; en la 
+actualidad, el uso de arquitecturas asimétricas es una tendencia en alza en el mercado de 
+dipositivos móviles, en el que el tipo de tareas a ejecutar y su criticalidad es altamente 
+heterogéneo, y el tiempo de vida de las baterías es un bien escaso y muy a tener en cuenta.
 
-\item Motivación para el uso de asimétricos en entornos móviles y limitados por consumo energético. Motivación para el uso de todos los recursos en HPC. Arquitectura
-asimétrica más extendida: compuesta por núcleos ARM (big.LITTLE). Referencia al proyecto MontBlanc.
+Dentro de las arquitecturas multinúcleo asimétricas, tienen especial relevancia los procesadores de la familia
+ARM, que se denominan big.LITTLE para reflejar que incluyen procesadores potentes ({\em big})
+junto con procesadores de menor rendimiento y mucho menor consumo ({\em LITTLE})[Jeff]. Por
+ejemplo, se pueden combinar núcleos Cortex-A15 (big) con Cortex-A7 (LITTLE), si nos referimos al repertorio de
+instrucciones de 32 bits (ARMv7), o Cortex A57 (big) con A53 (Little) para el caso de 64 bits
+(ARMv8). Uno de los ejemplos reales más utilizados a día de hoy es el SoC Samsung Exynos (véase Figura~\ref{fig:exynos})
+ en sus versiones de 32 y 64 bits, ampliamente utilizado en dispositivos móviles de última generación.
 
-\item Revisar el artículo {\em Arquitecturas Heterogéneas} de Drive, donde se describen los anteriores puntos y se presentó la arquitectura big.LITTLE.
+\begin{figure}[th!]
+\begin{center}
+\includegraphics[width=0.4\columnwidth]{Figures/Exynos.eps}
+\end{center}
+\caption{\label{fig:exynos} Diagrama de bloques del SoC Samsung Exynos 5422.}
+\end{figure}
 
-\end{itemize}
+En los últimos años, además, la utilización de este tipo de arquitecturas de muy bajo consumo se ha
+convertido en un campo de investigación en pleno auge en la ruta hacia la construcción de futuros
+supercomputadores que alcancen la barrera del Exaflop [REF ROAD TO EXAFLOP y MontBLANC]. La construcción
+de este tipo de computadores y su posible idoneidad de cara a llegar a (y superar) dicha barrera
+los ha convertido en un candidato más que factible a la hora de desarrollar técnicas y códigos
+que exploten de manera eficiente todos los recursos computacionales que ofrecen.
 
 \subsection{Soporte en el kernel para arquitecturas big.LITTLE}
 \label{sec:models}
