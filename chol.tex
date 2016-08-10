@@ -58,7 +58,7 @@ para su ejecución en los distintos núcleos computacionales del sistema.
 
 \subsubsection{Planificación de tareas en OmpSs. El planificador Nanox}
 
-\subsubsection{Ejemplo: paralelización de la factorización de Cholesky a nivel de tareas}
+\subsection{Ejemplo: paralelización de la factorización de Cholesky}
 
 A continuación describimos los mecanismos utilizados para extraer paralelismo a nivel de tareas
 durante la ejecución de una operación específica de álgebra lineal densa, utilizando la Factorización
@@ -120,7 +120,7 @@ kernels computacionales básicos de álgebra lineal proporcionados por LAPACK
 
 \lstinputlisting[float=th!,frame=lines,caption=Tareas etiquetadas necesarias para la factorización de Cholesky por bloques.,label=lst:chol_tasks]{Codes/cholesky_tasks.c}
 
-\subsection{Adaptación de OmpSs a arquitecturas asimétricas (botlev)}
+\subsection{Adaptación de OmpSs a arquitecturas asimétricas}
 \label{s3:botlev}
 
 En servidores equipados con uno o más aceleradores --por ejemplo, procesadores gráficos--, versiones especializadas de los
