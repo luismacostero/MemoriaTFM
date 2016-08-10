@@ -1,10 +1,64 @@
-En esta seccion se describen brevemente distintos enfoques software tanto a nivel de planificadores de tareas
-en tiempo de ejecución como de bibliotecas matemáticas, específicamente desarrollados para arquitecturas 
-asimétricas (o heterogéneas).
+En este capítulo se describen distintos enfoques software a la hora de explotar el paralelismo 
+existente en las arquitecturas paralelas más extendidas actualmente, incluyendo sistemas multinúcleo y 
+arquitecturas heterogéneas, haciendo especial hincapié en los mecanismos existentes a la hora de
+explotar sistemas asimétricos. Se describen las dos soluciones con mayor aceptación a día de hoy. 
+La Sección~\ref{sec:tareas} introduce los mecanismos e implementaciones más extendidas para la
+extracción y explotación de paralelismo a nivel de tareas. 
+La Sección~\ref{sec:bibliotecas} incide en el desarrollo de bibliotecas paralelas, extrayendo
+paralelismo a nivel de datos.
+En ambos casos, se tomará como hilo conductor un ámbito concreto: el desarrollo de códigos matemáticos
+dentro del ámbito del álgebra lineal, ya que serán estos códigos los utilizados en la descripción
+del trabajo realizado en próximos capítulos.
+Finalmente, la Sección~\ref{sec:comparativa} realiza una breve comparativa entre ambos enfoques,
+destacando las ventajas e inconvenientes de cada uno de ellos desde el punto de vista del rendimiento
+y de la facilidad de programación.
 
-\section{Planificación de tareas en tiempo de ejecución}
 
-\subsection{Planificación de tareas en la Factorización de Cholesky}
+\section{Modelos de programación basados en paralelismo a nivel de tareas}
+\label{sec:tareas}
+
+El DAG asociado con un algoritmo o rutina es una representación gráfica del paralelismo de tareas asociado a ella,
+e, idealmente, un planificador de tareas en tiempo de ejecución podría explotar esta información para determinar
+distintas planificaciones (esto es, ordenación de tareas y asignación de las mismas a recursos computacionales
+disponibles) que satisfacen las dependencias fijadas en el DAG.
+
+\subsection{Introducción al paralelismo a nivel de tareas. Estado del arte}
+
+\begin{itemize}
+
+\item Hacer un repaso por las distintas alternativas en planificadores a nivel de tareas existentes.
+
+\item Hacer hincapié en el soporte para arquitecturas heterogéneas (muchos lo soportan).
+
+\item Destacar el poco soporte para arquitecturas asimétricas, lo que da valor a nuestra propuesta.
+
+\end{itemize}
+
+\subsection{OmpSs. Modelo de programación y planificación de tareas}
+
+OmpSs es uno de los modelos de programación paralela a nivel de tareas más extendidos a día de hoy. A grandes
+rasgos, el diseño del modelo de programación se basa en la inclusión de directivas (o {\tt pragma}s) similares
+a las utilizadas en otros modelos de programación paralela, como OpenMP. Sin embargo, dichas directivas se limitan
+en su mayoría, a la anotación de ciertos bloques de código (típicamente funciones) para informar de su carácter de
+{\em tareas}, es decir, unidades básicas de planificación a los recursos computacionales disponibles. Dicha planificación
+se difiere hasta el momento de la ejecución del código, en el que un {\em planificador de tareas} o 
+{\em runtime} (en el caso de OmpSs, llamado Nanox) se encarga de mapear, de forma eficiente, su ejecución al 
+mejor recurso computacional disponible en un momento dado.  
+
+\subsubsection{El modelo de programación OmpSs}
+
+Con el fin de ayudar al programador en la construcción de un DAG completo y correcto partiendo de un código secuencial,
+OmpSs proporciona mecanismos sencillos y no invasivos. En dicho modelo, el programador 
+utiliza directivas similares a OpenMP ({\tt pragma}s) para anotar rutinas existentes en el código como tareas, indicando
+a la vez la direccionalidad de sus operandos (entrada, salida o entrada/salida) a través de cláusulas adicionales. A 
+grandes rasgos, el planificador de OmpSs descompone el código (transformado previamente a través del compilador 
+fuente-a-fuente Mercurium~\cite{Mercurium}) en un conjunto de tareas, identificando las dependencias entre ellas, 
+y lanzando a ejecución únicamente {\em tareas listas} (es decir, aquellas cuyas dependencias han sido satisfechas)
+para su ejecución en los distintos núcleos computacionales del sistema.
+
+\subsubsection{Planificación de tareas en OmpSs. El planificador Nanox}
+
+\subsubsection{Ejemplo: paralelización de la factorización de Cholesky a nivel de tareas}
 
 A continuación describimos los mecanismos utilizados para extraer paralelismo a nivel de tareas
 durante la ejecución de una operación específica de álgebra lineal densa, utilizando la Factorización
@@ -54,25 +108,6 @@ el paralelismo de tareas potencial de la operación.
 Por ejemplo, la Figura ~\ref{fig:dag} muestra el DAG con las tareas (nodos) y las dependencias de datos
 (arcos) intrínsecas a la ejecución del código de la Figura~\ref{lst:chol}, cuando éste se ejecuta sobre
 una matriz compuesta por $4 \times 4$ submatrices (esto es, cuando {\tt s}=4).  
-
-\section{Modelos de programación basados en paralelismo a nivel de tareas}
-
-El DAG asociado con un algoritmo o rutina es una representación gráfica del paralelismo de tareas asociado a ella,
-e, idealmente, un planificador de tareas en tiempo de ejecución podría explotar esta información para determinar
-distintas planificaciones (esto es, ordenación de tareas y asignación de las mismas a recursos computacionales
-disponibles) que satisfacen las dependencias fijadas en el DAG.
-
-\subsection{Modelo de programación y planificación de tareas en OmpSs}
-
-Con el fin de ayudar al programador en la construcción de un DAG completo y correcto partiendo de un código secuencial,
-modelos de programación como OmpSs proporcionan mecanismos sencillos y no invasivos. En dicho modelo, el programador 
-utiliza directivas similares a OpenMP ({\tt pragma}s) para anotar rutinas existentes en el código como tareas, indicando
-a la vez la direccionalidad de sus operandos (entrada, salida o entrada/salida) a través de cláusulas adicionales. A 
-grandes rasgos, el planificador de OmpSs descompone el código (transformado previamente a través del compilador 
-fuente-a-fuente Mercurium~\cite{Mercurium}) en un conjunto de tareas, identificando las dependencias entre ellas, 
-y lanzando a ejecución únicamente {\em tareas listas} (es decir, aquellas cuyas dependencias han sido satisfechas)
-para su ejecución en los distintos núcleos computacionales del sistema.
-
 
 El código de la Figura~\ref{lst:chol_tasks} muestra las anotaciones necesarias por parte del programador para explotar
 el paralelismo a nivel de tareas inherente a la factorización de Cholesky usando OmpSs; cabe destacar las líneas etiquetadas
@@ -251,9 +286,10 @@ encuentra desactivado por defecto.
 
 %%{\bf Explain}
 
-\subsection{Implementaciones paralelas y asimétricas de kernels matemáticos fundamentales}
+\section{Implementaciones paralelas de bibliotecas matemáticas}
+\label{sec:bibliotecas}
 
-\subsubsection{Implementación multihebra de BLAS-3}
+\subsection{BLIS: implementación multihebra del estándar BLAS}
 
 A la hora de explotar el paralelismo potencial de una arquitectura, una segunda alternativa al efoque 
 basado en planificación a nivel de tareas (es decir, explotando paralelismo
@@ -289,7 +325,7 @@ de registros vectoriales y tamaño/grado de asociatividad de cada nivel de cache
 
 \lstinputlisting[float=th!,frame=lines,caption=Implementación de altas prestaciones de \gemm en BLIS.,label=lst:gemm]{Codes/gemm.c}
 
-\subsubsection{Implementación multihebra consciente de la asimetría}
+\subsection{Implementación multihebra consciente de la asimetría}
 
 La implementación de \gemm\ en BLIS obtiene un rendimiento cercano al rendimiento pico de la arquitectura,
 como tanto en sistemas multinúcleo como sistemas aceleradores~\cite{BLIS2,BLIS3}. 
@@ -310,3 +346,6 @@ de las rutinas BLAS implementadas en la biblioteca. Así, BLIS se convierte en u
 internamente, explotan la asimetría de la arquitectura subyacente; esta característica será aprovechada en el resto del trabajo en combinación
 con planificadores de tareas ``clásicos'' (no conscientes de la asimetría), como se describe en la siguiente sección.
 
+
+\section{Paralelismo a nivel de tareas y a nivel de datos: ventajas e inconvenientes}
+\label{sec:comparativa}
