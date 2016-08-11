@@ -177,14 +177,14 @@ la ejecución cuanto antes, mientras que si existen pocas tareas listas para
 ser ejecutadas la frecuencia será menor, intentando favorecer el ahorro
 energético. Este planteamiento es similar a tener en cuenta la carga de
 trabajo del sistema, pero medida en número de tareas pendientes en vez de
-ciclos ociosos del procesador. Más concretamente, las políticas monitorizan
-el tamaño de la cola de tareas listas para ser ejecutadas, y determinan
-cuál es el tamaño máximo de la cola hasta el momento de manera dinámica. Si
-la cola posee un tamaño igual o superior al tamaño máximo conocido,
-significa que el número de tareas es elevado y por tanto la frecuencia debe
-ser elevada. Si el tamaño es menor, entonces se determina en que porcentaje
-es menor, y en función de las frecuencias consideradas se toma la decisión
-de modificar la frecuencia actual o no. En el código de la
+ciclos ociosos/ocupados del procesador. Más concretamente, las políticas
+monitorizan el tamaño de la cola de tareas listas para ser ejecutadas, y
+determinan cuál es el tamaño máximo de la cola hasta el momento de manera
+dinámica. Si la cola posee un tamaño igual o superior al tamaño máximo
+conocido, significa que el número de tareas es elevado y por tanto la
+frecuencia debe ser elevada. Si el tamaño es menor, entonces se determina
+en que porcentaje es menor, y en función de las frecuencias consideradas se
+toma la decisión de modificar la frecuencia actual o no. En el código de la
 figura~\ref{s5:fig:listing-p2} se muestra el pseudocódigo asociado a estas
 políticas. El bloque \texttt{if} de la línea~\ref{s5:lst:p2-detectPico} es
 el encargado de determinar si el tamaño actual de la cola es mayor o igual
@@ -237,23 +237,52 @@ el tamaño de la cola entre todas las frecuencias posibles para el
 procesador, mientras que la política P2' solamente considera la frecuencia
 máxima y mínima del mismo. 
 
+
+\subsection{P3}
+La política P3 es similar a la política anterior, pero realizando el
+escalado de frecuencias sobre el cluster de cores big en vez de cores
+LITTLE. De manera similar a la anterior, la política ha sido implementada
+sobre el planificador botlev implementado sobre \ompss para intentar
+minimizar el impacto negativo sobre las tareas críticas. La
+figura~\ref{s5:fig:P3-evo} muestra los distintos cambios de frecuencia que
+se han realizado en función del número de tareas listas para ser
+ejecutadas. En la parte superior, se muestra la evolución del número de
+tareas listas para ser ejecutadas según avanza la ejecución del
+problema. En la gráfica inferior, se muestra la frecuencia del cluster de
+cores big durante la ejecución. Ambas gráficas poseen la misma escala en el
+eje x, permitiendo relacionar ambas gráficas de manera visual. La gráfica
+corresponde a una ejecución sobre la plataforma Juno, para una
+factorización de Cholesky sobre una matriz de tamaño 4608 elementos
+dividida en bloques de tamaño 512 elementos.\\
+
+
 \begin{figure}
   \centering
-  \includegraphics[width=0.5\textwidth]{Figures/todo.png}
-
-  \caption{Cambios de frecuencia en función del tamaño de las colas para la
-    política P2 y P2'.}
-  \label{s5:fig:p2}
+  \setlength{\fboxsep}{5pt}
+  \fbox{\includegraphics[width=1\textwidth]{Figures/Politicas_evo/P3_4608-512.eps}}
+  \caption[Escalado de frecuencia en función del número de tareas listas
+  según la política P3]{Escalado de frecuencia en función del número de
+    tareas listas según la política P3. La ejecución corresponde a una
+    factorización de Cholesky sobre una matriz de 4608 elementos en
+    precisión simple, dividida en bloques de tamaño de 512 elementos,
+    ejecutada sobre la plataforma de desarrollo Juno (donde los cores big
+    corresponden a cores ARM-A57).}
+  \label{s5:fig:P3-evo}
 \end{figure}
 
 
+\comentario{Desarrollar más este párrafo}
+Como se puede apreciar, en una primera fase que se desconoce el
+tamaño máximo de la cola de tareas listas (ya que este está en constante
+crecimiento/decrecimiento), la frecuencia varía al más mínimo cambio en el
+tamaño. Una vez que el número de tareas listas alcanza el máximo y comienza
+a decrementar, los cambios de frecuencia se realizan de manera escalonada
+como se ha comentado en la sección anterior.
 
 
 
 
 
-
-\subsection{P3}
 
 \subsection{P4}
 
