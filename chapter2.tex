@@ -173,6 +173,27 @@ utilizado y el entorno experimental para la medición de consumo usado en parte 
 
 \subsection{Entorno de medición de consumo}
 
+Para el desarrollo del Capítulo~\ref{ch:chapter5} se han utilizado dos entornos experimentales de medición de consumo
+energético sobre las plataformas \odroid y \juno. Ambos entornos se basan en sendas adaptaciones del software {\tt pmlib}~\cite{pmlib},
+desarrollado por la Universidad Jaume I de Castellón; dicha herramienta, desarrollada en lenguaje Python, implementa un paradigma
+ cliente/servidor, en el que la parte servidora se encarga de recoger continuamente muestras de potencia instantánea disipada
+por cierto dispositivo, mientras que la utilización de una API propia permite instrumentar los códigos a perfilar desde el
+punto de vista energético, que actúan como cliente realizando peticiones al servidor {\tt pmlib}.
+
+Ambos entornos difieren en la forma en la que las muestras de consumo energético son recogidas desde el sistema objetivo:
+
+\begin{description}
+
+\item[\odroid:] El servidor {\tt pmlib} ha sido adaptado para interactuar con los sensores de consumo energético integrados 
+en la placa y basados en resistencias de {\em shunt}. Dichos sensores ofrecen lecturas independientes para el consumo energético
+del cluster formado por los Cortex-A7, Cortex-A15, GPU y RAM, con una frecuencia de refresco de cuatro muestras por segundo.
+
+\item[\juno:] El servidor {\tt pmlib} ha sido adaptado para recoger los datos de consumo desde un DAQ XX fabricado por National
+Instruments. Dicho dispositivo, a su vez, recoge muestras de potencia instantánea a partir de las resistencias de {\em shunt}
+integradas en la plataforma, con lecturas actualizadas cada XX segundos e independientes para el cluster formado por los 
+Cortex-A53, Cortex-A57, GPU y resto del sistema.
+
+\end{description}
 
 %-- Configuraciones para emacs --
 %%% Local Variables:
