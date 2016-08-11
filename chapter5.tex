@@ -69,16 +69,13 @@ tareas no críticas, la frecuencia se disminuye un escalón; si el tamaño es
 el triple, la frecuencia se disminuye hasta el tercer escalón de
 frecuencia, etc. Recordar que los valores de frecuencia que puede tomar el
 cluster están limitados por el kernel del sistema operativo, como se
-mencionó en la sección~\todo{poner referencia}. La
+mencionó en la sección~\todo{ref}. La
 línea~\ref{s5:lst:p1-calculoPrincipal(b)} asegura que la frecuencia final
 no es menor que la menor frecuencia soportada. Destacar que de esta manera
 se consigue que el cambio de frecuencia en el cluster se realice de manera
 escalonada según varía el tamaño de las colas.\\
 %%%
 \comentario{La línea 8 es un poco desconcertante}
-\comentario{Comprobar el resultado final poniendo el label y caption
-  como opción de lstlisting, en vez de meterlo en una figura. Observar la
-  tableoffigures o equivalente}
 %%%
 \begin{figure}
   \centering
@@ -98,7 +95,8 @@ int P1(int bigQueueSize, int littleQueueSize){
 }
 \end{lstlisting}
 
-  \caption{Fragmento de código esquemático para la política P1.}
+  \caption[Fragmento de código esquemático para la política P1]
+  {Fragmento de código esquemático para la política P1.}
   \label{s5:fig:listing-p1}
 \end{figure}
 
@@ -112,8 +110,148 @@ aumentar la frecuencia al máximo directamente en caso de que todas las
 tareas sean no críticas, o de disminuir la frecuencia al mínimo en caso de
 que no exista ninguna tarea no crítica que ejecutar.
 
+\todo{quizás poner aquí la evolución de la frecuencia en funcińo del tamaño
+  de las colas. Puede que mejor en la sección de resultados}.
 
-\subsection{P2}
+\subsection{P2 y P2'}
+A la hora de aplicar técnicas de escalado de frecuencia (DVFS) sobre una
+arquitectura o problema, la técnica presenta de manera simplificada dos
+grandes dimensiones sobre las que tomar decisiones sobre los parámetros de
+configuración para conseguir el objetivo de reducir el consumo total:
+(a)~una primera dimensión que determina qué frecuencias utilizar durante
+los diferentes cambios, y (b)~una segunda dimensión que determina en qué
+momentos de la ejecución se debe modificar la frecuencia.\\
+La primera dimensión normalmente viene acotada por la propia arquitectura
+sobre la que se ejecuta el problema, ya que es común que el procesador no
+pueda funcionar a cualquier frecuencia, sino solamente a una serie de
+frecuencias prefijadas de antemano. Esto hace que tomar la decisión de a
+qué frecuencia se desea cambiar el procesador sea únicamente realizar una
+elección en un conjunto cerrado y finito de frecuencias. Destacar que en
+ocasiones puede ser interesante descartar algunas de estas frecuencias y no
+tenerlas en consideración, ya sea porque impactan de manera muy negativa en
+el rendimiento, o no tienen un impacto muy significativo en la mejora de
+consumo.\\
+La segunda dimensión está estrechamente relacionada con el problema a
+ejecutar y el conocimiento que se tenga de él. Las decisiones que se pueden
+tomar van desde decisiones de grano grueso, como puede ser tener en cuenta
+el nivel de carga de trabajo de cada procesador y variar la frecuencia en
+función de este dato, hasta decisiones de grano más fino como puede ser
+conocer el comportamiento de cada una de las tareas a ejecutar y el árbol
+de dependencias de antemano, y tomar decisiones en función de estos
+parámetros, por ejemplo, si se sabe que una tarea es crítica, aumentar la
+frecuencia para así intentar generar nuevas tareas cuanto antes, o si se
+sabe que la ejecución va a estar bloqueada hasta que no finalice una tarea
+en concreto, disminuir la frecuencia del resto de procesadores hasta que
+esta tarea finalice y así intentar disminuir el consumo energético. Hay que
+hacer notar que aunque bajar la frecuencia del procesador implique
+conseguir una potencia instantánea menor, eso no implica que la energía
+final consumida sea también menor, ya que al bajar la frecuencia el tiempo
+de ejecución puede aumentar lo suficiente provocando un consumo de energía
+mayor al final.\\
+Adicionalmente a estas dos dimensiones, los sistemas heterogéneos, y en
+concreto las arquitecturas asimétricas, presentan una dimensión extra sobre
+la que tomar decisiones: (c) decidir sobre qué elementos de cálculo aplicar
+el escalado de frecuencia. En el caso de las arquitecturas asimétricas,
+esta decisión se simplifica a decidir si aplicar el escalado al cluster de
+cores big, o al cluster de cores LITTLE.\\
+
+La primera intuición que surge al intentar aplicar un escalado de
+frecuencia sobre una arquitectura asimétrica es la de pensar que debido a
+la gran diferencia de rendimiento entre los cores big y LITTLE (como se
+pudo ver en la figura~\todo{ref}), aplicar la técnica a los cores big puede
+suponer una pérdida significativa de rendimiento, lo cuál puede provocar
+incluso un aumento en el consumo energético al tardar mayor tiempo en
+ejecutarse la aplicación, es decir, se podría llegar a empeorar tanto el
+rendimiento como el consumo energético. Para evitar que suceda este hecho,
+las políticas P2 y P2' han sido diseñadas para modificar la frecuencia
+sobre el cluster de cores LITTLE, y así intentar no causar un gran impacto
+sobre el rendimiento. Además, las políticas han sido desarrolladas sobre el
+planificador botlev comentando en la seccion~\ref{s3:botlev}, con el
+objetivo de intentar asegurar que las tareas críticas se ejecutan en los
+cores big para así evitar que se retrasen si se ejecutaran en un core
+LITTLE con la frecuencia disminuida.\\
+Para determina cuando variar la frecuencia del cluster se tienen en cuenta
+el número de tareas listas para ser ejecutadas, así, si existen muchas
+tareas para ser ejecutadas, la frecuencia será alta para intentar finalizar
+la ejecución cuanto antes, mientras que si existen pocas tareas listas para
+ser ejecutadas la frecuencia será menor, intentando favorecer el ahorro
+energético. Este planteamiento es similar a tener en cuenta la carga de
+trabajo del sistema, pero medida en número de tareas pendientes en vez de
+ciclos ociosos del procesador. Más concretamente, las políticas monitorizan
+el tamaño de la cola de tareas listas para ser ejecutadas, y determinan
+cuál es el tamaño máximo de la cola hasta el momento de manera dinámica. Si
+la cola posee un tamaño igual o superior al tamaño máximo conocido,
+significa que el número de tareas es elevado y por tanto la frecuencia debe
+ser elevada. Si el tamaño es menor, entonces se determina en que porcentaje
+es menor, y en función de las frecuencias consideradas se toma la decisión
+de modificar la frecuencia actual o no. En el código de la
+figura~\ref{s5:fig:listing-p2} se muestra el pseudocódigo asociado a estas
+políticas. El bloque \texttt{if} de la línea~\ref{s5:lst:p2-detectPico} es
+el encargado de determinar si el tamaño actual de la cola es mayor o igual
+que cualquier tamaño hasta el momento, y en caso de ser así, configurar el
+cluster para que funcione a máxima frecuencia. Esto es equivalente a
+determinar si hay un pico de carga de trabajo o no. Las
+líneas~\ref{s5:lst:p2-tamStep1}-\ref{s5:lst:p2-tamStep2} determinan el
+número de tareas que separan una frecuencia de la otra. La forma de
+determinar esta cantidad consiste en repartir de manera equitativa el
+espacio máximo de tareas conocido hasta el momento entre todas las
+frecuencias, y asignar la frecuencia actual en función de qué tamaño posea
+la cola (línea~\ref{s5:lst:p2-step}). Por ejemplo, si el cluster es capaz
+de ejecutarse a 5 frecuencias distintas, y hasta el momento el número
+máximo de tareas preparadas para ser ejecutas ha sido de 20 tareas, antes
+de cambiar de frecuencia se dispone de un margen de 4 tareas. Si el tamaño
+actual de la cola es de 3 tareas, la frecuencia del cluster será la mínima,
+mientras que si es de 5 tareas, la frecuencia ya no será la mínima, sino la
+frecuencia inmeditamente superior.
+
+\begin{figure}
+  \centering
+
+  \begin{lstlisting}[language=C++]
+int P2(int littleQueueSize, int bigQueueSize){      
+  //Comprobamos si estamos en un pico de carga
+  if(littleQueueSize >= FreqCfg::maxQueueSize){ |\label{s5:lst:p2-detectPico}|
+    FreqCfg::maxQueueSize = littleQueueSize;
+
+    return changeLittleFreq(FreqCfg::maxLittleFreq);
+  }
+
+  //Tamanyo para cambiar de frecuencia
+  float tamStep = (FreqCfg::maxQueueSize*1.0 /     |\label{s5:lst:p2-tamStep1}|
+                   (FreqCfg::maxIdxLittle+1)*1.0); |\label{s5:lst:p2-tamStep2}|
+  //Escalon actual
+  int step = (int) (littleQueueSize / tamStep);    |\label{s5:lst:p2-step}|
+
+  return changeLittleFreq(FreqCfg::littleFreqs[step]);
+}
+  \end{lstlisting}
+
+  \caption{Pseudocódigo para las políticas P2 y P2'.}
+
+  \label{s5:fig:listing-p2}
+\end{figure}
+
+La diferencia entre las políticas P2 y P2' se encuentra en el rango de
+frecuencias que se consideran para el cluster. Así, la política P2 divide
+el tamaño de la cola entre todas las frecuencias posibles para el
+procesador, mientras que la política P2' solamente considera la frecuencia
+máxima y mínima del mismo. 
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.5\textwidth]{Figures/todo.png}
+
+  \caption{Cambios de frecuencia en función del tamaño de las colas para la
+    política P2 y P2'.}
+  \label{s5:fig:p2}
+\end{figure}
+
+
+
+
+
+
+
 
 \subsection{P3}
 
