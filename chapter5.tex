@@ -114,9 +114,9 @@ que no exista ninguna tarea no crítica que ejecutar.
   de las colas. Puede que mejor en la sección de resultados}.
 
 \subsection{P2 y P2'}
-A la hora de aplicar técnicas de escalado de frecuencia (DVFS) sobre una
-arquitectura o problema, la técnica presenta de manera simplificada dos
-grandes dimensiones sobre las que tomar decisiones sobre los parámetros de
+A la hora de aplicar técnicas de escalado de frecuencia (DVFS) sobre un
+problema cualquiera, la técnica presenta de manera simplificada dos grandes
+dimensiones sobre las que tomar decisiones sobre los parámetros de
 configuración para conseguir el objetivo de reducir el consumo total:
 (a)~una primera dimensión que determina qué frecuencias utilizar durante
 los diferentes cambios, y (b)~una segunda dimensión que determina en qué
@@ -125,11 +125,11 @@ La primera dimensión normalmente viene acotada por la propia arquitectura
 sobre la que se ejecuta el problema, ya que es común que el procesador no
 pueda funcionar a cualquier frecuencia, sino solamente a una serie de
 frecuencias prefijadas de antemano. Esto hace que tomar la decisión de a
-qué frecuencia se desea cambiar el procesador sea únicamente realizar una
-elección en un conjunto cerrado y finito de frecuencias. Destacar que en
-ocasiones puede ser interesante descartar algunas de estas frecuencias y no
-tenerlas en consideración, ya sea porque impactan de manera muy negativa en
-el rendimiento, o no tienen un impacto muy significativo en la mejora de
+qué frecuencia se desea configurar el procesador sea únicamente realizar
+una elección en un conjunto cerrado y finito de frecuencias. Destacar que
+en ocasiones puede ser interesante descartar algunas de estas frecuencias y
+no tenerlas en consideración, ya sea porque impactan de manera muy negativa
+en el rendimiento, o no tienen un impacto muy significativo en la mejora de
 consumo.\\
 La segunda dimensión está estrechamente relacionada con el problema a
 ejecutar y el conocimiento que se tenga de él. Las decisiones que se pueden
@@ -143,14 +143,14 @@ frecuencia para así intentar generar nuevas tareas cuanto antes, o si se
 sabe que la ejecución va a estar bloqueada hasta que no finalice una tarea
 en concreto, disminuir la frecuencia del resto de procesadores hasta que
 esta tarea finalice y así intentar disminuir el consumo energético. Hay que
-hacer notar que aunque bajar la frecuencia del procesador implique
-conseguir una potencia instantánea menor, eso no implica que la energía
-final consumida sea también menor, ya que al bajar la frecuencia el tiempo
-de ejecución puede aumentar lo suficiente provocando un consumo de energía
-mayor al final.\\
+destacar que aunque bajar la frecuencia del procesador implique conseguir
+una potencia instantánea menor, eso no implica que la energía final
+consumida sea también menor, ya que al bajar la frecuencia el tiempo de
+ejecución puede aumentar lo suficiente para provocar un consumo de energía
+mayor global.\\
 Adicionalmente a estas dos dimensiones, los sistemas heterogéneos, y en
 concreto las arquitecturas asimétricas, presentan una dimensión extra sobre
-la que tomar decisiones: (c) decidir sobre qué elementos de cálculo aplicar
+la que tomar decisiones: (c)~decidir sobre qué elementos de cálculo aplicar
 el escalado de frecuencia. En el caso de las arquitecturas asimétricas,
 esta decisión se simplifica a decidir si aplicar el escalado al cluster de
 cores big, o al cluster de cores LITTLE.\\
@@ -158,19 +158,19 @@ cores big, o al cluster de cores LITTLE.\\
 La primera intuición que surge al intentar aplicar un escalado de
 frecuencia sobre una arquitectura asimétrica es la de pensar que debido a
 la gran diferencia de rendimiento entre los cores big y LITTLE (como se
-pudo ver en la figura~\todo{ref}), aplicar la técnica a los cores big puede
-suponer una pérdida significativa de rendimiento, lo cuál puede provocar
-incluso un aumento en el consumo energético al tardar mayor tiempo en
-ejecutarse la aplicación, es decir, se podría llegar a empeorar tanto el
-rendimiento como el consumo energético. Para evitar que suceda este hecho,
-las políticas P2 y P2' han sido diseñadas para modificar la frecuencia
-sobre el cluster de cores LITTLE, y así intentar no causar un gran impacto
-sobre el rendimiento. Además, las políticas han sido desarrolladas sobre el
-planificador botlev comentando en la seccion~\ref{s3:botlev}, con el
-objetivo de intentar asegurar que las tareas críticas se ejecutan en los
-cores big para así evitar que se retrasen si se ejecutaran en un core
-LITTLE con la frecuencia disminuida.\\
-Para determina cuando variar la frecuencia del cluster se tienen en cuenta
+pudo ver en la figura~\todo{ref}), aplicar una reducción de frecuencia a
+los cores big puede suponer una pérdida significativa de rendimiento, lo
+cuál puede provocar incluso un aumento en el consumo energético al tardar
+mayor tiempo en ejecutarse la aplicación, es decir, se podría llegar a
+empeorar tanto el rendimiento como el consumo energético. Para evitar que
+suceda este hecho, las políticas P2 y P2' han sido diseñadas para modificar
+la frecuencia sobre el cluster de cores LITTLE, y así intentar no causar un
+gran impacto sobre el rendimiento. Además, las políticas han sido
+desarrolladas sobre el planificador botlev comentando en la
+sección~\ref{s3:botlev}, con el objetivo de intentar asegurar que las
+tareas críticas se ejecutan en los cores big para así evitar que se
+retrasen si se ejecutaran en un core LITTLE con la frecuencia disminuida.\\
+Para determinar cuando variar la frecuencia del cluster se tiene en cuenta
 el número de tareas listas para ser ejecutadas, así, si existen muchas
 tareas para ser ejecutadas, la frecuencia será alta para intentar finalizar
 la ejecución cuanto antes, mientras que si existen pocas tareas listas para
@@ -239,7 +239,7 @@ máxima y mínima del mismo.
 
 
 \subsection{P3}
-La política P3 es similar a la política anterior, pero realizando el
+La política P3 es similar a la política anterior P2, pero realizando el
 escalado de frecuencias sobre el cluster de cores big en vez de cores
 LITTLE. De manera similar a la anterior, la política ha sido implementada
 sobre el planificador botlev implementado sobre \ompss para intentar
@@ -253,13 +253,15 @@ cores big durante la ejecución. Ambas gráficas poseen la misma escala en el
 eje x, permitiendo relacionar ambas gráficas de manera visual. La gráfica
 corresponde a una ejecución sobre la plataforma Juno, para una
 factorización de Cholesky sobre una matriz de tamaño 4608 elementos
-dividida en bloques de tamaño 512 elementos.\\
+dividida en bloques de tamaño 512 elementos en precisión simple.\\
 
 
 \begin{figure}
   \centering
-  \setlength{\fboxsep}{5pt}
-  \fbox{\includegraphics[width=1\textwidth]{Figures/Politicas_evo/P3_4608-512.eps}}
+  {
+    \setlength{\fboxsep}{-10pt}
+    \fbox{\includegraphics[width=1.0\textwidth]{Figures/Politicas_evo/P3_4608-512.eps}}
+  }
   \caption[Escalado de frecuencia en función del número de tareas listas
   según la política P3]{Escalado de frecuencia en función del número de
     tareas listas según la política P3. La ejecución corresponde a una
@@ -271,13 +273,28 @@ dividida en bloques de tamaño 512 elementos.\\
 \end{figure}
 
 
-\comentario{Desarrollar más este párrafo}
-Como se puede apreciar, en una primera fase que se desconoce el
-tamaño máximo de la cola de tareas listas (ya que este está en constante
-crecimiento/decrecimiento), la frecuencia varía al más mínimo cambio en el
-tamaño. Una vez que el número de tareas listas alcanza el máximo y comienza
-a decrementar, los cambios de frecuencia se realizan de manera escalonada
-como se ha comentado en la sección anterior.
+Como se puede observar en la gráfica, la ejecución se puede dividir en dos
+partes diferenciadas: una primera parte hasta que alcanza la cola el tamaño
+máximo, y una segunda parte en la que el número de tareas críticas
+desciende constantemente. Estas dos partes están totalmente relacionadas
+con el grafo de dependencias de una factorización de Cholesky, donde existe
+una primera fase en la que se crean un gran número de tareas y se expande
+el árbol, y una segunda fase donde las tareas se van ejecutando y el árbol
+se cierra poco a poco.\\
+Como el cálculo del tamaño máximo de la cola se realiza de manera dinámica,
+en la primera fase se realizan cambios de frecuencia continuamente, a cause
+de ligeros cambios en el tamaño de la cola hasta que se consigue
+estabilizar la cota superior, y poder aplicar la política de manera
+correcta. Una vez que se alcanza el tamaño máximo de la cola, se observa
+como el espacio está dividido en varios escalones, cada uno correspondiente
+a una frecuencia distinta. En algunos puntos en los que el tamaño de la
+cola crece en alguna unidad, se observa que la frecuencia oscila hasta que
+se vuelve a estabilizar el decrecimiento del número de tareas. Esto se
+observa fácilmente al comienzo de la fase en la que el procesador se
+encuentra a una frecuencia de 950 MHz, como la caída del número de tareas
+es elevada y en algunos puntos la frecuencia se disminuye a 800MHz. También
+se puede observar en la fase final de la ejecución, donde la frecuencia
+varía entre 450MHz y 625MHz.
 
 
 
