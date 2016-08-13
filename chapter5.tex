@@ -16,23 +16,24 @@
 %%
 \comentario{Reescribir}%%
 Durante la ejecución de un programa paralelo mediante un paradigma basado
-en tareas, puede ocurrir el caso en el que la mayor parte de tareas listas
-para ser ejecutadas sean críticas, provocando que no existan más tareas
-listas hasta que estas acaben. Un ejemplo de aplicación con este
-comportamiento sería aquella cuyo árbol de dependencias se encogiera muy
-rápidamente en algún punto intermedio de la ejecución, para luego volverse
-a expandir rápidamente (un árbol con forma de diábolo). En este árbol, las
-tareas del cuello de botella del medio serían tareas críticas ya que son
-prioritarias para que la ejecución continúe su ejecución, y además, en el
-momento que esto ocurra, un gran número de tareas estarán listas para ser
-ejecutadas y
+en tareas, puede ocurrir el caso en el que cierto momento de la ejecución
+la mayor parte de tareas listas para ser ejecutadas sean críticas,
+provocando que nuevas tareas no estén listas para ser ejecutadas hasta que
+estas acaben. Este comportamiento podría reflejarse en una aplicación cuyo
+grafo de dependencias se encogiera muy rápidamente en algún punto
+intermedio de la ejecución, para luego volverse a expandir rápidamente (un
+árbol con forma de diábolo). En este árbol, las tareas del cuello de
+botella del medio serían tareas críticas ya que son prioritarias para que
+la ejecución continúe su ejecución, y además, en el momento que esto
+ocurra, un gran número de tareas estarán listas para ser ejecutadas y
 poder continuar la ejecución del problema.\\
-Este problema aplicado al planificador botlev supondría que en el momento
-en el que el árbol se estreche, la cola de tareas no críticas tendría un
-tamaño mucho inferior al de tareas críticas, y por tanto los cores LITTLE
-tendrían mucha menor carga de trabajo que los cores big. Esto ocurriría
-mientras que los cores big finalicen la ejecución de sus tareas críticas y
-se preparen más tareas para ejecutar por los cores LITTLE.\\
+Este problema aplicado al planificador botlev (descrito en la
+sección~\ref{s3:botlev}) supondría que en el momento en el que el árbol se
+estreche, la cola de tareas no críticas tendría un tamaño mucho inferior al
+de tareas críticas, y por tanto los cores LITTLE tendrían mucha menor carga
+de trabajo que los cores big. Esto ocurriría mientras que los cores big
+finalicen la ejecución de sus tareas críticas y se preparen más tareas para
+ejecutar por los cores LITTLE.\\
 Aunque una forma de intentar paliar este problema sería obligar a que los
 cores lentos ejecutaran tareas críticas, esto podría provocar que se
 retrase la finalización de una tarea crítica, ya que aunque su ejecución
@@ -297,11 +298,19 @@ se puede observar en la fase final de la ejecución, donde la frecuencia
 varía entre 450MHz y 625MHz.
 
 
-
-
-
-
 \subsection{P4}
+Como se ha descrito en los puntos anteriores, las políticas desarrolladas
+intentan obtener una mejora en el consumo energético a partir de un
+escalado de frecuencia en los distintos clusters de la arquitectura,
+prestando atención al número de tareas listas para ser ejecutadas, como
+medida equivalente a detectar el nivel de carga de trabajo en un cierto
+momento. Las siguientes políticas se enfrentan al problema de una manera
+totalmente distinta: en vez de disminuir o aumentar la frecuencia de los
+procesadores en función del número de tareas listas para ser ejecutadas, su
+objetivo es realizar la asignación de tareas a los distintos \wts libres,
+también teniendo en cuenta el número de tareas listas para ser ejecutadas
+en cierto momento. Es decir, en vez de realizar técnicas de escalado de
+frecuencia (DVFS), presentan técnicas de planificación.
 
 \subsection{\ldots}
 
