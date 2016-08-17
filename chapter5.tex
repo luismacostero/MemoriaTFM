@@ -1,4 +1,4 @@
-\cleardoublepage
+p\cleardoublepage
 
 \chapter{Optimización de la eficiencia energética de OmpSs sobre arquitecturas asimétricas}
 \label{ch:chapter5}
@@ -298,21 +298,195 @@ se puede observar en la fase final de la ejecución, donde la frecuencia
 varía entre 450MHz y 625MHz.
 
 
-\subsection{P4}
-Como se ha descrito en los puntos anteriores, las políticas desarrolladas
-intentan obtener una mejora en el consumo energético a partir de un
-escalado de frecuencia en los distintos clusters de la arquitectura,
-prestando atención al número de tareas listas para ser ejecutadas, como
-medida equivalente a detectar el nivel de carga de trabajo en un cierto
-momento. Las siguientes políticas se enfrentan al problema de una manera
-totalmente distinta: en vez de disminuir o aumentar la frecuencia de los
-procesadores en función del número de tareas listas para ser ejecutadas, su
-objetivo es realizar la asignación de tareas a los distintos \wts libres,
-también teniendo en cuenta el número de tareas listas para ser ejecutadas
-en cierto momento. Es decir, en vez de realizar técnicas de escalado de
-frecuencia (DVFS), presentan técnicas de planificación.
+\subsection{P4 y P5}
+Las políticas descritas hasta el momento intentan obtener una mejora en el
+consumo energético a partir de un escalado de frecuencia en los distintos
+clusters de la arquitectura, prestando atención al número de tareas listas
+para ser ejecutadas como medida equivalente a detectar el nivel de carga de
+trabajo en un cierto momento. Estas políticas se han desarrollado prestando
+atención a la figura~\todo{ref}, en la que se puede observar la disminución
+del consumo energético en función de la frecuencia. La siguiente idea que
+surge prestando atención a la figura es la de intentar disminuir el consumo
+al no utilizar algún cluster durante parte de la ejecución. Como se puede
+observar el consumo energético es menor si el cluster no se usa,
+independientemente de la frecuencia utilizada. Las siguientes políticas han
+sido diseñadas con el objetivo de que en ciertos momentos de la ejecución,
+modificar el planificador de tareas para evitar que se asignen tareas a
+cierto cluster del sistema. Es decir, estas políticas no están orientadas a
+realizar técnicas de escalado de frecuencia, sino que tratan con el
+problema de planificación de tareas a los distintos \wts disponibles.\\
 
-\subsection{\ldots}
+La política P4 monitoriza el tamaño de las colas de tareas listas y en
+función del tamaño de la cola respecto al tamaño máximo (similar a la
+política P2 o P3), decide si asignar tareas listas al cluster de cores
+LITTLE o no. En caso de que el tamaño de la cola sea lo suficientemente
+pequeño, la política no asigna ninguna tarea lista al cluster, provocando
+que este se encuentre ocioso. Hay que mencionar que aunque el planificador
+no asigne tareas al cluster, esto no implica que el sistema operativo no
+ejecute procesos sobre él, pero el impacto final es mínimo comparado con el
+de ejecutar una tarea o no.\\
+Para realizar este proceso, cada vez que una tarea se inserta en la cola de
+tareas listas o es extraída de esta, se compara el tamaño actual de la cola
+con el tamaño máximo conocido hasta el momento, y se decide si se debe
+utilizar el cluster o no para ejecutar acciones. Una vez que un \wt
+finaliza la ejecución de una tarea, éste solicita una nueva tarea a
+ejecutar al planificador. Si el \wt se ejecuta sobre un core del cluster
+LITTLE, y se ha decidido que el cluster no ejecute ninguna acción, al \wt
+se le asigna una tarea nula, evitando así la ejecución de cualquier tarea
+en ese core asociado al \wt y perteneciente al cluster inhabilitado. En
+caso de que el cluster no se encuentre desactivado se asigna la siguiente
+tarea de la cola de tareas listas para que la ejecute el \wt.\\
+Para que esta política funcione, es necesario que se verifiquen algunas
+condiciones cuando se ejecute el problema:
+
+\begin{itemize}
+\item Para simplificar la tarea, el número de \wts lanzados debe coincidir
+  con el número de núcleos de la placa. En caso de que el número de \wts sea
+  superior, ocurriría que varios \wts estarían compitiendo por ejecutarse
+  simultáneamente en el mismo núcleo. De manera contraria, si el número de
+  \wts es menor que el número de núcleos, se estarían desaprovechando
+  recursos ya que no se utilizarían todos los cores de manera simultánea. En
+  \nanos esto se consigue mediante el argumento \texttt{--smp-workers=<n>}.
+\item Cada \wt debe estar asignado a un núcleo único de la placa,
+  provocando que un \wt siempre ejecute tareas en el mismo núcleo durante
+  todo el problema. Esta condición unida a la anterior implica que existe una
+  relación directa entre cada núcleo y cada \wt del \emph{runtime}. En
+  \nanos, este comportamiento se consigue desactivando la opción contraria
+  mediante el argumento \texttt{--disable-binding}.
+\item Aunque se tenga control sobre qué tarea se ejecuta en qué \wt (y por
+  tanto en qué core), existen ciertas tareas pertenecientes al propio
+  \emph{runtime} o código no paralelo del programa sobre el que no se puede
+  tomar decisiones desde el planificador, siendo normal que este código se
+  ejecute sobre el \wt principal, normalmente ejecutado sobre el núcleo 0 de
+  la máquina.
+\end{itemize}
+
+
+En las políticas anteriores donde se disponía un número limitado de
+frecuencias, el punto en el que cambiar la frecuencia venía determinado a
+la hora de repartir por igual el tamaño máximo de la cola entre todas las
+frecuencias disponibles. Para dar mayor flexibilidad a esta política, el
+punto en el que tomar la decisión de apagar el cluster viene determinado
+por una variable elegida por el usuario a la hora de lanzar el
+experimento. Esto permite observar el comportamiento variando el momento en
+el que se desactiva el cluster, como se describe en la siguiente
+sección. Además, para evitar efectos rebote, en los que el clustes esté
+activando y desactivándose de manera continuada, mediante experimentación
+se ha decidido insertar un margen del 10\% del tamaño de la cola antes de
+tomar la decisión de apagar o encender el cluster.\\
+
+La figura~\ref{fig:P4-puedo-ejecutar} muestra un fragmento del código
+encargado de determinar si un \wt debe ejecutar una tarea lista o no. La
+función recibe por parámetro el núcleo al que se encuentra asignado el \wt
+y devuelve un valor \emph{booleano} en función de si el cluster se
+encuentra desactivado o no. Para agilizar el proceso, la
+línea~\ref{lst:p4-a} filtra la ejecución y permite continuar con la
+ejecución únicamente en el caso de que el cluster se encuentre
+desactivado. La labor de determinar si el cluster debe estar activo o no se
+realiza en el momento en el que una tarea lista es insertada en la cola de
+tareas listas, o es extraída, y se realiza mediante un código muy parecido
+al de la figura~\ref{s5:fig:listing-p2}.\comentario{quizá poner el código
+  real}. Si el cluster se encuentra desactivado, mediante las siguientes
+líneas se determina si el núcleo pertenece al cluster desactivado. En caso
+de pertenecer, se devuelve el valor de falso para indicar que el \wt no
+debe ejecutar nada, pero además se reduce la frecuencia de núcleo al mínimo
+para intentar minimizar el consumo energético mientras no se utilice el
+cluster de cores LITTLE (línea~\ref{lst:p4-c}).
+
+
+\begin{figure}
+  \centering
+\begin{lstlisting}[language=C++]
+bool CoresCfg::puedoEjecutar(int coreId){
+  //core little
+  if(apagadoLittle)                     |\label{lst:p4-a}|
+    for(int i=0; i<N_CORE_LITTLE; i++)
+      if(coresLittle[i] == coreId){     |\label{lst:p4-b}|
+        if (!coresApagados[coreId]){
+          FreqCfg::changeLittleFreq(FreqCfg::minFreqLittle); |\label{lst:p4-c}|
+          coresApagados[coreId] = true;   |\label{lst:p4-d}|
+        }
+        return false;
+      }
+\end{lstlisting}
+  \caption{Fragmento de código para determinar si asignar una tarea a un
+    \wt o no.}
+  \label{fig:P4-puedo-ejecutar}
+\end{figure}
+
+La política P5 realiza el mismo procedimiento, pero para el cluster de
+cores big. Ambas políticas están implementadas sobre el planificador botlev
+para así asegurar que la ejecución de tareas críticas siguen siendo en
+cores big. Sin embargo, al apagar los cores big, hay que tener en cuenta
+que es necesario que las tareas críticas se ejecuten en cores LITTLE si los
+big no están disponibles.\\
+La figura~\ref{fig:P4-evo} muestra un ejemplo de esta política para la
+ejecución de una factorización de Cholesky. La gráfica superior muestra la
+ejecución de las diferentes tareas por los distintos \wts, cada uno
+asignado a un núcleo distinto en orden de aparición. La ejecución ha sido
+realizada sobre la plataforma \juno, por lo que los 4 primeros núcleos
+corresponden a cores LITTLE, mientras que los dos siguientes a cores
+big. La segunda gráfica muestra la evolución del tamaño de las colas en
+función del tiempo. Como se puede observar, la ejecución de las tareas se
+realiza de manera normal hasta que el tamaño de la cola decrece por debajo
+del 25\% del tamaño máximo (el experimento se configuró con este valor). En
+ese momento, los cores LITTLE dejan de recibir tareas mientras que los big
+continúan su ejecución normal. Una vez que el número de tareas vuelve a
+incrementarse, los cores lentos vuelven a activarse y a ejecutar tareas,
+hasta que al final de la ejecución el tamaño de la cola vuelve a decrecer,
+y el cluster se desactiva hasta finalizar la ejecución. Aunque el primer
+\wt está asociado a un core LITTLE, también es considerado como el \wt
+principal del planificador, por lo que es el encargado de ejecutar la parte
+del código no paralela (en color verde). La mayor parte del tiempo que se
+encuentra ejecutando este código corresponde a tareas del propio
+planificador, o a la espera de que finalice la ejecución paralela (marcada
+por una etiqueta \texttt{\#pragma omp taskwait} en el código secuencial).
+
+
+
+\begin{figure}
+  \centering
+  \begin{framed}
+    \begin{subfigure}{.9\textwidth}
+      \centering
+      \includegraphics[width=1\linewidth]{Figures/Politicas_evo/Apagado_tareas.png}
+      \caption{Asignación tareas a los distintos \wts.}
+      \label{}
+    \end{subfigure}
+
+    \begin{subfigure}{0.9\textwidth}
+      \centering
+      \includegraphics[width=1\linewidth]{Figures/Politicas_evo/Apagado_colas.png}
+      \caption{Evolución del tamaño de la cola de tareas listas.}
+      \label{}
+    \end{subfigure}  
+    
+    % \begin{subfigure}{0.9\textwidth}
+    %   \centering
+    %   \includegraphics[width=1\linewidth]{Figures/Politicas_evo/Apagado_cores.png}
+    %   \caption{Estado de los núcleos. Rosa = activo. Blanco = inactivo.}
+    %   \label{}
+    % \end{subfigure}  
+  \end{framed}
+    \caption[Asignación de tareas en función del tamaño de la cola según la
+    política P4]{Asignación de tareas en función del tamaño de la cola
+      según la política P4. La gráfica superior muestras las distintas
+      tareas ejecutadas por cada uno de los \wts a lo largo del
+      tiempo. Cada tarea posee un color, y el color verde se reserva para
+      la ejecución de las tareas no paralelas del código. En este caso, la
+      mayor parte del tiempo no-paralelo corresponde a la espera de la
+      finalización de las tareas paralelas. La ejecución corresponde a una
+      factorización de Cholesky para una matriz de 4096 elementos dividido
+      en bloques de tamaño 512 en precisión simple sobre una arquitectura
+      \juno, donde los 4 primeros \wts corresponden a los cores lentos y
+      los 2 últimos a los cores rápidos. La política está configurada para
+      desactivar cores a partir del 25\% del tamaño máximo de la cola.}
+  \label{fig:P4-evo}
+\end{figure}
+
+
+
+\subsection{P6 y P7}
 
 
 \section{Resultados experimentales}
