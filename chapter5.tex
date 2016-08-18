@@ -13,8 +13,6 @@
 \section{Políticas de reducción de consumo}
 
 \subsection{P1}
-%%
-\comentario{Reescribir}%%
 Durante la ejecución de un programa paralelo mediante un paradigma basado
 en tareas, puede ocurrir el caso en el que cierto momento de la ejecución
 la mayor parte de tareas listas para ser ejecutadas sean críticas,
@@ -486,10 +484,7 @@ por lo que el impacto final no es muy significativo.
 
 
 
-\subsection{P6 y P7}
-\rev{OJO: revisar esto con los experimentos reales para ver que no se está
-  metiendo la pata muy hondo.}
-
+\subsection{P6}
 Una de las muchas funcionalidades que ofrece el kernel Linux es la de poder
 activar y desactivar cores a demanda y de manera dinámica. En cualquier
 momento de la ejecución, un núcleo puede ser desactivado, y este desaparece
@@ -505,52 +500,123 @@ arquitecturas diferentes utilizando el mismo hardware.
 Esta funcionalidad aplicada a una arquitectura big.LITTLE teóricamente
 proporciona que en cualquier momento de la ejecución se pueda desactivar
 uno de los dos cluster de la máquina, convirtiendo a la arquitectura en una
-plataforma totalmente asimétrica. En la práctica, no todas las versiones
+plataforma totalmente simétrica. En la práctica, no todas las versiones
 del kernel permiten apagar el core 0, por lo que no es posible apagar el
 cluster entero que contiene al core 0.
 
-Si se realiza un estudio del consumo energético sobre el impacto que tiene
-apagar cores de manera dinámica se puede observar que: \comentario{quizás
-  justificar con una figura}
-\begin{enumerate}
-\item Disminuir el número de núcleos de un cluster sin llegar a apagar
-  todos los núcleos del cluster de manera simultanea no presenta ninguna
-  mejora frente a no ejecutar ningún proceso en ellos pero dejarlos
-  activos.
-\item Si se desactivan todos los cores de un cluster (es decir, el cluster
-  entero), y dependiendo de la arquitectura, el consumo asociado a ese
-  cluster es nulo. En el caso de las plataformas \juno y \odroid, la
-  primera no presenta mejora al apagar el cluster o no, mientras que en la
-  segunda el consumo cae a 0.
-\end{enumerate}
-
-
-Los resultados se pueden ver en las siguientes gráficas donde ....
+Para realizar un estudio del impacto que tiene apagar cores sobre el
+consumo energético, se han ido apagando uno a uno y midiendo el consumo de
+manera simultánea. Además, para evitar errores en las medidas, se ha
+establecido un tiempo de espera entre apagado de dos cores, y
+adicionalmente se ha ejecutado el test asociado a un core que no se fuera a
+apagar, evitando así problemas al migrar el proceso de un core a otro. La
+figura~\ref{s5:fig:apagadoCores} muestra las mediciones del consumo
+energético en las dos plataformas: la figura superior para la plataforma
+\juno y la inferior para la plataforma \odroid.
 
 \comentario{Bajar el numero de puntos. Tarda mucho en renderizar}
 \begin{figure}
-  \setlength{\fboxsep}{-5pt}
   \centering
-  \begin{subfigure}{0.75\textwidth}
+  \begin{subfigure}{0.9\textwidth}
     \centering
-    \fbox{\includegraphics[width=1\linewidth]{Plots/Modelos_consumo/apagadoJuno.eps}}
-    \caption{Plataforma Juno. Posee 4 cores LITTLE A53, y 2 cores big A57.}
+    \fbox{\includegraphics[width=0.75\linewidth]{Plots/Modelos_consumo/apagadoJuno.eps}}
+    \caption{Plataforma \juno: 2 cores big A57 y 4 cores LITTLE A53.}
       \label{}
     \end{subfigure}
 \vspace{0.5cm}
 
-    \begin{subfigure}{0.75\textwidth}
+    \begin{subfigure}{0.9\textwidth}
       \centering
-      \fbox{\includegraphics[width=1\linewidth]{Plots/Modelos_consumo/apagadoOdroid.eps}}
-      \caption{Plataforma Odroid. Posee 4 cores LITTLE A7 y 4 cores big A15.}
+      \setlength{\fboxsep}{20pt} %No tienen el mismo margen :(
+      \fbox{\includegraphics[width=0.66\linewidth]{Plots/Modelos_consumo/apagadoOdroid.eps}}
+      \caption{Plataforma \odroid: 4 cores big A15 y 4 cores LITTLE A7.}
       \label{}
     \end{subfigure}  
     
-  \caption{Consumo energético en reposo en función del número de núcleos
+  \caption[Consumo energético en función del número de cores activos en
+  cada cluster]{Consumo energético en reposo en función del número de núcleos
     activos del sistema y de la plataforma. La versión del kernel Linux
     instalada en la plataforma \odroid no permite apagar los el cluster
     LITTLE de manera completa.}
-  \label{}
+  \label{s5:fig:apagadoCores}
+\end{figure}
+
+
+Las gráficas muestran el consumo energético (en Watios) durante todo el
+experimento en el eje vertical, mientras que el eje horizontal corresponde
+a las distintas fases por las que ha ido pasando el experimento. Por cada
+plataforma, la gráfica superior muestra el experimento apagando los cores
+del cluster big, indicándose en el eje x el número de cores activos del
+cluster en cada momento, mientras que la gráfica inferiores muestra el
+mismo experimento para el cluster LITTLE. La diferencia de aspecto entre
+las gráficas de ambas plataformas se produce por la forma en la que se han
+realizado las medidas: mientras que en la plataforma \odroid los medidores
+poseen una frecuencia de muestreo máxima de 4 muestras por segundo (y por
+eso el aspecto \emph{lineal} de la gráfica), el entorno de medición de la
+plataforma \juno permite una mayor frecuencia de muestreo, por lo que la
+gráfica presenta un mayor ruido (esta es la causa de que la gráfica no
+presente una forma de línea, sino que los valores oscilan por encima y
+debajo del valor medio real).\\
+Observando los resultados de las gráficas se pueden extraer las siguientes
+conclusiones:
+
+\begin{enumerate}
+\item En la plataforma \juno, desactivar cores es equivalente a no usarlos
+  en lo referente al consumo energético.
+\item Mientras que la versión del kernel Linux utilizada en la plataforma
+  \juno permite apagar todos los cores del sistema, la versión utilizada en
+  la plataforma \odroid no permite apagar el core 0, por lo que no es
+  posible desactivar el cluster LITTLE completo.
+\item En la plataforma \odroid, desactivar un cierto número de cores sin
+  llegar a desactivar el cluster completo no tiene ningún impacto
+  significativo en el consumo energético. Sin embargo, para esta
+  plataforma, desactivar todos los cores del cluster big produce que el
+  consumo sea casi nulo.
+\end{enumerate}
+
+
+Intentando aprovechar que el consumo es casi nulo cuando el cluster de
+cores big se desactive por completo en la plataforma \odroid, la política
+P6 ha sido desarrollada como una modificación de la política anterior, pero
+en vez de no asignar tareas a estos cores, realiza un apagado controlado de
+los mismos. Para realizar esta modificación, el cambio introducido sobre el
+código de la figura~\ref{fig:P4-puedo-ejecutar} afecta a la línea en la que
+en vez de disminuir la frecuencia del cluster, se realiza una llamada al
+código encargado de realizar el apagado de los distintos núcleos, mostrado
+en la figura~\ref{s5:fig:apagadoCores}. Como se puede observar, el apagado
+del core se realiza escribiendo el valor 0 en el fichero del sistema que se
+encuentra en la ruta \texttt{/sys/devices/system/cpu/cpu<cpuId>/online}. Esta operación se
+encuentra protegida por un cerrojo para evitar problemas de concurrencia
+durante la ejecución.
+
+
+
+\begin{figure}
+  \centering
+\begin{lstlisting}[language=C++]
+char path[50];
+sprintf(path, "/sys/devices/system/cpu/cpu%d/online", coreId);
+
+FILE* f;
+int d, a;
+
+(CoresCfg::_lock[coreId])->acquire();
+{
+  f = fopen(path, "r+");
+  a = fscanf(f, "%d", &d);
+	
+  if(d!=0 && a!=0){
+    fseek(f, 0, SEEK_SET);
+    fprintf(f, "0"); //Apagado
+  }
+	
+  fclose(f);
+}
+(CoresCfg::_lock[coreId])->release();
+\end{lstlisting}
+  \caption{Fragmento de código para el apagado de cores de manera
+    dinámica.}
+  \label{fig:lst:apagado-cores}
 \end{figure}
 
 
