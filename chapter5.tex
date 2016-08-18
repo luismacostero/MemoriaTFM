@@ -11,19 +11,19 @@
 
 
 \section{Políticas de reducción de consumo}
-
 \subsection{P1}
 Durante la ejecución de un programa paralelo mediante un paradigma basado
-en tareas, puede ocurrir el caso en el que cierto momento de la ejecución
-la mayor parte de tareas listas para ser ejecutadas sean críticas,
-provocando que nuevas tareas no estén listas para ser ejecutadas hasta que
-estas acaben. Este comportamiento podría reflejarse en una aplicación cuyo
-grafo de dependencias se encogiera muy rápidamente en algún punto
-intermedio de la ejecución, para luego volverse a expandir rápidamente (un
-árbol con forma de diábolo). En este árbol, las tareas del cuello de
-botella del medio serían tareas críticas ya que son prioritarias para que
-la ejecución continúe su ejecución, y además, en el momento que esto
-ocurra, un gran número de tareas estarán listas para ser ejecutadas y
+en tareas, puede ocurrir el caso en el que en cierto momento de la
+ejecución del problema la mayor parte de tareas listas para ser ejecutadas
+sean tareas críticas, provocando que nuevas tareas no puedan estar listas
+para ejecución hasta que estas tareas críticas finalicen. Este
+comportamiento podría reflejarse en una aplicación cuyo grafo de
+dependencias se encogiera muy rápidamente en algún punto intermedio de la
+ejecución, para luego volverse a expandir rápidamente (un árbol con forma
+de diábolo). En este árbol, las tareas del cuello de botella del medio
+serían tareas críticas ya que son prioritarias para que la ejecución
+continúe su ejecución, y además, en el momento que esto ocurra, un gran
+número de tareas estarán listas para ser ejecutadas y
 poder continuar la ejecución del problema.\\
 Este problema aplicado al planificador botlev (descrito en la
 sección~\ref{s3:botlev}) supondría que en el momento en el que el árbol se
@@ -33,10 +33,10 @@ de trabajo que los cores big. Esto ocurriría mientras que los cores big
 finalicen la ejecución de sus tareas críticas y se preparen más tareas para
 ejecutar por los cores LITTLE.\\
 Aunque una forma de intentar paliar este problema sería obligar a que los
-cores lentos ejecutaran tareas críticas, esto podría provocar que se
-retrase la finalización de una tarea crítica, ya que aunque su ejecución
-puede comenzar antes (pues se disponen de más cores para distribuir el
-mismo número de tareas), el rendimiento de los cores LITTLE es mucho
+cores lentos también ejecutaran tareas críticas, esto podría provocar que
+se retrase la finalización de una tarea crítica, ya que aunque su ejecución
+aunque puede comenzar antes (pues se disponen de más cores para distribuir
+el mismo número de tareas), el rendimiento de los cores LITTLE es mucho
 inferior que el de los cores big, provocando retrasos en la ejecución,
 incluso llegando a aumentar el problema del cuello de botella.
 
@@ -46,36 +46,34 @@ estos momentos en los que la carga de trabajo sobre los cores lentos es
 menor para intentar disminuir el consumo energético aplicando una reducción
 de frecuencia sobre el cluster LITTLE. Como se podía ver en la
 figura~\todo{ref}, reducir la frecuencia al cluster LITTLE implica que la
-potencia instantánea disminuye. Es cierto que al reducir la frecuencia de
-los cores el tiempo usado en ejecutar una tarea aumenta, pero como esta
-técnica únicamente se aplica en los momentos en los que la ejecución está
-limitada por el gran número de tareas críticas y el bajo número de tareas
-no críticas, se espera que el impacto final en el rendimiento no sea muy
-elevado.\\
-La forma de aplicar esta política sobre botlev consiste en monitorizar
-constantemente el número de tareas tanto críticas como no críticas listas
-para ser ejecutadas (reflejado en el tamaño de las colas internas del
-planificador), y actuar en función a la relación entre el tamaño de ambas
-colas. La figura~\ref{s5:fig:listing-p1} muestra un fragmento esquemático
-del código encargado de realizar esta tarea. Este método es invocado cada
-vez que el tamaño de una cola cambia (ya sea porque una tarea comienza su
-ejecución, o porque una tarea se encuentra lista para ser ejecutada y es
-introducida en una cola). Como se puede ver en la
+potencia instantánea consumida disminuye. Es cierto que al reducir la
+frecuencia de los cores el tiempo usado en ejecutar una tarea aumenta, pero
+como esta técnica únicamente se aplica en los momentos en los que la
+ejecución está limitada por el gran número de tareas críticas y el bajo
+número de tareas no críticas, se espera que el impacto final en el
+rendimiento no sea muy elevado.\\
+La forma en la que se ha decidido aplicar esta política sobre botlev
+consiste en monitorizar constantemente el número de tareas tanto críticas
+como no críticas listas para ser ejecutadas (reflejado en el tamaño de las
+colas internas del planificador), y actuar en función a la relación entre
+el tamaño de ambas colas. La figura~\ref{s5:fig:listing-p1} muestra un
+fragmento esquemático del código encargado de realizar esta tarea. Este
+método es invocado cada vez que el tamaño de una cola cambia (ya sea porque
+una tarea comienza su ejecución, o porque una tarea se encuentra lista para
+ser ejecutada y es insertada en una cola). Como se puede ver en la
 línea~\ref{s5:lst:p1-calculoPrincipal(a)}, la frecuencia a la que cambiar
 el cluster se calcula como una proporción directa entre el tamaño de ambas
 colas, así, si el número de tareas críticas es el doble que el de las
-tareas no críticas, la frecuencia se disminuye un escalón; si el tamaño es
-el triple, la frecuencia se disminuye hasta el tercer escalón de
+tareas no críticas, la frecuencia se disminuye un ``escalón''; si el tamaño
+es el triple, la frecuencia se disminuye hasta el tercer escalón de
 frecuencia, etc. Recordar que los valores de frecuencia que puede tomar el
 cluster están limitados por el kernel del sistema operativo, como se
 mencionó en la sección~\todo{ref}. La
 línea~\ref{s5:lst:p1-calculoPrincipal(b)} asegura que la frecuencia final
-no es menor que la menor frecuencia soportada. Destacar que de esta manera
+no es menor que la menor frecuencia soportada. Destacar que con este método
 se consigue que el cambio de frecuencia en el cluster se realice de manera
 escalonada según varía el tamaño de las colas.\\
-%%%
-\comentario{La línea 8 es un poco desconcertante}
-%%%
+
 \begin{figure}
   \centering
 
@@ -109,10 +107,32 @@ aumentar la frecuencia al máximo directamente en caso de que todas las
 tareas sean no críticas, o de disminuir la frecuencia al mínimo en caso de
 que no exista ninguna tarea no crítica que ejecutar.
 
-\todo{quizás poner aquí la evolución de la frecuencia en funcińo del tamaño
-  de las colas. Puede que mejor en la sección de resultados}.
+La figura~\ref{s5:fig:P1-evo} muestra el comportamiento de esta política
+para una factoriación de Cholesky de 1024 elementos con precisión simple
+dividida en bloques de 64 elementos. La gráfica superior muestra el estado
+de las colas durante la ejecución del problema, mientras que la gráfica
+inferior muestra la frecuencia del cluster de cores lentos durante toda la
+ejecución del problema. Como se puede apreciar, al inicio de la ejecución
+donde el número de tareas críticas es elevado, la frecuencia se reduce de
+manera escalonada en función de la relación entre el tamaño de ambas
+colas. Una vez que el número de tareas no críticas aumenta, el cluster se
+mantiene a máxima frecuencia durante la mayor parte de la ejecución hasta
+que esta se encuentra en las fases finales donde el número de tareas
+críticas vuelve a ser elevado respecto al número de tareas no críticas y la
+frecuencia vuelve a disminuirse.
+
+\begin{figure}
+  \centering
+  \fbox{\includegraphics[width=1\textwidth]{Figures/Politicas_evo/P1_1024-64_juno.eps}}
+  \caption[Cambio de frecuencias según la política P1]{Cambio de
+    frecuencias según la política P1 para una factorización de Cholesky
+    sobre una matriz de 1024 elementos dividida en bloques de 64, ejecutada
+    sobre la plataforma \juno.}
+  \label{s5:fig:P1-evo}
+\end{figure}
 
 \subsection{P2 y P2'}
+\comentario{Quizás mover esta primera parte a 5.1.1}
 A la hora de aplicar técnicas de escalado de frecuencia (DVFS) sobre un
 problema cualquiera, la técnica presenta de manera simplificada dos grandes
 dimensiones sobre las que tomar decisiones sobre los parámetros de
@@ -153,6 +173,7 @@ la que tomar decisiones: (c)~decidir sobre qué elementos de cálculo aplicar
 el escalado de frecuencia. En el caso de las arquitecturas asimétricas,
 esta decisión se simplifica a decidir si aplicar el escalado al cluster de
 cores big, o al cluster de cores LITTLE.\\
+\comentario{}
 
 La primera intuición que surge al intentar aplicar un escalado de
 frecuencia sobre una arquitectura asimétrica es la de pensar que debido a
@@ -165,7 +186,7 @@ empeorar tanto el rendimiento como el consumo energético. Para evitar que
 suceda este hecho, las políticas P2 y P2' han sido diseñadas para modificar
 la frecuencia sobre el cluster de cores LITTLE, y así intentar no causar un
 gran impacto sobre el rendimiento. Además, las políticas han sido
-desarrolladas sobre el planificador botlev comentando en la
+desarrolladas sobre el planificador botlev descrito en la
 sección~\ref{s3:botlev}, con el objetivo de intentar asegurar que las
 tareas críticas se ejecutan en los cores big para así evitar que se
 retrasen si se ejecutaran en un core LITTLE con la frecuencia disminuida.\\
@@ -447,14 +468,16 @@ por lo que el impacto final no es muy significativo.
 \begin{figure}
   \centering
   \begin{framed}
-    \begin{subfigure}{.9\textwidth}
+    \begin{subfigure}{1\textwidth}
       \centering
       \includegraphics[width=1\linewidth]{Figures/Politicas_evo/Apagado_tareas.png}
       \caption{Asignación tareas a los distintos \wts.}
       \label{}
     \end{subfigure}
 
-    \begin{subfigure}{0.9\textwidth}
+\vspace{0.5cm}
+
+    \begin{subfigure}{1\textwidth}
       \centering
       \includegraphics[width=1\linewidth]{Figures/Politicas_evo/Apagado_colas.png}
       \caption{Evolución del tamaño de la cola de tareas listas.}
@@ -491,7 +514,7 @@ momento de la ejecución, un núcleo puede ser desactivado, y este desaparece
 del sistema, siendo totalmente transparente para cualquier aplicación en
 ejecución. Esto implica que si se decide apagar un core, todos los procesos
 asociados a ese núcleo son migrados a otro de manera totalmente
-transparente al proceso en ejecución. El número total de cores disminuye y
+transparente al proceso en ejecución, el número total de cores disminuye y
 cualquier llamada a una función del kernel considerará la nueva
 configuración hardware creada como la configuración real de la
 máquina. Esta funcionalidad permite, entre muchas cosas, la de generar
@@ -502,17 +525,17 @@ proporciona que en cualquier momento de la ejecución se pueda desactivar
 uno de los dos cluster de la máquina, convirtiendo a la arquitectura en una
 plataforma totalmente simétrica. En la práctica, no todas las versiones
 del kernel permiten apagar el core 0, por lo que no es posible apagar el
-cluster entero que contiene al core 0.
+cluster entero que contiene a este core.
 
 Para realizar un estudio del impacto que tiene apagar cores sobre el
-consumo energético, se han ido apagando uno a uno y midiendo el consumo de
-manera simultánea. Además, para evitar errores en las medidas, se ha
-establecido un tiempo de espera entre apagado de dos cores, y
-adicionalmente se ha ejecutado el test asociado a un core que no se fuera a
-apagar, evitando así problemas al migrar el proceso de un core a otro. La
-figura~\ref{s5:fig:apagadoCores} muestra las mediciones del consumo
-energético en las dos plataformas: la figura superior para la plataforma
-\juno y la inferior para la plataforma \odroid.
+consumo energético, se ha realizado el experimento de desactivar uno a uno
+mientras se mide el consumo de ambos clusters. Además, para evitar
+errores en las medidas, se ha establecido un tiempo de espera entre apagado
+de dos cores, y adicionalmente se ha ejecutado el test asociado a un core
+que no se fuera a apagar, evitando así problemas al migrar el proceso de un
+core a otro. La figura~\ref{s5:fig:apagadoCores} muestra las mediciones del
+consumo energético en las dos plataformas: la figura superior para la
+plataforma \juno y la inferior para la plataforma \odroid.
 
 \comentario{Bajar el numero de puntos. Tarda mucho en renderizar}
 \begin{figure}
@@ -580,12 +603,14 @@ cores big se desactive por completo en la plataforma \odroid, la política
 P6 ha sido desarrollada como una modificación de la política anterior, pero
 en vez de no asignar tareas a estos cores, realiza un apagado controlado de
 los mismos. Para realizar esta modificación, el cambio introducido sobre el
-código de la figura~\ref{fig:P4-puedo-ejecutar} afecta a la línea en la que
-en vez de disminuir la frecuencia del cluster, se realiza una llamada al
-código encargado de realizar el apagado de los distintos núcleos, mostrado
-en la figura~\ref{s5:fig:apagadoCores}. Como se puede observar, el apagado
-del core se realiza escribiendo el valor 0 en el fichero del sistema que se
-encuentra en la ruta \texttt{/sys/devices/system/cpu/cpu<cpuId>/online}. Esta operación se
+código de la figura~\ref{fig:P4-puedo-ejecutar} afecta a la
+línea~\ref{lst:p4-c} en la que en vez de disminuir la frecuencia
+del cluster, se realiza una llamada al código encargado de realizar el
+apagado de los distintos núcleos, mostrado en la
+figura~\ref{s5:fig:apagadoCores}. Como se puede observar, el apagado del
+core se realiza escribiendo el valor 0 en el fichero del sistema que se
+encuentra en la ruta
+\texttt{/sys/devices/system/cpu/cpu<cpuId>/online}. Esta operación se
 encuentra protegida por un cerrojo para evitar problemas de concurrencia
 durante la ejecución.
 
