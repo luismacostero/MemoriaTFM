@@ -1,4 +1,4 @@
-p\cleardoublepage
+\cleardoublepage
 
 \chapter{Optimización de la eficiencia energética de OmpSs sobre arquitecturas asimétricas}
 \label{ch:chapter5}
@@ -367,7 +367,7 @@ frecuencias, el punto en el que cambiar la frecuencia venía determinado a
 la hora de repartir por igual el tamaño máximo de la cola entre todas las
 frecuencias disponibles. Para dar mayor flexibilidad a esta política, el
 punto en el que tomar la decisión de apagar el cluster viene determinado
-por una variable elegida por el usuario a la hora de lanzar el
+por una variable de entorno elegida por el usuario a la hora de lanzar el
 experimento. Esto permite observar el comportamiento variando el momento en
 el que se desactiva el cluster, como se describe en la siguiente
 sección. Además, para evitar efectos rebote, en los que el clustes esté
@@ -419,7 +419,8 @@ cores big. Ambas políticas están implementadas sobre el planificador botlev
 para así asegurar que la ejecución de tareas críticas siguen siendo en
 cores big. Sin embargo, al apagar los cores big, hay que tener en cuenta
 que es necesario que las tareas críticas se ejecuten en cores LITTLE si los
-big no están disponibles.\\
+big no están disponibles para que la ejecución no se quede bloqueada por
+las tareas críticas (opción \texttt{--steal=1} en botlev).\\
 La figura~\ref{fig:P4-evo} muestra un ejemplo de esta política para la
 ejecución de una factorización de Cholesky. La gráfica superior muestra la
 ejecución de las diferentes tareas por los distintos \wts, cada uno
@@ -440,7 +441,8 @@ principal del planificador, por lo que es el encargado de ejecutar la parte
 del código no paralela (en color verde). La mayor parte del tiempo que se
 encuentra ejecutando este código corresponde a tareas del propio
 planificador, o a la espera de que finalice la ejecución paralela (marcada
-por una etiqueta \texttt{\#pragma omp taskwait} en el código secuencial).
+por una etiqueta \texttt{\#pragma omp taskwait} en el código secuencial),
+por lo que el impacto final no es muy significativo.
 
 
 
@@ -468,25 +470,92 @@ por una etiqueta \texttt{\#pragma omp taskwait} en el código secuencial).
     %   \label{}
     % \end{subfigure}  
   \end{framed}
-    \caption[Asignación de tareas en función del tamaño de la cola según la
-    política P4]{Asignación de tareas en función del tamaño de la cola
-      según la política P4. La gráfica superior muestras las distintas
-      tareas ejecutadas por cada uno de los \wts a lo largo del
-      tiempo. Cada tarea posee un color, y el color verde se reserva para
-      la ejecución de las tareas no paralelas del código. En este caso, la
-      mayor parte del tiempo no-paralelo corresponde a la espera de la
-      finalización de las tareas paralelas. La ejecución corresponde a una
-      factorización de Cholesky para una matriz de 4096 elementos dividido
-      en bloques de tamaño 512 en precisión simple sobre una arquitectura
-      \juno, donde los 4 primeros \wts corresponden a los cores lentos y
-      los 2 últimos a los cores rápidos. La política está configurada para
-      desactivar cores a partir del 25\% del tamaño máximo de la cola.}
+  \caption[Asignación de tareas en función del tamaño de la cola según la
+  política P4]{Asignación de tareas en función del tamaño de la cola según
+    la política P4. La gráfica superior muestras las distintas tareas
+    ejecutadas por cada uno de los \wts a lo largo del tiempo. Clave de
+    colores: rojo=\trsm, rosa=\potrf, granate=\syrk, amarillo=\gemm,
+    verde={\sc main}. La ejecución corresponde a una factorización de
+    Cholesky para una matriz de 4096 elementos dividido en bloques de
+    tamaño 512 en precisión simple sobre una arquitectura \juno, donde los
+    4 primeros \wts corresponden a los cores lentos y los 2 últimos a los
+    cores rápidos. La política está configurada para desactivar cores a
+    partir del 25\% del tamaño máximo de la cola.}
   \label{fig:P4-evo}
 \end{figure}
 
 
 
 \subsection{P6 y P7}
+\rev{OJO: revisar esto con los experimentos reales para ver que no se está
+  metiendo la pata muy hondo.}
+
+Una de las muchas funcionalidades que ofrece el kernel Linux es la de poder
+activar y desactivar cores a demanda y de manera dinámica. En cualquier
+momento de la ejecución, un núcleo puede ser desactivado, y este desaparece
+del sistema, siendo totalmente transparente para cualquier aplicación en
+ejecución. Esto implica que si se decide apagar un core, todos los procesos
+asociados a ese núcleo son migrados a otro de manera totalmente
+transparente al proceso en ejecución. El número total de cores disminuye y
+cualquier llamada a una función del kernel considerará la nueva
+configuración hardware creada como la configuración real de la
+máquina. Esta funcionalidad permite, entre muchas cosas, la de generar
+arquitecturas diferentes utilizando el mismo hardware.
+
+Esta funcionalidad aplicada a una arquitectura big.LITTLE teóricamente
+proporciona que en cualquier momento de la ejecución se pueda desactivar
+uno de los dos cluster de la máquina, convirtiendo a la arquitectura en una
+plataforma totalmente asimétrica. En la práctica, no todas las versiones
+del kernel permiten apagar el core 0, por lo que no es posible apagar el
+cluster entero que contiene al core 0.
+
+Si se realiza un estudio del consumo energético sobre el impacto que tiene
+apagar cores de manera dinámica se puede observar que: \comentario{quizás
+  justificar con una figura}
+\begin{enumerate}
+\item Disminuir el número de núcleos de un cluster sin llegar a apagar
+  todos los núcleos del cluster de manera simultanea no presenta ninguna
+  mejora frente a no ejecutar ningún proceso en ellos pero dejarlos
+  activos.
+\item Si se desactivan todos los cores de un cluster (es decir, el cluster
+  entero), y dependiendo de la arquitectura, el consumo asociado a ese
+  cluster es nulo. En el caso de las plataformas \juno y \odroid, la
+  primera no presenta mejora al apagar el cluster o no, mientras que en la
+  segunda el consumo cae a 0.
+\end{enumerate}
+
+
+Los resultados se pueden ver en las siguientes gráficas donde ....
+
+\comentario{Bajar el numero de puntos. Tarda mucho en renderizar}
+\begin{figure}
+  \setlength{\fboxsep}{-5pt}
+  \centering
+  \begin{subfigure}{0.75\textwidth}
+    \centering
+    \fbox{\includegraphics[width=1\linewidth]{Plots/Modelos_consumo/apagadoJuno.eps}}
+    \caption{Plataforma Juno. Posee 4 cores LITTLE A53, y 2 cores big A57.}
+      \label{}
+    \end{subfigure}
+\vspace{0.5cm}
+
+    \begin{subfigure}{0.75\textwidth}
+      \centering
+      \fbox{\includegraphics[width=1\linewidth]{Plots/Modelos_consumo/apagadoOdroid.eps}}
+      \caption{Plataforma Odroid. Posee 4 cores LITTLE A7 y 4 cores big A15.}
+      \label{}
+    \end{subfigure}  
+    
+  \caption{Consumo energético en reposo en función del número de núcleos
+    activos del sistema y de la plataforma. La versión del kernel Linux
+    instalada en la plataforma \odroid no permite apagar los el cluster
+    LITTLE de manera completa.}
+  \label{}
+\end{figure}
+
+
+
+
 
 
 \section{Resultados experimentales}
