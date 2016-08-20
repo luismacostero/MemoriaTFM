@@ -35,7 +35,7 @@ se está utilizando una versión no consciente de la asimetría del planificador
 Para este experimento, se ha evaluado un rango lo suficientemente amplio de tamaños de bloque 
 ({\tt b} en el código de la Figura~\ref{lst:chol}), aunque por simplicidad se reporta únicamente los
 resultados obtenidos para el valor de {\tt b} que optimiza el ratio de GFLOPS para cada dimensión
-del problema\footnote{En este capítulo, todos los exprimentos se han realizado utilizando doble precisión.}.
+del problema\footnote{En este capítulo, todos los experimentos se han realizado utilizando doble precisión.}.
 
 \begin{figure}
 \centering
@@ -57,7 +57,7 @@ casos en los que el planificador del sistema operativo asigna su ejecución a lo
 Sin embargo, cuando el número de \wts excede la cantidad de núcleos rápidos, el sistema operativo se ve forzado a asignar
 \wts a núcleos lentos (Cortex-A7), en cuyo caso el aumento en prestaciones desaparece, e incluso éstas disminuyen drásticamente 
 a medida que el número de \wts aumenta. La principal causa de este decremento en las prestaciones es el desequilibrio de carga,
-ya que tareas con granularidad univorme, posiblemente pertenecientes al camino crítico, son asignadas a núcleos lentos.
+ya que tareas con granularidad uniforme, posiblemente pertenecientes al camino crítico, son asignadas a núcleos lentos.
 
 Este experimento revela la principal motivación por la que es necesario un planificador de tareas consciente de la
 arquitectura y adaptado a ella~\cite{OmpSsbigLITTLE}. Sin embargo, en el presente capítulo, se desarrollará un enfoque alternativo
@@ -74,18 +74,18 @@ de tareas considere la arquitectura \odroid (por ejemplo) como una arquitectura 
 cuatro VCs (núcleos virtuales, o {\em Virtual Cores}), cada uno de ellos compuesto por un núcleo rápido y un núcleo
 lento. Para ello, a diferencia del modelo CPUM, {\em ambos} núcleos físicos dentro de cada VC se mantendrán activos y 
 colaborarán en la ejecución de una determinada tarea. Así, la propuesta explota dos niveles de concurrencia: el {\em paralelismo
-a nivel de tareas} es extraído por el planificador para asignar tareas a cda uno de los cuatro VCs idénticos disponibles en
-el sistema, e internamente, cada tarea/kernel divide su carga de forma correcta para exponer {\em paralalismo a nivel de datos}, 
+a nivel de tareas} es extraído por el planificador para asignar tareas a cada uno de los cuatro VCs idénticos disponibles en
+el sistema, e internamente, cada tarea/kernel divide su carga de forma correcta para exponer {\em paralelismo a nivel de datos}, 
 distribuyendo la carga de trabajo entre los dos núcleos físicos asimétricos dentro del VC que está a cargo de la ejecución
 de dicha tarea.
 
 Esta solución requiere únicamente un planificador de tareas convencional (es decir, no consciente de la asimetría de la arquitectura, o lo
 que es lo mismo, orientado a arquitecturas SMT), como por ejemplo el planificador de tareas convencional proporcionado por OmpSs, donde, 
 en lugar de crear un \wt\ por núcleo físico del sistema, se sigue una filosofía similar a la propuesta por el modelo CPUM, creando 
-{\em un único worker thread por VC}. Internamente, cuando una tareai es elegida para ser ejecutada por un \wt disponible, dicha tarea
+{\em un único worker thread por VC}. Internamente, cuando una tarea es elegida para ser ejecutada por un \wt disponible, dicha tarea
 se ejecutará, de forma ya no secuencial, sino paralela sobre cada uno de los núcleos que componen el VC, explotando, en este caso,
 la asimetría interna de dicha abstracción. Por ejemplo, en el caso de \odroid, equipada con cuatro núcleos rápidos y cuatro lentos, 
-la propuesta desarrollada desplegará únicamente cuatro \wt; para cualquier tarea básica o kernel de álgebra lineal a ejecutar, dicha
+la propuesta desarrollada desplegará únicamente cuatro \wts; para cualquier tarea básica o kernel de álgebra lineal a ejecutar, dicha
 rutina explotará la asimetría internamente, siempre bajo la condición de que existe una implementación de la misma optimizada para
 este tipo de paralelismo asimétrico.
 
@@ -124,7 +124,7 @@ La solución desarrollada reúne un conjunto de ventajas de cara al desarrollado
 \end{itemize}
 
 Obviamente, existe una dificultad adicional intrínseca a la solución propuesta, y que se convierte en un requisito fundamental de cara
-a su viabilidad: debe existir, necesariamente, una versión conscente de la asimería para cada tarea a ejecutar (por ejemplo, una implementación
+a su viabilidad: debe existir, necesariamente, una versión consciente de la asimetría para cada tarea a ejecutar (por ejemplo, una implementación
 completa de las rutinas BLAS). En el ámbito del álgebra lineal densa, este requisito se cumple a través de la versión asimétrica de BLIS, aunque
 en otros ámbitos, el desarrollo específico de este tipo de implementaciones es todavía escaso.
 
@@ -223,8 +223,8 @@ El aspecto más importante radica en el hecho de que el punto de corte entre amb
 es típicamente menor) de $\bopt$, véase Tabla~\ref{tab:optimal_bs_sym}. 
 Esto implica que la versión asimétrica de BLIS puede, potencialmente, mejorar el rendimiento general de la factorización, 
 incluso usando un planificador de tareas convencional.
-Además, la mejora en rendimento aumenta con el tamaño de problema, estabilizándose para dimensiones alrededor de 
-{\tt m}, {\tt n}, {\tt k } $\approx~400$. Dado que este valor está en el randgo del tamaño de bloque óptimo para
+Además, la mejora en rendimiento aumenta con el tamaño de problema, estabilizándose para dimensiones alrededor de 
+{\tt m}, {\tt n}, {\tt k } $\approx~400$. Dado que este valor está en el rango del tamaño de bloque óptimo para
 la factorización de Cholesky, sobre esta arquitectura es esperable una mejora en el orden de 0.3--0.5 GFLOPS por núcleo lento
 añadido.
 %mimicking the behavior of the underlying BLIS.
@@ -244,16 +244,16 @@ añadido.
 
 Con el fin de analizar los beneficios reales de la solución propuesta en términos de rendimiento, comparamos a continuación
 el rendimiento del planificador OmpSs enlazado con {\em (a)} una versión secuencial de BLIS, y {\em (b)} con la versión asimétrica de BLIS. 
-En todos los experimentos, los kernels BLIS en la primera configuración utlilizarán exclusivamente un núcleo Cortex-A15, mientras
-que en el segundo caso se utlizará un núcleo Cortex-A15 más un núcleo Cortex-A7 para la ejecución de las tareas.
+En todos los experimentos, los kernels BLIS en la primera configuración utilizaran exclusivamente un núcleo Cortex-A15, mientras
+que en el segundo caso se utilizara un núcleo Cortex-A15 más un núcleo Cortex-A7 para la ejecución de las tareas.
 %
 La Figura~\ref{fig:ompss_blis} muestra los resultados obtenidos para ambas configuraciones, utilizando un número creciente
 de \wts, entre~1 y~4. Por simplicidad, únicamente se reportan los resultados obtenidos considerando el tamaño de bloque óptimo
-para cada tamaño de problema. En todos los casos, la solución basada en la utilización de una bilioteca asimétrica mejora
+para cada tamaño de problema. En todos los casos, la solución basada en la utilización de una biblioteca asimétrica mejora
 el rendimiento de la implementación secuencial para matrices relativamente grandes (típicamente con dimensiones {\tt n}~$>$~2,048)
 mientras que, para tamaños de problema menores, el ratio de GFLOPS obtenido en ambos casos es similar. 
 La razón de este comportamiento viene marcada por el tamaño de bloque óptimo reportado en la Tabla~\ref{tab:optimal_bs_sym}
-y el rendimento de BLIS mostrado en la Figura~\ref{fig:cross_blis}: para dicho rango de dimensiones de problema,
+y el rendimiento de BLIS mostrado en la Figura~\ref{fig:cross_blis}: para dicho rango de dimensiones de problema,
 el tamaño óptimo de bloque es significativamente menor, y ambas implementaciones BLIS obtienen resultados de rendimiento similares.
 
 \begin{figure}%[t]
@@ -290,7 +290,7 @@ en las Tablas~\ref{tab:improvement_absolute} y~\ref{tab:improvement_percore}.
 La primera tabla muestra la diferencia absoluta en rendimiento, mientras que la segunda 
 muestra la diferencia en rendimiento por cada núcleo lento (Cortex-A7) introducido en
 el experimento. Consideremos, por ejemplo, el tamaño de problema {\tt n}~=~6,144. 
-En este caso, el rendimiento meora en 0.975 GFLOPS cuando se añaden los 4~núcleos lentos para 
+En este caso, el rendimiento mejora en 0.975 GFLOPS cuando se añaden los 4~núcleos lentos para 
 dar soporte a los 4~núcleos Cortex-A15. Este hecho se traduce en una ganancia de rendimiento de
 0.243 GFLOPS por core lento, ligeramente por debajo de la mejora que podría esperarse a partir de
 los resultados experimentales observados en la anterior sección. Nótese, sin embargo, cómo el 
@@ -302,7 +302,7 @@ hasta 0.243~GFLOPS, al utilizar los cuatro núcleos lentos.
 
 \begin{table}
 	\centering
-\caption{Mejora de rendimento absoluta (en GFLOPS) para la factorización de Cholesky utilizando
+\caption{Mejora de rendimiento absoluta (en GFLOPS) para la factorización de Cholesky utilizando
          el planificador OmpSs convencional enlazado con una versión asimétrica de BLIS, con respecto
 	 al mismo planificador enlazado con la versión secuencial de BLIS sobre \odroid.}
 	 \label{tab:improvement_absolute}
@@ -354,7 +354,7 @@ hasta 0.243~GFLOPS, al utilizar los cuatro núcleos lentos.
 
 \begin{table}
 \centering
-\caption{Mejora de rendimiento por núcleo lento (in GFLOPS) para la factorización de Cholesky utilizando
+\caption{Mejora de rendimiento por núcleo lento (en GFLOPS) para la factorización de Cholesky utilizando
          el planificador OmpSs convencional enlazado con una versión asimétrica de BLIS, con respecto
 	 al mismo planificador enlazado con la versión secuencial de BLIS sobre \odroid.}
 \label{tab:improvement_percore}
@@ -411,7 +411,7 @@ hasta 0.243~GFLOPS, al utilizar los cuatro núcleos lentos.
 \label{sec:comparative}
 
 El último conjunto de experimentos tiene como objetivo ofrecer una visión global de las ventajas en términos
-de rendimiento de disintas configuraciones en la ejecución paralela a nivel de tareas de la factorización de
+de rendimiento de distintas configuraciones en la ejecución paralela a nivel de tareas de la factorización de
 Cholesky utilizando el planificador de OmpSs. Más concretamente, se consideran a continuación las siguientes
 alternativas:
 
@@ -423,7 +423,7 @@ alternativas:
 
 \end{enumerate}
 
-En las ejecuciones, se utilizan los cuatro núcleos Cortex-A15 y se evalua el impacto de añadir núcleos 
+En las ejecuciones, se utilizan los cuatro núcleos Cortex-A15 y se evalúa el impacto de añadir núcleos 
 Cortex-A7 a la configuración (entre 1 y 4) para el planificador Botlev.
 
 
@@ -446,7 +446,7 @@ en tres grandes grupos, atendiendo a la dimensión del problema:
 
  \item Para matrices de grandes dimensiones ({\tt n}~=~6,144, 7,680) la anterior tendencia se consolida, y ambos enfoques conscientes de la arquitectura muestran
 	 ganancias de rendimiento considerables. Comparando ambos enfoques conscientes de la arquitectura, nuestra solución
-obtiene mejor rendimiento, incluso considreando la utilización de todos los núcleos lentos para el planificador Botlev-OmpSs.
+obtiene mejor rendimiento, incluso considerando la utilización de todos los núcleos lentos para el planificador Botlev-OmpSs.
 
 \end{itemize}
 
@@ -469,12 +469,12 @@ asimetría.
 \subsection{Análisis detallado de rendimiento}
 
 A continuación, se proporcionan más detalles sobre el comportamiento, en términos de rendimiento, de cada una de las 
-configuraciones anteriormente descritas.Las trazas de ejecución mostradas en esta sección han sido extraídas con la
-heramienta de instrumentación {\tt Extrae}~\cite{Extrae} y visualizadas a través de la herramienta {\tt Paraver}~\cite{Paraver}.
+configuraciones anteriormente descritas. Las trazas de ejecución mostradas en esta sección han sido extraídas con la
+herramienta de instrumentación {\tt Extrae}~\cite{Extrae} y visualizadas a través de la herramienta {\tt Paraver}~\cite{Paraver}.
 Los resultados corresponden a un caso concreto de la factorización de Cholesky, con matriz de entrada de dimensión
 {\tt n}~=~6,144 y tamaño de bloque {\tt b}~=~448.
 
-\subsubsection{Visión genral de la ejecución de tareas}
+\subsubsection{Visión general de la ejecución de tareas}
 
 La Figura~\ref{fig:traces_tasks} muestra una traza completa de ejecución para cada configuración del planificador OmpSs. A grandes rasgos, es posible
 extraer un conjunto de observaciones generales:
@@ -487,7 +487,7 @@ extraer un conjunto de observaciones generales:
 		ejecución de tareas, especialmente a medida que el paralelismo de tareas disponible disminuye (en las últimas etapas
 		de la ejecución) conllevan una penalización de rendimiento muy considerable.
 
-\item Las marcas de inicio/finalización de cada tarea revelan que la versión asimétrica de BLIS (que utliza los recursos combinados
+\item Las marcas de inicio/finalización de cada tarea revelan que la versión asimétrica de BLIS (que utiliza los recursos combinados
 	en cada VC) requiere menor tiempo de ejecución por tarea que las dos alternativas basadas en BLIS secuencial. Un efecto a observar
 		es la lógica diferencia en rendimiento en la versión Botlev del planificador en la ejecución de las tareas sobre núcleos
 		rápidos (\wts entre el 5 y el 8) y lentos (\wts entre el 1 y el 4). Este fenómeno no se observa en nuestra solución, ya
@@ -498,8 +498,8 @@ extraer un conjunto de observaciones generales:
 		por ejemplo, las tareas correspondientes a factorizaciones de los bloques diagonales, coloreadas en amarillo). Esta
 		política induce una planificación más compactadurante las primeras fases de la ejecución paralela, pero 
 		con mayores problemas a medida que el grado de concurrencia disminuye (en las últimas iteraciones de la 
-		factorización). Aunque es posible, no se ha activado este tipo de gestíon de prioridades en la versión convencional
-		de OmpSs utlilizada en el resto de experimentos, y su interacción con una implementación asimétrica de las tareas
+		factorización). Aunque es posible, no se ha activado este tipo de gestión de prioridades en la versión convencional
+		de OmpSs utilizada en el resto de experimentos, y su interacción con una implementación asimétrica de las tareas
 		se plantea como trabajo futuro.
 \end{itemize}
 
@@ -543,20 +543,20 @@ Los resultados muestran como el tiempo de ejecución para cada tipo de tarea es 
 en la versión asimétrica de BLIS que en las alternativas basadas en ejecuciones secuenciales de las
 tareas. La única excepción es la factorización de los bloques diagonales (rutina {\tt dpotrf}), ya que
 se trata de una rutina perteneciente a LAPACK, y por tanto no disponible en BLIS y no paralelizada de forma
-consciente de la asimetría). Inspecionando la duración de las tareas en la configuración Botlev-OmpSs, 
+consciente de la asimetría). Inspeccionando la duración de las tareas en la configuración Botlev-OmpSs, 
 se observa una notable diferencia en función del tipo de núcleo sobre el que el planificador mapea las tareas. Por
 ejemplo, el tiempo medio de ejecución para {\tt dgemm} varía entre más de 400~ms en un núcleo lento, hasta prácticamente
 90~ms en un núcleo rápido. Este comportamiento se reproduce para todos los tipos de tareas.
 
 Para ilustrar más claramente estas observaciones, la Figura~\ref{fig:traces_task_duration} representa un histograma
 detallado de los tiempos de ejecución para las distintas instancias de la tarea {\tt dgemm} durante la ejecución
-paralela. Cada casilla corresponde al número de tareas con un tiempo de ejecución dado, mietras que las filas corresponden
+paralela. Cada casilla corresponde al número de tareas con un tiempo de ejecución dado, mientras que las filas corresponden
 a cada \wt en ejecución.
 Comparando las configuraciones que utilizan planificadores convencionales (trazas (a) y (b)),
 existe una clara desviación en el tiempo medio de ejecución hacia mayores rendimientos al utilizar
 BLIS asimétrico, esto es, el tiempo medio de ejecución de una tarea es claramente menor en este caso. El histograma para Botlev (traza (c))
-muestra dos zonas diferenciadas, que corresponden a tareas ejecutadas sobre núcleos rápidos y núcleos lentos, respetivamente. Nótese que
-las tareas ejecutadas sobre núcleos rápidos obitnen el mismo rendimiento que las equivalentes en una configuración convencional
+muestra dos zonas diferenciadas, que corresponden a tareas ejecutadas sobre núcleos rápidos y núcleos lentos, respectivamente. Nótese que
+las tareas ejecutadas sobre núcleos rápidos obtienen el mismo rendimiento que las equivalentes en una configuración convencional
 usando BLIS secuencial. Se ha observado un comportamiento similar para el resto de tareas BLAS ejecutadas durante el experimento.
 
 \begin{figure}%[t]
@@ -614,7 +614,6 @@ usando BLIS secuencial. Se ha observado un comportamiento similar para el resto 
 
 \end{table}
 
-\subsubsection{Task scheduling policies and idle times.}
 \subsubsection{Políticas de planificación y tiempos sin actividad}
 
 
@@ -624,11 +623,11 @@ en el código secuencial (Figura~\ref{lst:chol}), desde la primera hasta la últ
 
 En tiempo de ejecución, el planificador de tareas Botlev-OmpSs lanza tareas a ejecución fuera de orden, dependiendo de
 su criticalidad, y las asigna, a ser posible, sobre núcleos rápidos. De acuerdo con esta estrategia, la ejecución fuera de
-orden se revela más frecuentemente en las líneas de timepo para los núcleos rápidos que para los lentos. Con el planificador
+orden se revela más frecuentemente en las líneas de tiempo para los núcleos rápidos que para los lentos. Con el planificador
 convencional, la ejecución fuera de orden sólo viene dictada por el cumplimiento de las dependencias de datos en tiempo de ejecución.
 
 A la vista de las trazas de ejecución, es posible observar cómo el planificador Botlev-OmpSs muestra una penalización
-en el rendimiento muy aprecialbe debida a la existencia de periodos ociosos en la parte final de la factorización, cuando
+en el rendimiento muy apreciable debida a la existencia de periodos ociosos en la parte final de la factorización, cuando
 la concurrencia disponible disminuye. Este problema no se da utilizando políticas de planificación convencionales. Sin embargo,
 en las primeras fases de la factorización, el uso de una política consciente de la criticalidad de las tareas (implementada en 
 Botlev-OmpSs), reduce de forma efectiva los períodos de tiempo en los que los \wts permanecen ociosos.
@@ -637,8 +636,8 @@ La Tabla~\ref{tab:th_state} muestra el porcentaje de tiempo en el que cada \wt p
 {\tt running} (ejecutando tareas) o {\tt idle} (sin ejecutar tareas). En general, la cantidad de tiempo transcurrido en estado
 {\tt idle} es mucho mayor para Botlev-OmpSs que para las implementaciones convencionales
 (17\% contra 5\%, respectivamente). 
-Nótese también la notable diferencia en el procentaje de tiempo ocioso entre núcleos rápidos y lentos
-(20\% y~13\%, respectivamente), lo que lleva a la conclusión de que los núcleos rápidos deben eseprar 
+Nótese también la notable diferencia en el porcentaje de tiempo ocioso entre núcleos rápidos y lentos
+(20\% y~13\%, respectivamente), lo que lleva a la conclusión de que los núcleos rápidos deben esperar 
 a la finalización de tareas ejecutadas en núcleos lentos. En otras palabras, en estas configuraciones, los núcleos lentos ``frenan'' a los
 rápidos. Este hecho es también constatable en las etapas finales de la traza obtenida con la configuración Botlev-OmpSs.
 
@@ -676,7 +675,7 @@ en el código secuencial, y son mostradas usando un gradiente de color, correspo
 
 \begin{table}
 \centering
-	\caption{Porentaje de tiempo por \wt en estado {\tt idle} o {\tt running} para distintas configuraciones de planificador para la factorización de Cholesky
+	\caption{Porcentaje de tiempo por \wt en estado {\tt idle} o {\tt running} para distintas configuraciones de planificador para la factorización de Cholesky
 ({\tt n}~=~6,144, {\tt b}~=~448).
 	Nótese que {\sc wt 0} es el hilo principal, y por tanto nunca permanece en estado {\tt idle} dadas las características de OmpSs; 
 	para él, el resto del tiempo hasta el 100\% se dedica a sincronización, planificación y creación de la hebra. Para el resto de las hebras, esta cantidad

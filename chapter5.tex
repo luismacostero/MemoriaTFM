@@ -9,9 +9,41 @@
 
 \subsection{Evaluación de rendimiento/eficiencia energética de las tareas}
 
+\begin{figure}
+  \centering
+    \begin{subfigure}{0.45\textwidth}
+      \centering
+
+      \begin{framed}
+        \includegraphics[width=1\linewidth]{Plots/Modelos_consumo/odroid_big.eps}
+        \includegraphics[width=1\linewidth]{Plots/Modelos_consumo/odroid_little.eps}
+      \end{framed}
+      \caption{\odroid}
+      \label{fig:modelo_consumo-odroid}
+
+    \end{subfigure}
+%
+    \begin{subfigure}{0.45\textwidth}
+      \centering
+      \begin{framed}
+        \includegraphics[width=1\linewidth]{Plots/Modelos_consumo/juno_big.eps}
+        \includegraphics[width=1\linewidth]{Plots/Modelos_consumo/juno_little.eps}
+      \end{framed}
+      \caption{\juno}
+      \label{fig:modelo_consumo-juno}
+    \end{subfigure}  
+
+  \caption{Medidas de consumo energético por núcleo y plataforma.}
+  \label{fig:modelo_consumo}
+\end{figure}
+
+
+
+
 
 \section{Políticas de reducción de consumo}
-\subsection{P1}
+\subsection{Basadas en escalado de frecuencia (P1, P2, P2' y P3)}
+\subsubsection{P1}
 Durante la ejecución de un programa paralelo mediante un paradigma basado
 en tareas, puede ocurrir el caso en el que en cierto momento de la
 ejecución del problema la mayor parte de tareas listas para ser ejecutadas
@@ -45,12 +77,12 @@ idea principal que se encuentra detrás de esta política es la de aprovechar
 estos momentos en los que la carga de trabajo sobre los cores lentos es
 menor para intentar disminuir el consumo energético aplicando una reducción
 de frecuencia sobre el cluster LITTLE. Como se podía ver en la
-figura~\todo{ref}, reducir la frecuencia al cluster LITTLE implica que la
-potencia instantánea consumida disminuye. Es cierto que al reducir la
-frecuencia de los cores el tiempo usado en ejecutar una tarea aumenta, pero
-como esta técnica únicamente se aplica en los momentos en los que la
-ejecución está limitada por el gran número de tareas críticas y el bajo
-número de tareas no críticas, se espera que el impacto final en el
+figura~\ref{fig:modelo_consumo}, reducir la frecuencia al cluster LITTLE
+implica que la potencia instantánea consumida disminuye. Es cierto que al
+reducir la frecuencia de los cores el tiempo usado en ejecutar una tarea
+aumenta, pero como esta técnica únicamente se aplica en los momentos en los
+que la ejecución está limitada por el gran número de tareas críticas y el
+bajo número de tareas no críticas, se espera que el impacto final en el
 rendimiento no sea muy elevado.\\
 La forma en la que se ha decidido aplicar esta política sobre botlev
 consiste en monitorizar constantemente el número de tareas tanto críticas
@@ -131,7 +163,7 @@ frecuencia vuelve a disminuirse.
   \label{s5:fig:P1-evo}
 \end{figure}
 
-\subsection{P2 y P2'}
+\subsubsection{P2 y P2'}
 \comentario{Quizás mover esta primera parte a 5.1.1}
 A la hora de aplicar técnicas de escalado de frecuencia (DVFS) sobre un
 problema cualquiera, la técnica presenta de manera simplificada dos grandes
@@ -258,7 +290,7 @@ procesador, mientras que la política P2' solamente considera la frecuencia
 máxima y mínima del mismo. 
 
 
-\subsection{P3}
+\subsubsection{P3}
 La política P3 es similar a la política anterior P2, pero realizando el
 escalado de frecuencias sobre el cluster de cores big en vez de cores
 LITTLE. De manera similar a la anterior, la política ha sido implementada
@@ -266,7 +298,7 @@ sobre el planificador botlev implementado sobre \ompss para intentar
 minimizar el impacto negativo sobre las tareas críticas. La
 figura~\ref{s5:fig:P3-evo} muestra los distintos cambios de frecuencia que
 se han realizado en función del número de tareas listas para ser
-ejecutadas. En la parte superior, se muestra la evolución del número de
+ppejecutadas. En la parte superior, se muestra la evolución del número de
 tareas listas para ser ejecutadas según avanza la ejecución del
 problema. En la gráfica inferior, se muestra la frecuencia del cluster de
 cores big durante la ejecución. Ambas gráficas poseen la misma escala en el
@@ -316,14 +348,14 @@ es elevada y en algunos puntos la frecuencia se disminuye a 800MHz. También
 se puede observar en la fase final de la ejecución, donde la frecuencia
 varía entre 450MHz y 625MHz.
 
-
-\subsection{P4 y P5}
+\subsection{Basadas en planificación de tareas (P4, P5 y P6)}
+\subsubsection{P4 y P5}
 Las políticas descritas hasta el momento intentan obtener una mejora en el
 consumo energético a partir de un escalado de frecuencia en los distintos
 clusters de la arquitectura, prestando atención al número de tareas listas
 para ser ejecutadas como medida equivalente a detectar el nivel de carga de
 trabajo en un cierto momento. Estas políticas se han desarrollado prestando
-atención a la figura~\todo{ref}, en la que se puede observar la disminución
+atención a la figura~\ref{fig:modelo_consumo}, en la que se puede observar la disminución
 del consumo energético en función de la frecuencia. La siguiente idea que
 surge prestando atención a la figura es la de intentar disminuir el consumo
 al no utilizar algún cluster durante parte de la ejecución. Como se puede
@@ -507,7 +539,7 @@ por lo que el impacto final no es muy significativo.
 
 
 
-\subsection{P6}
+\subsubsection{P6}
 Una de las muchas funcionalidades que ofrece el kernel Linux es la de poder
 activar y desactivar cores a demanda y de manera dinámica. En cualquier
 momento de la ejecución, un núcleo puede ser desactivado, y este desaparece
