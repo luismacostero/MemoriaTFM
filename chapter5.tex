@@ -42,8 +42,18 @@
 
 
 \section{Políticas de reducción de consumo}
-\subsection{Basadas en escalado de frecuencia (P1, P2, P2' y P3)}
-\subsubsection{P1}
+En esta sección se detallan las políticas desarrolladas para intentar
+reducir el consumo energético en una arquitectura asimétrica. Las políticas
+se encuentran divididas en dos grandes grupos: un primer grupo formado por
+politicas basadas en escalado de brecuencia, y un segundo grupo formado por
+políticas encargadas de modificar la asignación de las tareas a los
+diferentes \wts del \emph{runtime} (es decir, a los diferentes núcleos de
+la arquitectura).
+
+\subsection[{Basadas en escalado de frecuencia (P1, P2, P2' y P3)}]{Basadas en escalado de frecuencia}
+
+
+\subsubsection{Política P1}
 Durante la ejecución de un programa paralelo mediante un paradigma basado
 en tareas, puede ocurrir el caso en el que en cierto momento de la
 ejecución del problema la mayor parte de tareas listas para ser ejecutadas
@@ -163,7 +173,7 @@ frecuencia vuelve a disminuirse.
   \label{s5:fig:P1-evo}
 \end{figure}
 
-\subsubsection{P2 y P2'}
+\subsubsection{Políticas P2 y P2'}
 \comentario{Quizás mover esta primera parte a 5.1.1}
 A la hora de aplicar técnicas de escalado de frecuencia (DVFS) sobre un
 problema cualquiera, la técnica presenta de manera simplificada dos grandes
@@ -290,7 +300,7 @@ procesador, mientras que la política P2' solamente considera la frecuencia
 máxima y mínima del mismo. 
 
 
-\subsubsection{P3}
+\subsubsection{Política P3}
 La política P3 es similar a la política anterior P2, pero realizando el
 escalado de frecuencias sobre el cluster de cores big en vez de cores
 LITTLE. De manera similar a la anterior, la política ha sido implementada
@@ -348,8 +358,8 @@ es elevada y en algunos puntos la frecuencia se disminuye a 800MHz. También
 se puede observar en la fase final de la ejecución, donde la frecuencia
 varía entre 450MHz y 625MHz.
 
-\subsection{Basadas en planificación de tareas (P4, P5 y P6)}
-\subsubsection{P4 y P5}
+\subsection[Basadas en planificación de tareas (P4, P5 y P6)]{Basadas en planificación de tareas}
+\subsubsection{Políticas P4 y P5}
 Las políticas descritas hasta el momento intentan obtener una mejora en el
 consumo energético a partir de un escalado de frecuencia en los distintos
 clusters de la arquitectura, prestando atención al número de tareas listas
@@ -539,7 +549,7 @@ por lo que el impacto final no es muy significativo.
 
 
 
-\subsubsection{P6}
+\subsubsection{Política P6}
 Una de las muchas funcionalidades que ofrece el kernel Linux es la de poder
 activar y desactivar cores a demanda y de manera dinámica. En cualquier
 momento de la ejecución, un núcleo puede ser desactivado, y este desaparece
