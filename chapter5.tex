@@ -690,10 +690,37 @@ int d, a;
 
 
 
-
 \section{Resultados experimentales}
+\subsection{Análisis de la mejora energética para las políticas P1-P3}
+El primer conjunto de experimentos que se muestran a continuación tiene
+como objetivo principal comprobar el nivel de eficiencia energética desde
+la política P1 hasta la política P3, las cuales corresponden a políticas
+que siguen una estrategia puramente DVFS. Los experimentos corresponden a
+distintas ejecuciones de una factorización de Cholesky para distintas
+configuraciones de tamaño de matriz y bloque. Para comprobar si estas
+políticas presentan una mejora energética real, los resultados son
+comparados con una ejecución normal utilizando el planificador botlev sobre
+el \emph{runtime} \ompss (esta ejecución se denomina P0 en los experimentos
+realizados). Para poder observar el comportamiento con detalle y poder
+extraer mejores conclusiones, de todos los experimentos se extraen los tres
+siguientes datos:
+\begin{itemize} \comentario{reescribir. Quizás mover a 5.1.2.}
+\item Rendimiento computacional medido en GFLOPS. Distintas políticas
+  aplicadas sobre la misma configuración de matriz pueden dar rendimientos
+  diferentes, indicando la diferencia de tiempo de ejecución entre cada una
+  de ellas.
+\item Muestreo de potencia instantánea durante toda la ejecución (en
+  watios). Esto da lugar a poder observar la potencia instantánea media por
+  cada cluster del sistema, y de manera conjunta.
+\item Medida de rendimiento energético reflejada en GFLOP/Watio, como
+  resultado de combinar las dos magnitudes anteriores.
+\end{itemize}
 
+En la figura~\ref{fig:resultados:all-0-3} se muestran de manera conjunta
+los resultados obtenidos tanto para la plataforma \juno como para la
+plataforma \odroid.
 
+\comentario{La figura no entra en una página sola. OJO}
 \begin{figure}
   \centering
     \begin{subfigure}{1.0\textwidth}
@@ -716,6 +743,43 @@ int d, a;
     representan el tamaño de la matriz y de bloque utilizado para el experimento.}
   \label{fig:resultados:all-0-3}
 \end{figure}
+
+
+
+\begin{table}
+  \centering
+  \caption{Mejora de rendimiento energético absoluta (en GFLOPS/Watio) para
+  la factorización de Cholesky utilizando distintas políticas P1 a P3
+  respecto a una ejecución estándar del mismo problema utilizando el
+  planificador botlev sobre \ompss, sobre la plataforma \juno.}
+  \label{s5:table:mejora-gplosw}
+  \ra{1.2}
+  \ca{2pt}
+  
+  {\scriptsize
+    \begin{tabular}{ccccccccccccccc}
+      \toprule
+      \phantom{a} & \multicolumn{14}{c}{Tamaño de la matriz \texttt{(m)} y
+                    de bloque \texttt{(b)}.} \\ \cmidrule{2-15}
+\texttt{(m)} & \multicolumn{2}{c}{1024} & \multicolumn{2}{c}{2048} &
+                                                                    \multicolumn{2}{c}{4096}& \multicolumn{2}{c}{4608} & \multicolumn{2}{c}{5120} & \multicolumn{2}{c}{6144} & \multicolumn{2}{c}{8192} \\
+\texttt{(b)} & 64 & 128 & 128 & 256 & 256 & 512 & 256 & 512 & 512 & 1024 & 512 & 1024 &
+                                                                         512 & 1024 \\ \hline
+      {\sc P1} & \br{-1.405} & \br{-1.963} & \br{-0.968} & \br{-0.519} & \br{-0.318} & \br{-0.146} & \br{-0.183} & \br{-0.124} & \br{-0.119} & \br{-0.469} & \fg{0.101} & \br{-0.331} & \br{-0.011} & \br{-0.252} \\
+      {\sc P2} &\br{-1.635} & \br{-1.995} & \br{-1.139} & \br{-0.391} & \br{-0.289} & \br{-0.060} & \br{-0.255} & \br{-0.011} & \br{-0.036} & \br{-0.418} & \fg{0.249} & \fg{0.184} & \fg{0.069} & \fg{0.012} \\
+      {\sc P2'} & \br{-1.438} & \br{-1.766} & \br{-0.675} & \br{-0.064} & \br{-0.092} & \br{-0.084} & \br{-0.056} & \br{-0.006} & \br{-0.012} & \br{-0.221} & \fg{0.131} & \fg{0.012} & \fg{0.018} & \br{-0.058}\\
+      {\sc P3} & \br{-1.594} & \br{-1.971} & \br{-1.001} & \br{-0.141} & \fg{0.460} & \fg{1.496} & \fg{0.652} & \fg{1.045} & \fg{0.860} & \fg{1.391} & \fg{1.046} & \fg{1.643} & \fg{1.114} & \fg{1.263} \\\bottomrule
+
+    \end{tabular}
+  }
+\end{table}
+
+
+
+
+
+
+
 
 %-- Configuraciones para emacs --
 %%% Local Variables:
