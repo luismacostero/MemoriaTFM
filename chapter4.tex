@@ -234,7 +234,7 @@ añadido.
 \includegraphics[width=0.49\textwidth]{Plots/BLIS_small/blis_dgemm_sym_asym}
 \includegraphics[width=0.49\textwidth]{Plots/BLIS_small/blis_dsyrk_sym_asym}
 \includegraphics[width=0.49\textwidth]{Plots/BLIS_small/blis_dtrsm_sym_asym}
-\caption{Rendimiento de los kernels BLAS-3 en las implementaciones secuencial y asimétrica de BLIS, utilizando, respectivamente
+	\caption[Rendimiento de los kernels BLAS-3 en las implementaciones secuencial y asimétrica de BLIS.]{Rendimiento de los kernels BLAS-3 en las implementaciones secuencial y asimétrica de BLIS, utilizando, respectivamente
          un núcleo Cortex-A15 y un núcleo Cortex-A15 más un núcleo Cortex-A7 sobre \odroid.}
 \label{fig:cross_blis}
 \end{figure}
@@ -302,7 +302,8 @@ hasta 0.243~GFLOPS, al utilizar los cuatro núcleos lentos.
 
 \begin{table}
 	\centering
-\caption{Mejora de rendimiento absoluta (en GFLOPS) para la factorización de Cholesky utilizando
+	\caption[Mejora de rendimiento absoluta (en GFLOPS) para la factorización de Cholesky utilizando
+         el planificador OmpSs convencional enlazado con una versión asimétrica de BLIS.]{Mejora de rendimiento absoluta (en GFLOPS) para la factorización de Cholesky utilizando
          el planificador OmpSs convencional enlazado con una versión asimétrica de BLIS, con respecto
 	 al mismo planificador enlazado con la versión secuencial de BLIS sobre \odroid.}
 	 \label{tab:improvement_absolute}
@@ -354,7 +355,8 @@ hasta 0.243~GFLOPS, al utilizar los cuatro núcleos lentos.
 
 \begin{table}
 \centering
-\caption{Mejora de rendimiento por núcleo lento (en GFLOPS) para la factorización de Cholesky utilizando
+	\caption[Mejora de rendimiento por núcleo lento (en GFLOPS) para la factorización de Cholesky utilizando el planificador OmpSs convencional enlazado con una versión asimétrica de BLIS.]
+	{Mejora de rendimiento por núcleo lento (en GFLOPS) para la factorización de Cholesky utilizando
          el planificador OmpSs convencional enlazado con una versión asimétrica de BLIS, con respecto
 	 al mismo planificador enlazado con la versión secuencial de BLIS sobre \odroid.}
 \label{tab:improvement_percore}
@@ -453,7 +455,7 @@ obtiene mejor rendimiento, incluso considerando la utilización de todos los nú
 \begin{figure}
 \centering
 \includegraphics[width=0.70\textwidth]{Plots/Comparative/comparative}
-\caption{Rendimiento (en GFLOPS) para la factorización de Cholesky utilizando 
+	\caption[Rendimiento (en GFLOPS) para la factorización de Cholesky utilizando distintas implementaciones.]{Rendimiento (en GFLOPS) para la factorización de Cholesky utilizando 
 el planificador convencional de OmpSs enlazado con la versión secuencial de BLIS, la implementación asimétrica de BLIS, y 
 la implementación consciente de la arquitectura Botlev de OmpSs enlazado con la versión secuencial de BLIS sobre \odroid. 
 Las etiquetas con la forma ``4+x'' indican una ejecución con 4~núcleos Cortex-A15 utilizando x núcleos Cortex-A7.}
@@ -522,7 +524,8 @@ extraer un conjunto de observaciones generales:
    \includegraphics[width=\textwidth]{Plots/Traces/botlev_tasks.png}
 		\caption{Botlev-OmpSs - BLIS secuencial (8 worker threads, 4+4)}
 	\end{subfigure}
-\caption{Trazas de ejecución para las tres configuraciones estudiadas en la factorización de Cholesky ({\tt n}~=~6,144, 
+	\caption[Trazas de ejecución para las tres configuraciones estudiadas en la factorización de Cholesky ({\tt n}~=~6,144, {\tt b}~=~448).]
+	{Trazas de ejecución para las tres configuraciones estudiadas en la factorización de Cholesky ({\tt n}~=~6,144, 
 {\tt b}~=~448). 
 La línea de tiempo en cada fila recoge las tareas ejecutadas por un único \wt.
 Las tareas se han coloreado siguiendo la convención de la Figura~\ref{fig:dag};
@@ -573,7 +576,7 @@ usando BLIS secuencial. Se ha observado un comportamiento similar para el resto 
    \includegraphics[width=\textwidth]{Plots/Traces/botlev_task_duration_histogram.png}
  \caption{Botlev-OmpSs - 4+4 threads}
 	\end{subfigure}
-\caption{Histograma de duración de tareas para la tarea {\tt dgemm} sobre las tres configuraciones de planificador utilizadas para la factorización de Cholesky ({\tt n}~=~6,144, {\tt b}~=~448).  
+	\caption[Histograma de duración de tareas para la tarea {\tt dgemm} sobre las tres configuraciones de planificador.]{Histograma de duración de tareas para la tarea {\tt dgemm} sobre las tres configuraciones de planificador utilizadas para la factorización de Cholesky ({\tt n}~=~6,144, {\tt b}~=~448).  
 	Las filas corresponden a los \wts en ejecución. Las columnas corresponden a intervalos de tiempo de ejecución medio. Los colores (en gradiente) indican el número de tareas en el 
 	intervalo correspondiente (desde verde claro hasta azul oscuro, en un rango de menor a mayor número de tareas).}
 \label{fig:traces_task_duration}
@@ -666,7 +669,7 @@ en un punto determinado de la ejecución. Estas ideas se plantean como líneas d
    \includegraphics[width=\textwidth]{Plots/Traces/botlev_task_number.png}
 		\caption{Botlev-OmpSs - BLIS secuencial (8 worker threads, 4+4)} 
 	\end{subfigure}
-\caption{Orden de ejecución de tareas para las tres configuraciones estudiadas sobre la factorización de Cholesky
+	\caption[Orden de ejecución de tareas para las tres configuraciones estudiadas sobre la factorización de Cholesky ({\tt n}~=~6,144, {\tt b}~=~448).]{Orden de ejecución de tareas para las tres configuraciones estudiadas sobre la factorización de Cholesky
 ({\tt n}~=~6,144, {\tt b}~=~448). En las trazas, las tareas se ordenan según su orden de aparición
 en el código secuencial, y son mostradas usando un gradiente de color, correspondiendo el color verde claro a tareas
 	tempranas, y azul oscuro a tareas tardías.}
@@ -675,7 +678,8 @@ en el código secuencial, y son mostradas usando un gradiente de color, correspo
 
 \begin{table}
 \centering
-	\caption{Porcentaje de tiempo por \wt en estado {\tt idle} o {\tt running} para distintas configuraciones de planificador para la factorización de Cholesky
+	\caption[Porcentaje de tiempo por \wt en estado {\tt idle} o {\tt running} para distintas configuraciones de planificador para la factorización de Cholesky ({\tt n}~=~6,144, {\tt b}~=~448).]
+	{Porcentaje de tiempo por \wt en estado {\tt idle} o {\tt running} para distintas configuraciones de planificador para la factorización de Cholesky
 ({\tt n}~=~6,144, {\tt b}~=~448).
 	Nótese que {\sc wt 0} es el hilo principal, y por tanto nunca permanece en estado {\tt idle} dadas las características de OmpSs; 
 	para él, el resto del tiempo hasta el 100\% se dedica a sincronización, planificación y creación de la hebra. Para el resto de las hebras, esta cantidad
