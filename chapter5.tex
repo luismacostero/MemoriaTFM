@@ -695,57 +695,161 @@ int d, a;
 El primer conjunto de experimentos que se muestran a continuación tiene
 como objetivo principal comprobar el nivel de eficiencia energética desde
 la política P1 hasta la política P3, las cuales corresponden a políticas
-que siguen una estrategia puramente DVFS. Los experimentos corresponden a
-distintas ejecuciones de una factorización de Cholesky para distintas
-configuraciones de tamaño de matriz y bloque. Para comprobar si estas
-políticas presentan una mejora energética real, los resultados son
-comparados con una ejecución normal utilizando el planificador botlev sobre
-el \emph{runtime} \ompss (esta ejecución se denomina P0 en los experimentos
-realizados). Para poder observar el comportamiento con detalle y poder
-extraer mejores conclusiones, de todos los experimentos se extraen los tres
-siguientes datos:
-\begin{itemize} \comentario{reescribir. Quizás mover a 5.1.2.}
-\item Rendimiento computacional medido en GFLOPS. Distintas políticas
-  aplicadas sobre la misma configuración de matriz pueden dar rendimientos
-  diferentes, indicando la diferencia de tiempo de ejecución entre cada una
-  de ellas.
-\item Muestreo de potencia instantánea durante toda la ejecución (en
-  watios). Esto da lugar a poder observar la potencia instantánea media por
-  cada cluster del sistema, y de manera conjunta.
-\item Medida de rendimiento energético reflejada en GFLOP/Watio, como
-  resultado de combinar las dos magnitudes anteriores.
-\end{itemize}
+que siguen una estrategia puramente DVFS como se ha descrito
+anteriormente\footnote{En este capítulo todos los experimentos han sido
+  realizados utilizando precisión simple}. Los experimentos corresponden a distintas ejecuciones de una
+factorización de Cholesky para distintas configuraciones de tamaño de
+matriz y bloque. Para comprobar si estas políticas presentan una mejora
+energética real, los resultados son comparados con una ejecución normal
+utilizando el planificador botlev sobre el \emph{runtime} \ompss (esta
+ejecución se denomina P0 en los experimentos realizados). Para poder
+observar el comportamiento con detalle y poder extraer mejores
+conclusiones, de todos los experimentos se extraen las tres siguientes
+medidas:
+\begin{enumerate}
+\item Rendimiento computacional medido en GFLOPS. Distintos rendimientos
+  sobre la misma configuración del problema sirven para indicar
+  diferencias en el tiempo de ejecución.
+\item Muestreo de la potencia media instantánea (en watios). Los medidores
+  permiten extraer el muestreo de potencia diferenciado por clusters.
+\item Rendimiento energético medido en GFLOPS/Watio, como resultado de
+  combinar las dos medidas anteriores.
+\end{enumerate}
 
-En la figura~\ref{fig:resultados:all-0-3} se muestran de manera conjunta
-los resultados obtenidos tanto para la plataforma \juno como para la
-plataforma \odroid.
+En las
+figura~\ref{fig:resultados:all-0-3:juno}~y~\ref{fig:resultados:all-0-3:odroid}
+se muestran de manera conjunta los resultados obtenidos para la plataforma
+\juno y para la plataforma \odroid respectivamente. Las gráficas
+representan de manera conjunta las tres medidas mencionadas anteriormente
+para las políticas P1 a P3. A grandes rasgos, es posible extraer un
+conjunto de observaciones generales:
+\begin{itemize}
+\item Se pueden distinguir dos grupos bien diferenciados: un primer grupo
+  formado por las matrices de tamaño pequeño ($n \le 2048$), y un segundo
+  grupo formado por las matrices de mayor tamaño. La principal diferencia
+  radica en el rendimiento de las distintas políticas respecto a la
+  ejecución normal sobre botlev: mientras que en el segundo grupo el
+  rendimiento se aproxima al de una ejecución normal con botlev (aunque
+  casi siempre inferior), en el primer grupo la diferencia de rendimiento
+  es muy elevada. Esta diferencia provoca no solo un rendimiento
+  computacional menor, sino que el rendimiento energético también es mucho
+  inferior. Además, esta diferencia es mayor en la plataforma \odroid que
+  en la plataforma \juno.
+\item El comportamiento de todas las políticas es similar en ambas
+  plataformas, dando una mayor validez a los datos. Además, la proporción
+  entre el número de cores big y LITTLE varía entre una plataforma y otra,
+  dando mayor relevancia a los datos.
+\item Mientras que las políticas P1, P2 y P2' obtienen un rendimiento
+  energético muy similar a la ejecución normal sin aplicar ninguna
+  política, la política P3 obtiene un rendimiento energético mucho mayor
+  que la ejecución con botlev sobre \ompss.
+\end{itemize}  
 
-\comentario{La figura no entra en una página sola. OJO}
+
 \begin{figure}
   \centering
-    \begin{subfigure}{1.0\textwidth}
-      \centering
-      \fbox{\includegraphics[width=1.0\textwidth]{Plots/dvfs_results/0-4_all_juno.eps}}
-      \caption{\juno}
-      \label{fig:resultados:all-0-3:juno}
-    \end{subfigure}
-
-    \begin{subfigure}{1.0\textwidth}
-      \centering
-      \fbox{\includegraphics[width=1.0\textwidth]{Plots/dvfs_results/0-4_all_odroid.eps}}
-      \caption{\odroid}
-      \label{fig:resultados:all-0-3:odroid}
-    \end{subfigure}
-
-  \caption[Medidas experimentales para las políticas desde P1 a P3]{Medidas
-    experimentales para las políticas desde P1 a P3. La política P0
+  \fbox{\includegraphics[width=1.0\textwidth]{Plots/dvfs_results/0-4_all_juno.eps}}
+  
+  \caption[Medidas experimentales para las políticas desde P1 a P3 en \juno]{Medidas
+    experimentales para las políticas desde P1 a P3 para la plataforma \juno. La política P0
     representa a una ejecución normal con botlev. Las etiquetas del eje x
     representan el tamaño de la matriz y de bloque utilizado para el experimento.}
-  \label{fig:resultados:all-0-3}
+  \label{fig:resultados:all-0-3:juno}
 \end{figure}
 
+\begin{figure}
+  \centering
+  \fbox{\includegraphics[width=1.0\textwidth]{Plots/dvfs_results/0-4_all_odroid.eps}}
+  \caption[Medidas experimentales para las políticas desde P1 a P3 en \odroid]{Medidas
+    experimentales para las políticas desde P1 a P3 en la plataforma \odroid. La política P0
+    representa a una ejecución normal con botlev. Las etiquetas del eje x
+    representan el tamaño de la matriz y de bloque utilizado para el experimento.}
+  \label{fig:resultados:all-0-3:odroid}
+\end{figure}
+
+Prestando más atención a la política P1, se observa que no presenta una
+gran diferencia respecto a la ejecución normal con botlev. La causa de este
+hecho está relacionada con el DAG asociado a la factorización de Cholesky,
+el cual se caracteriza por una rápida explosión de tareas al comienzo de la
+ejecución, provocando que el número de tareas críticas sea inferior al
+número de tareas no críticas durante casi toda la ejecución. Como trabajo
+futuro se considera experimentar esta política sobre otros problemas donde
+su DAG se abra y cierre durante la ejecución.\\
+Respecto a las políticas P2 y P2', no presentan una gran diferencia entre
+ellas en los resultados, tanto en el rendimiento en GFLOPS, como el consumo
+de energía. La razón de este parecido radica en que las políticas son
+prácticamente iguales, únicamente variando el conjunto de frecuencias sobre
+las que elegir para realizar el escalado de frecuencia. Respecto a la
+mejora del rendimiento energético, que es el objetivo final buscado, no se
+consigue superar el rendimiento alcanzado por una ejecución normal de
+botlev, sin embargo, se observa que la potencia instantánea media consumida
+ha disminuido. Este dato, junto con el hecho de que el rendimiento
+energético (GFLOPS/watio) no disminuye considerablemente respecto a la
+ejecución normal, hacen que las políticas P2 y P2' representen una posible
+solución para arquitecturas cuya potencia instantánea máxima está limitada
+por motivos de diseño. La tabla~\ref{tab:mejora-potencia} representan la
+disminución de potencia en watios respecto a la ejecución normal de
+botlev. Como se puede observar, salvo el primer grupo de matrices que
+identificábamos antes, el resultado es bueno para todas las políticas,
+obteniendo disminuciones de potencia entorno a 0.25 watios para las
+políticas P2 y P2', y reducciones entorno a 1 watio para la política P3
+sobre la plataforma \juno.
+
+%%% WATIOS %%%%
+\begin{table}
+  \centering
+  \caption{Mejora de la potencia instantánea media para las políticas P1-P3.}
+  \label{tab:mejora-potencia}
+  {\scriptsize
+    \begin{tabular}{cccccccccccccccc}
+      \toprule
+      \multicolumn{2}{c}{\phantom{a}} & \multicolumn{14}{c}{Tamaño de la matriz \texttt{(m)} y
+                                        de bloque \texttt{(b)}.} \\ \cmidrule{2-16}
+      \phantom{4} & \texttt{(m)} & \multicolumn{2}{c}{1024} & \multicolumn{2}{c}{2048} &                                                                         \multicolumn{2}{c}{4096} & \multicolumn{2}{c}{4608} & \multicolumn{2}{c}{5120} & \multicolumn{2}{c}{6144} & \multicolumn{2}{c}{8192} \\
+      \phantom{a} & \texttt{(b)} & 64 & 128 & 128 & 256 & 256 & 512 & 256 & 512 & 512 & 1024 & 512 & 1024 & 512 & 1024 \\ \hline
+
+      {\sc P1} & \phantom{a} & \br{-0.538} & \br{-0.897} & \fg{0.118} & \fg{0.260} & \fg{0.040} & \fg{0.100} & \fg{0.053} & \fg{0.054} & \fg{0.051} & \fg{0.399} & \fg{0.016} & \fg{0.279} & \br{-0.001} & \fg{0.162} \\
+      {\sc P2} & \phantom{a} & \br{-0.377} & \br{-0.684} & \fg{0.555} & \fg{0.274} & \fg{0.226} & \fg{0.145} & \fg{0.155} & \fg{0.153} & \fg{0.139} & \fg{0.359} & \fg{0.136} & \fg{0.254} & \fg{0.129} & \fg{0.271} \\
+      {\sc P2'} & \phantom{a} & \br{-0.536} & \br{-0.625} & \fg{0.299} & \fg{0.342} & \fg{0.115} & \fg{0.162} & \fg{0.092} & \fg{0.175} & \fg{0.125} & \fg{0.343} & \fg{0.115} & \fg{0.263} & \fg{0.111} & \fg{0.268}\\
+      {\sc P3} & \phantom{a} & \br{-0.134} & \br{-0.563} & \fg{0.778} & \fg{0.664} & \fg{0.846} & \fg{1.035} & \fg{0.865} & \fg{0.850} & \fg{0.891} & \fg{1.255} & \fg{0.886} & \fg{1.219} & \fg{0.866} & \fg{1.088} \\ \bottomrule
+    \end{tabular}
+    \caption*{\juno}
+  }
+  {\scriptsize
+    \begin{tabular}{cccccccccccccccc}
+      \toprule
+      \multicolumn{2}{c}{\phantom{a}} & \multicolumn{14}{c}{Tamaño de la matriz \texttt{(m)} y
+                                        de bloque \texttt{(b)}.} \\ \cmidrule{2-16}
+      \phantom{4} & \texttt{(m)} & \multicolumn{2}{c}{1024} & \multicolumn{2}{c}{2048} &                                                                         \multicolumn{2}{c}{4096} & \multicolumn{2}{c}{4608} & \multicolumn{2}{c}{5120} & \multicolumn{2}{c}{6144} & \multicolumn{2}{c}{8192} \\
+      \phantom{a} & \texttt{(b)} & 64 & 128 & 128 & 256 & 256 & 512 & 256 & 512 & 512 & 1024 & 512 & 1024 & 512 & 1024 \\ \hline
+
+{\sc P1} & \phantom{a} & \br{-0.929} & \br{-0.301} & \br{-0.444} & \br{-0.234} & \br{-0.038} & \fg{0.165} & \fg{0.004} & \fg{0.125} & \fg{0.114} & \fg{0.422} & \fg{0.073} & \fg{0.390} & \fg{0.049} & \fg{0.273} \\
+{\sc P2} & \phantom{a} & \br{-1.219} & \br{-0.455} & \br{-0.515} & \br{-0.169} & \fg{0.153} & \fg{0.269} & \fg{0.215} & \fg{0.300} & \fg{0.207} & \fg{0.413} & \fg{0.219} & \fg{0.398} & \fg{0.194} & \fg{0.340} \\
+{\sc P2'} & \phantom{a} & \br{-0.783} & \br{-0.090} & \br{-0.296} & \br{-0.140} & \fg{0.126} & \fg{0.220} & \fg{0.195} & \fg{0.228} & \fg{0.199} & \fg{0.327} & \fg{0.177} & \fg{0.354} & \fg{0.218} & \fg{0.311} \\
+{\sc P3} & \phantom{a} & \br{-1.092} & \br{-0.205} & \br{-0.354} & \br{-0.234} & \fg{0.732} & \fg{0.932} & \fg{0.867} & \fg{0.961} & \fg{0.891} & \fg{1.181} & \fg{0.845} & \fg{1.208} & \fg{0.862} & \fg{1.213} \\\bottomrule
+    \end{tabular}
+    \caption*{\odroid}
+  }
+\end{table}
 
 
+Como se observa en la figura, la política que mayor rendimiento energético
+alcanza, incluso superando a una ejecución normal con botlev es la política
+P3. La política, caracterizada por disminuir frecuencia sobre el cluster de
+cores big, consigue, a costa de obtener un menor rendimiento, una mejora
+elevada de rendimiento energético frente al resto de políticas y a la
+ejecución normal. La tabla~\ref{s5:table:mejora-gflopsw} indica la mejora
+de gflops/watio de cada política y para cada configuración de tamaño tanto
+en la plataforma \juno como en la plataforma \odroid. Como se puede
+observar, la mejora es efectiva para matrices de tamaño mayor a 2048,
+alcanzando una mejora aproximada de 1 GFLOP/watio en la plataforma \juno, y
+una mejora entorno a 0.4 GFLOP/watio en la plataforma
+\odroid. Adicionalmente a esta mejora, la política P3 también consigue
+reducir la potencia instantánea media en todas las configuraciones, siendo
+esta política también válida para plataformas donde la potencia esté
+limitada (similar a las políticas anteriores).
+
+%%%% GFLOPS/WATIO %%%%
 \begin{table}
   \centering
 	\caption[Mejora de rendimiento energético absoluta (en GFLOPS/Watio) para
@@ -754,32 +858,126 @@ plataforma \odroid.
   la factorización de Cholesky utilizando distintas políticas P1 a P3
   respecto a una ejecución estándar del mismo problema utilizando el
   planificador botlev sobre \ompss, sobre la plataforma \juno.}
-  \label{s5:table:mejora-gplosw}
+  \label{s5:table:mejora-gflopsw}
   \ra{1.2}
   \ca{2pt}
   
   {\scriptsize
-    \begin{tabular}{ccccccccccccccc}
+    \begin{tabular}{cccccccccccccccc}
       \toprule
-      \phantom{a} & \multicolumn{14}{c}{Tamaño de la matriz \texttt{(m)} y
-                    de bloque \texttt{(b)}.} \\ \cmidrule{2-15}
-\texttt{(m)} & \multicolumn{2}{c}{1024} & \multicolumn{2}{c}{2048} &
+      \multicolumn{2}{c}{\phantom{a}} & \multicolumn{14}{c}{Tamaño de la matriz \texttt{(m)} y
+                    de bloque \texttt{(b)}.} \\ \cmidrule{2-16}
+\phantom{4} & \texttt{(m)} & \multicolumn{2}{c}{1024} & \multicolumn{2}{c}{2048} &
                                                                     \multicolumn{2}{c}{4096}& \multicolumn{2}{c}{4608} & \multicolumn{2}{c}{5120} & \multicolumn{2}{c}{6144} & \multicolumn{2}{c}{8192} \\
-\texttt{(b)} & 64 & 128 & 128 & 256 & 256 & 512 & 256 & 512 & 512 & 1024 & 512 & 1024 &
+\phantom{a} & \texttt{(b)} & 64 & 128 & 128 & 256 & 256 & 512 & 256 & 512 & 512 & 1024 & 512 & 1024 &
                                                                          512 & 1024 \\ \hline
-      {\sc P1} & \br{-1.405} & \br{-1.963} & \br{-0.968} & \br{-0.519} & \br{-0.318} & \br{-0.146} & \br{-0.183} & \br{-0.124} & \br{-0.119} & \br{-0.469} & \fg{0.101} & \br{-0.331} & \br{-0.011} & \br{-0.252} \\
-      {\sc P2} &\br{-1.635} & \br{-1.995} & \br{-1.139} & \br{-0.391} & \br{-0.289} & \br{-0.060} & \br{-0.255} & \br{-0.011} & \br{-0.036} & \br{-0.418} & \fg{0.249} & \fg{0.184} & \fg{0.069} & \fg{0.012} \\
-      {\sc P2'} & \br{-1.438} & \br{-1.766} & \br{-0.675} & \br{-0.064} & \br{-0.092} & \br{-0.084} & \br{-0.056} & \br{-0.006} & \br{-0.012} & \br{-0.221} & \fg{0.131} & \fg{0.012} & \fg{0.018} & \br{-0.058}\\
-      {\sc P3} & \br{-1.594} & \br{-1.971} & \br{-1.001} & \br{-0.141} & \fg{0.460} & \fg{1.496} & \fg{0.652} & \fg{1.045} & \fg{0.860} & \fg{1.391} & \fg{1.046} & \fg{1.643} & \fg{1.114} & \fg{1.263} \\\bottomrule
+      {\sc P1} &\phantom{a}& \br{-1.405} & \br{-1.963} & \br{-0.968} & \br{-0.519} & \br{-0.318} & \br{-0.146} & \br{-0.183} & \br{-0.124} & \br{-0.119} & \br{-0.469} & \fg{0.101} & \br{-0.331} & \br{-0.011} & \br{-0.252} \\
+      {\sc P2} &\phantom{a}&\br{-1.635} & \br{-1.995} & \br{-1.139} & \br{-0.391} & \br{-0.289} & \br{-0.060} & \br{-0.255} & \br{-0.011} & \br{-0.036} & \br{-0.418} & \fg{0.249} & \fg{0.184} & \fg{0.069} & \fg{0.012} \\
+      {\sc P2'} & \phantom{a}&\br{-1.438} & \br{-1.766} & \br{-0.675} & \br{-0.064} & \br{-0.092} & \br{-0.084} & \br{-0.056} & \br{-0.006} & \br{-0.012} & \br{-0.221} & \fg{0.131} & \fg{0.012} & \fg{0.018} & \br{-0.058}\\
+      {\sc P3} & \phantom{a}&\br{-1.594} & \br{-1.971} & \br{-1.001} & \br{-0.141} & \fg{0.460} & \fg{1.496} & \fg{0.652} & \fg{1.045} & \fg{0.860} & \fg{1.391} & \fg{1.046} & \fg{1.643} & \fg{1.114} & \fg{1.263} \\\bottomrule
 
     \end{tabular}
+    \caption*{\juno}
+  }
+
+
+  {\scriptsize
+    \begin{tabular}{cccccccccccccccc}
+      \toprule
+      \multicolumn{2}{c}{\phantom{a}} & \multicolumn{14}{c}{Tamaño de la matriz \texttt{(m)} y
+                                        de bloque \texttt{(b)}.} \\ \cmidrule{2-16}
+      \phantom{4} & \texttt{(m)} & \multicolumn{2}{c}{1024} & \multicolumn{2}{c}{2048} & \multicolumn{2}{c}{4096}& \multicolumn{2}{c}{4608} & \multicolumn{2}{c}{5120} & \multicolumn{2}{c}{6144} & \multicolumn{2}{c}{8192} \\
+      \phantom{a} & \texttt{(b)} & 64 & 128 & 128 & 256 & 256 & 512 & 256 & 512 & 512 & 1024 & 512 & 1024 & 512 & 1024 \\ \hline
+
+      {\sc P1} & \phantom{a} & \br{-4.835} & \br{-3.835} & \br{-2.293} & \br{-1.106} & \fg{0.042} & \br{-0.187} & \br{-0.121} & \br{-0.072} & \br{-0.053} & \br{-0.097} & \br{-0.057} & \br{-0.195} & \br{-0.028} & \br{-0.120} \\
+      {\sc P2} & \phantom{a} & \br{-5.124} & \br{-4.866} & \br{-3.004} & \br{-1.087} & \br{-0.038} & \br{-0.163} & \br{-0.112} & \br{-0.165} & \br{-0.174} & \br{-0.158} & \br{-0.105} & \br{-0.258} & \br{-0.182} & \br{-0.251} \\
+      {\sc P2'} & \phantom{a} & \br{-4.636} & \br{-2.490} & \br{-2.100} & \br{-1.036} & \br{-0.005} & \br{-0.230} & \br{-0.164} & \br{-0.188} & \br{-0.121} & \br{-0.037} & \br{-0.149} & \br{-0.193} & \br{-0.248} & \br{-0.274} \\
+      {\sc P3} & \phantom{a} & \br{-5.014} & \br{-4.223} & \br{-2.699} & \br{-1.472} & \fg{0.408} & \fg{0.309} & \fg{0.339} & \fg{0.426} & \fg{0.408} & \fg{0.432} & \fg{0.313} & \fg{0.476} & \fg{0.362} & \fg{0.500} \\\bottomrule
+    \end{tabular}
+    \caption*{\odroid}
   }
 \end{table}
 
 
+La razón de que la política P3 posea unos mejores resultados frente al
+resto de políticas se puede observar en la figura~\ref{fig:detalle:p1-p4},
+la cual muestra los datos obtenidos para una configuración concreta del
+problema (en este caso, para una matriz de 8192 elementos divida en bloques
+de tamaño 1024 elementos). Como se puede observar en la figura, la
+disminución de la potencia media en las políticas P1, P2 y P2' es ínfima
+frente a la perdida de rendimiento, seguramente causada por el alto grado
+de eficiencia energética que posee un procesador LITTLE, provocando que no
+exista mejora en el rendimiento energético. Sin embargo, la política P3
+provoca una gran reducción de la potencia en el cluster big, mayor en
+proporción que la pérdida de rendimiento, consiguiendo así una mejora en el
+rendimiento energético.
+
+\begin{figure}
+  \centering
+    \begin{subfigure}{0.85\textwidth}
+      \centering
+      \fbox{\includegraphics[width=0.9\textwidth]{Plots/dvfs_results/8192-124_0-4_juno.eps}}
+      \caption{\juno}
+    \end{subfigure}
+
+    \vspace{0.5cm}
+
+    \begin{subfigure}{0.85\textwidth}
+      \centering
+      \fbox{\includegraphics[width=0.9\textwidth]{Plots/dvfs_results/8192-124_0-4_odroid.eps}}
+      \caption{\odroid}
+    \end{subfigure}  
+  \caption{Detalle de las políticas P1-P3 para la configuración
+    \texttt{m=8192} y \texttt{b=1024}}
+  \label{fig:detalle:p1-p4}
+\end{figure}
 
 
 
+
+\subsection{Análisis de resultados para las políticas P4-P6}
+\subsubsection{Análisis del tamaño de cola óptimo para aplicar la política}
+\subsubsection{Análisis de resultados}
+
+% {
+%   % The min, mid and max values
+%   \newcommand*{\MinNumber}{0.0}%
+%   \newcommand*{\MidNumber}{0.5} %
+%   \newcommand*{\MaxNumber}{1.0}%
+  
+%   % Apply the gradient macro
+%   \newcommand{\ApplyGradient}[1]{%
+%     \ifdim #1 pt > \MidNumber pt
+%         \pgfmathsetmacro{\PercentColor}{max(min(100.0*(#1 - \MidNumber)/(\MaxNumber-\MidNumber),100.0),0.00)} %
+%         \hspace{-0.33em}\colorbox{green!\PercentColor!yellow}{#1}
+%     \else
+%         \pgfmathsetmacro{\PercentColor}{max(min(100.0*(\MidNumber - #1)/(\MidNumber-\MinNumber),100.0),0.00)} %
+%         \hspace{-0.33em}\colorbox{red!\PercentColor!yellow}{#1}
+%     \fi
+%   }
+  
+%   \newcolumntype{R}{>{\collectcell\ApplyGradient}c<{\endcollectcell}}
+%   \renewcommand{\arraystretch}{0}
+%   \setlength{\fboxsep}{3mm} % box size
+%   \setlength{\tabcolsep}{0pt}
+  
+%   \begin{table}[ht]
+%     \begin{center}
+%       \begin{tabular}{*{10}{R}}
+%         1.00 & 1.00 & 1.00 & 1.00 & 0.99 & 0.98 & 0.96 & 0.90 & 0.82 & 0.37 \\
+%         1.00 & 1.00 & 0.99 & 0.98 & 0.95 & 0.90 & 0.82 & 0.61 & 0.37 & 0.01 \\
+%         1.00 & 0.99 & 0.98 & 0.96 & 0.90 & 0.82 & 0.67 & 0.37 & 0.14 & 0.00 \\
+%         1.00 & 0.98 & 0.95 & 0.90 & 0.78 & 0.61 & 0.37 & 0.08 & 0.01 & 0.00 \\
+%         0.99 & 0.95 & 0.90 & 0.82 & 0.61 & 0.37 & 0.14 & 0.01 & 0.00 & 0.00 \\
+%         0.98 & 0.90 & 0.82 & 0.67 & 0.37 & 0.14 & 0.02 & 0.00 & 0.00 & 0.00 \\
+%         0.95 & 0.78 & 0.61 & 0.37 & 0.08 & 0.01 & 0.00 & 0.00 & 0.00 & 0.00 \\
+%         0.90 & 0.61 & 0.37 & 0.14 & 0.01 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \\
+%         0.82 & 0.37 & 0.14 & 0.02 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \\
+%         0.37 & 0.01 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \\
+%       \end{tabular}
+%     \end{center}
+%   \end{table}
+% }
 
 
 
