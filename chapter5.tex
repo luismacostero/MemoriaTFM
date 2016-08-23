@@ -697,15 +697,15 @@ como objetivo principal comprobar el nivel de eficiencia energética desde
 la política P1 hasta la política P3, las cuales corresponden a políticas
 que siguen una estrategia puramente DVFS como se ha descrito
 anteriormente\footnote{En este capítulo todos los experimentos han sido
-  realizados utilizando precisión simple}. Los experimentos corresponden a distintas ejecuciones de una
-factorización de Cholesky para distintas configuraciones de tamaño de
-matriz y bloque. Para comprobar si estas políticas presentan una mejora
-energética real, los resultados son comparados con una ejecución normal
-utilizando el planificador botlev sobre el \emph{runtime} \ompss (esta
-ejecución se denomina P0 en los experimentos realizados). Para poder
-observar el comportamiento con detalle y poder extraer mejores
-conclusiones, de todos los experimentos se extraen las tres siguientes
-medidas:
+  realizados utilizando precisión simple.}. Los experimentos corresponden a
+distintas ejecuciones de una factorización de Cholesky para distintas
+configuraciones de tamaño de matriz y bloque. Para comprobar si estas
+políticas presentan una mejora energética real, los resultados son
+comparados con una ejecución normal utilizando el planificador botlev sobre
+el \emph{runtime} \ompss (esta ejecución se denomina P0 en los experimentos
+realizados). Para poder observar el comportamiento con detalle y poder
+extraer mejores conclusiones, de todos los experimentos se extraen las tres
+siguientes medidas:
 \begin{enumerate}
 \item Rendimiento computacional medido en GFLOPS. Distintos rendimientos
   sobre la misma configuración del problema sirven para indicar
@@ -717,15 +717,17 @@ medidas:
 \end{enumerate}
 
 En las
-figura~\ref{fig:resultados:all-0-3:juno}~y~\ref{fig:resultados:all-0-3:odroid}
+figuras~\ref{fig:resultados:all-0-3:juno}~y~\ref{fig:resultados:all-0-3:odroid}
 se muestran de manera conjunta los resultados obtenidos para la plataforma
 \juno y para la plataforma \odroid respectivamente. Las gráficas
 representan de manera conjunta las tres medidas mencionadas anteriormente
-para las políticas P1 a P3. A grandes rasgos, es posible extraer un
-conjunto de observaciones generales:
+para las políticas P1 a P3 para un amplio conjunto de tamaños de matriz y
+bloque.\\
+A grandes rasgos, es posible extraer un conjunto de observaciones
+generales:
 \begin{itemize}
 \item Se pueden distinguir dos grupos bien diferenciados: un primer grupo
-  formado por las matrices de tamaño pequeño ($n \le 2048$), y un segundo
+  formado por las matrices de tamaño pequeño ($m \le 2048$), y un segundo
   grupo formado por las matrices de mayor tamaño. La principal diferencia
   radica en el rendimiento de las distintas políticas respecto a la
   ejecución normal sobre botlev: mientras que en el segundo grupo el
@@ -733,8 +735,8 @@ conjunto de observaciones generales:
   casi siempre inferior), en el primer grupo la diferencia de rendimiento
   es muy elevada. Esta diferencia provoca no solo un rendimiento
   computacional menor, sino que el rendimiento energético también es mucho
-  inferior. Además, esta diferencia es mayor en la plataforma \odroid que
-  en la plataforma \juno.
+  inferior. Además, hay que destacar que esta diferencia es más elevada en
+  la plataforma \odroid que en la plataforma \juno.
 \item El comportamiento de todas las políticas es similar en ambas
   plataformas, dando una mayor validez a los datos. Además, la proporción
   entre el número de cores big y LITTLE varía entre una plataforma y otra,
@@ -904,13 +906,24 @@ resto de políticas se puede observar en la figura~\ref{fig:detalle:p1-p4},
 la cual muestra los datos obtenidos para una configuración concreta del
 problema (en este caso, para una matriz de 8192 elementos divida en bloques
 de tamaño 1024 elementos). Como se puede observar en la figura, la
-disminución de la potencia media en las políticas P1, P2 y P2' es ínfima
-frente a la perdida de rendimiento, seguramente causada por el alto grado
-de eficiencia energética que posee un procesador LITTLE, provocando que no
-exista mejora en el rendimiento energético. Sin embargo, la política P3
-provoca una gran reducción de la potencia en el cluster big, mayor en
-proporción que la pérdida de rendimiento, consiguiendo así una mejora en el
-rendimiento energético.
+disminución de la potencia media en las políticas P1, P2 y P2' sobre el
+cluster LITTLE es ínfima frente a la perdida de rendimiento, seguramente
+causada por el alto grado de eficiencia energética que posee un procesador
+LITTLE, provocando que no exista mejora en el rendimiento energético. Sin
+embargo, la política P3 provoca una gran reducción de la potencia en el
+cluster big, mayor en proporción que la pérdida de rendimiento,
+consiguiendo así una mejora en el rendimiento energético elevada.\\
+
+Si se observa con detalle la gráfica, una consecuencia de la política P3 es
+el aumento de la potencia en el cluster LITTLE. La cause de este aumento es
+que al disminuir la frecuencia del cluster big, las tareas en ejecución
+tardan más en finalizar, por lo que existe un mayor número de tareas listas
+para ser ejecutadas, y mientras que en una ejecución normal existen
+momentos en los que el cluster de cores LITTLE se encuentra ocioso ya que
+no existen tareas listas, en esta política el cluster sí tiene tareas para
+ejecutar en todo momento. Sin embargo, a pesar del aumento de potencia en el
+cluster de cores LITTLE, la eficiencia energética sigue siendo mayor frente
+a una ejecución normal.\\
 
 \begin{figure}
   \centering
@@ -932,57 +945,13 @@ rendimiento energético.
   \label{fig:detalle:p1-p4}
 \end{figure}
 
-
+\comentario{¿?}
+Por último, destacar como una posible conclusión a estos experimentos, cómo
+el cluster LITTLE refleja que no posee mucho margen de mejora energética,
+mientras que el cluster big sí. Este hecho se verá respaldado por los
+resultados de las políticas P4-P6 que se muestran en la siguiente sección.
 
 
 \subsection{Análisis de resultados para las políticas P4-P6}
 \subsubsection{Análisis del tamaño de cola óptimo para aplicar la política}
 \subsubsection{Análisis de resultados}
-
-% {
-%   % The min, mid and max values
-%   \newcommand*{\MinNumber}{0.0}%
-%   \newcommand*{\MidNumber}{0.5} %
-%   \newcommand*{\MaxNumber}{1.0}%
-  
-%   % Apply the gradient macro
-%   \newcommand{\ApplyGradient}[1]{%
-%     \ifdim #1 pt > \MidNumber pt
-%         \pgfmathsetmacro{\PercentColor}{max(min(100.0*(#1 - \MidNumber)/(\MaxNumber-\MidNumber),100.0),0.00)} %
-%         \hspace{-0.33em}\colorbox{green!\PercentColor!yellow}{#1}
-%     \else
-%         \pgfmathsetmacro{\PercentColor}{max(min(100.0*(\MidNumber - #1)/(\MidNumber-\MinNumber),100.0),0.00)} %
-%         \hspace{-0.33em}\colorbox{red!\PercentColor!yellow}{#1}
-%     \fi
-%   }
-  
-%   \newcolumntype{R}{>{\collectcell\ApplyGradient}c<{\endcollectcell}}
-%   \renewcommand{\arraystretch}{0}
-%   \setlength{\fboxsep}{3mm} % box size
-%   \setlength{\tabcolsep}{0pt}
-  
-%   \begin{table}[ht]
-%     \begin{center}
-%       \begin{tabular}{*{10}{R}}
-%         1.00 & 1.00 & 1.00 & 1.00 & 0.99 & 0.98 & 0.96 & 0.90 & 0.82 & 0.37 \\
-%         1.00 & 1.00 & 0.99 & 0.98 & 0.95 & 0.90 & 0.82 & 0.61 & 0.37 & 0.01 \\
-%         1.00 & 0.99 & 0.98 & 0.96 & 0.90 & 0.82 & 0.67 & 0.37 & 0.14 & 0.00 \\
-%         1.00 & 0.98 & 0.95 & 0.90 & 0.78 & 0.61 & 0.37 & 0.08 & 0.01 & 0.00 \\
-%         0.99 & 0.95 & 0.90 & 0.82 & 0.61 & 0.37 & 0.14 & 0.01 & 0.00 & 0.00 \\
-%         0.98 & 0.90 & 0.82 & 0.67 & 0.37 & 0.14 & 0.02 & 0.00 & 0.00 & 0.00 \\
-%         0.95 & 0.78 & 0.61 & 0.37 & 0.08 & 0.01 & 0.00 & 0.00 & 0.00 & 0.00 \\
-%         0.90 & 0.61 & 0.37 & 0.14 & 0.01 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \\
-%         0.82 & 0.37 & 0.14 & 0.02 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \\
-%         0.37 & 0.01 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \\
-%       \end{tabular}
-%     \end{center}
-%   \end{table}
-% }
-
-
-
-%-- Configuraciones para emacs --
-%%% Local Variables:
-%%% mode: latex
-%%% TeX-master: "./principal.tex"
-%%% End:
