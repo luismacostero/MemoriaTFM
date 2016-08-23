@@ -16,16 +16,23 @@
 %
 \section{Planteamiento y objetivos generales}
 
-(Plantear objetivos e idea general. En el capítulo 5, copiaremos esta estructura, con la
-misma sección inicial de motivación/objetivos).
+Este capítulo presenta un nuevo acercamiento hacia la utilización de planificadores de tareas
+no conscientes de la asimetría (en adelante nos referiremos a ellos como {\em convencionales})
+sobre arquitecturas asimétricas, explotando toda la capacidad de cómputo de las mismas sin que
+ello suponga una adaptación específica de las políticas de planificación de los mismos. Para ello,
+se aprovechan implementaciones de tareas conscientes de la asimetría, abstrayendo al runtime de
+dicha característica. 
 
-In this section, we initially perform an evaluation 
-of the task-parallel Cholesky routine in Listings~\ref{lst:chol}--\ref{lst:chol_tasks},
-executed on top of the conventional (i.e., default) scheduler in 
-OmpSs linked to a sequential instance of BLIS,  on the target Exynos 5422 SoC.  The outcome from this study 
-motivates the development effort and experiments presented in the remainder of the paper.
+En primer lugar, se llevará a cabo una evaluación inicial de la implementación por bloques de 
+la factorización de Cholesky mostrada anteriormente en las Figuras~\ref{lst:chol} y \ref{lst:chol_tasks},
+utilizando el planificador convencional de OmpSs y una versión secuencial de BLIS. Las observaciones de
+dicho estudio servirán como base para la propuesta de solución introducida, consistente en el uso de
+un planificador convencional enlazado con una versión asimétrica de BLIS. Finalmente, se comparan los
+resultados obtenidos con los de los mismos códigos utilizando una versión de OmpSs consciente de la
+arquitectura; finalmente, estos resultados son analizados en detalle a través de trazas de ejecución.
 
 \subsection{Evaluación de runtimes convencionales en AMPs}
+\label{subsec:conv_eval}
 
 La Figura~\ref{fig:ompss_blis_oversubscription} muestra el rendimiento, en términos de GFLOPS (miles de millones de
 operaciones en coma flotante por segundo), mostrado por el runtime convencional de OmpSs para la factorización
@@ -130,7 +137,7 @@ en otros ámbitos, el desarrollo específico de este tipo de implementaciones es
 
 \subsection{Requisitos a nivel de tarea en el ámbito del álgebra lineal}
 
-\comentario{Hay que reescribir esta sección}.
+\comentario{Hay que reescribir esta sección}
 
 Por último, cabe destacar que son necesarios ciertos requisitos adicionales en la implementación multihebra de BLIS
 que opera sobre el modelo propuesto. Considérese el kernel \gemm y la descripción de alto nivel proporcionada en la Figura~\ref{lst:gemm}. 
@@ -566,15 +573,15 @@ usando BLIS secuencial. Se ha observado un comportamiento similar para el resto 
 \centering
 	\begin{subfigure}{\textwidth}
    \includegraphics[width=\textwidth]{Plots/Traces/sym_task_duration_histogram.png}
- \caption{OmpSs + Symmetric BLIS}
+ \caption{OmpSs + BLIS simétrico.}
 	\end{subfigure}
 	\begin{subfigure}{\textwidth}
    \includegraphics[width=\textwidth]{Plots/Traces/asym_task_duration_histogram.png}
-		\caption{OmpSs + Asymmetric BLIS}
+		\caption{OmpSs + BLIS asimétrico.}
 	\end{subfigure}
 	\begin{subfigure}{\textwidth}
    \includegraphics[width=\textwidth]{Plots/Traces/botlev_task_duration_histogram.png}
- \caption{Botlev-OmpSs - 4+4 threads}
+ \caption{Botlev-OmpSs - 4+4 hebras.}
 	\end{subfigure}
 	\caption[Histograma de duración de tareas para la tarea {\tt dgemm} sobre las tres configuraciones de planificador.]{Histograma de duración de tareas para la tarea {\tt dgemm} sobre las tres configuraciones de planificador utilizadas para la factorización de Cholesky ({\tt n}~=~6,144, {\tt b}~=~448).  
 	Las filas corresponden a los \wts en ejecución. Las columnas corresponden a intervalos de tiempo de ejecución medio. Los colores (en gradiente) indican el número de tareas en el 
