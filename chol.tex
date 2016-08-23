@@ -155,7 +155,7 @@ una matriz compuesta por $4 \times 4$ submatrices (esto es, cuando {\tt s}=4).
 
 El código de la Figura~\ref{lst:chol_tasks} muestra las anotaciones necesarias por parte del programador para explotar
 el paralelismo a nivel de tareas inherente a la factorización de Cholesky usando OmpSs; cabe destacar las líneas etiquetadas
-con  anotaciones (directivas) ``{\tt \#pragma omp}''.
+con  anotaciones (directivas) ``{\tt \#pragma omp task}''.
 Las cláusulas {\tt in}, {\tt out} e {\tt inout} denotan la direccionalidad de los datos, y ayudan al planificador
 de tareas a mantener coherentemente las dependencias entre tareas durante la ejecución. 
 En esta implementación, los cuatro kernels anotados son implementados como invocaciones a 
@@ -346,7 +346,8 @@ internos a cada tarea es sencilla, o cuando el número de núcleos en el sistema
 opción típicamente conlleva menos sobrecarga en tiempo de ejecución, y por tanto proporciona
 una solución más eficiente desde el punto de vista del rendimiento. A día de hoy, esta es la
 opción preferida y adoptada en bibliotecas comerciales y de software libre, como por ejemplo
-AMD ACML, IBM ESSL, Intel MKL, GotoBLAS~\cite{Goto:2008:AHP}, OpenBLAS~\cite{OpenBLAS} o BLIS~\cite{BLIS}.
+AMD ACML~\cite{ACML}, IBM ESSL~\cite{ESSL}, Intel MKL~\cite{mkl}, GotoBLAS~\cite{Goto:2008:AHP}, OpenBLAS~\cite{OpenBLAS} o BLIS~\cite{BLIS1}. Todas estas bibliotecas son implementaciones
+optimizadas de los estándares BLAS~\cite{blas1,blas2,blas3} y LAPACK~\cite{lapack}.
 
 A modo de ejemplo, y dado que utilizaremos BLIS como biblioteca subyacente para la ejecución de tareas
 individuales durante el resto del trabajo, se describe brevemente su funcionamiento, así como la posibilidad
