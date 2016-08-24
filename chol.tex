@@ -330,7 +330,7 @@ encuentra desactivado por defecto.
 
 %%{\bf Explain}
 
-\section{Implementaciones paralelas de bibliotecas matemáticas}
+\section{Implementación paralela de bibliotecas matemáticas}
 \label{sec:bibliotecas}
 
 \subsection{BLIS: implementación multihebra del estándar BLAS}
@@ -394,6 +394,38 @@ con planificadores de tareas ``clásicos'' (no conscientes de la asimetría), co
 
 \section{Paralelismo a nivel de tareas y a nivel de datos: ventajas e inconvenientes}
 \label{sec:comparativa}
+
+Existen pues dos alternativas principales a la hora de portar una determinada implementación (en nuestro caso, de una operación
+de álgebra lineal) a una plataforma asimétrica:
+
+\begin{enumerate}
+ \item Utilizar un planificador de tareas consciente de la asimetría, en el que, por ejemplo, las tareas pertenecientes al camino crítico 
+	 sean asignadas a núcleos de procesamiento rápidos. De este modo, la unidad básica de planificación de tareas es el núcleo individual,
+		las tareas son invocaciones a versiones secuenciales de una determinada biblioteca, 
+		y es el planificador de tareas el encargado de explotar en tiempo de ejecución, sin la intervención del programador, los
+		núcleos asimétricos subyacentes.
+		
+	\item Utilizar una implementación de rutinas de biblioteca conscientes de la asimetría, sin extraer paralelismo a nivel de tareas. Una
+		determinada invocación a una de estas rutinas se ejecutará eficientemente de forma paralela teniendo en cuenta las 
+		características de la arquitectura asimétrica subyacente, repartiendo su espacio de iteraciones, por ejemplo, según las
+		capacidades de cómputo de cada tipo de núcleo disponible.
+\end{enumerate}
+
+Las ventajas de la utilización de un planificador de tareas son obvias: menor intervención por parte del programador o usuario,
+adaptación a pequeños cambios en el comportamiento dinámico de la arquitectura ante la ejecución de un código, o modificación
+de las políticas de planificación dinámicamente, entre otras. Sin embargo, en muchas ocasiones, el sobrecoste de este tipo de
+mecanismos no es desdeñable; además, su adaptación a arquitecturas heterogéneas o asimétricas, como es el caso, requiere
+un desarrollo específico de nuevas políticas de planificación que exploten los recursos disponibles de manera eficiente.
+
+Una biblioteca de funciones específicamente desarrollada para una arquitectura asimétrica (por ejemplo, BLIS) elimina gran parte
+de este sobrecoste y suele conseguir mejores y más predecibles rendimientos, especialmente en arquitecturas no homogéneas. Sin
+embargo, su desarrollo conlleva implementaciones específicas para cada tipo de arquitectura, lo que supone un esfuerzo no despreciable.
+
+
+
+
+
+
 
 %-- Configuraciones para emacs --
 %%% Local Variables:

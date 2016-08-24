@@ -247,7 +247,7 @@ añadido.
 \end{figure}
 
 
-\subsection{Integración de BLIS asimétrico con un planificador de tareas convencional}
+\subsection{Integración de BLIS asimétrico con un planificador convencional}
 
 Con el fin de analizar los beneficios reales de la solución propuesta en términos de rendimiento, comparamos a continuación
 el rendimiento del planificador OmpSs enlazado con {\em (a)} una versión secuencial de BLIS, y {\em (b)} con la versión asimétrica de BLIS. 
@@ -416,7 +416,8 @@ hasta 0.243~GFLOPS, al utilizar los cuatro núcleos lentos.
 %\end{tabular}
 %\end{table}
 
-\subsection{Comparativa de rendimiento con un planificador consciente de la asimetría}
+%\subsection{Comparativa de rendimiento con un planificador consciente de la asimetría}
+\subsection{Rendimiento frente a un planificador consciente de la asimetría}
 \label{sec:comparative}
 
 El último conjunto de experimentos tiene como objetivo ofrecer una visión global de las ventajas en términos
@@ -592,8 +593,8 @@ usando BLIS secuencial. Se ha observado un comportamiento similar para el resto 
 
 \begin{table}%[t]
 \centering
-\caption{Average time (in ms) per task and worker thread in the Cholesky factorization  ({\tt n}~=~6,144, 
-{\tt b}~=~448), for the three runtime configurations.}
+	\caption{Tiempo medio (en ms) por tarea y \wt en la factorización de Cholesky ({\tt n}~=~6,144, 
+{\tt b}~=~448), para las tres configuraciones de runtime.}
 \label{tab:2dp_tasks}
 
 \ra{1.2}
