@@ -417,15 +417,14 @@ de las políticas de planificación dinámicamente, entre otras. Sin embargo, en
 mecanismos no es desdeñable; además, su adaptación a arquitecturas heterogéneas o asimétricas, como es el caso, requiere
 un desarrollo específico de nuevas políticas de planificación que exploten los recursos disponibles de manera eficiente.
 
-Una biblioteca de funciones específicamente desarrollada para una arquitectura asimétrica (por ejemplo, BLIS) elimina gran parte
+Una biblioteca de funciones específicamente desarrollada para una arquitectura asimétrica (por ejemplo, BLIS en el ámbito del álgebra lineal) elimina gran parte
 de este sobrecoste y suele conseguir mejores y más predecibles rendimientos, especialmente en arquitecturas no homogéneas. Sin
 embargo, su desarrollo conlleva implementaciones específicas para cada tipo de arquitectura, lo que supone un esfuerzo no despreciable.
 
-
-
-
-
-
+En el siguiente capítulo, se propone una solución que combina las ventajas de cada uno de los dos enfoque: combinando un planificador
+no consciente de la asimetría (es decir, convencional) con una biblioteca para la ejecución de tareas optimizada para arquitecturas
+asimétricas, se consigue aunar facilidad de programación y uso --derivado del uso de un planificador de tareas estándar-- con altas
+prestaciones --derivadas de la utilización de una biblioteca desarrollada ad-hoc para este tipo de arquitecturas--.
 
 %-- Configuraciones para emacs --
 %%% Local Variables:
