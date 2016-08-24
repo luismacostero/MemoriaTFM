@@ -747,7 +747,7 @@ generales:
   que la ejecución con botlev sobre \ompss.
 \end{itemize}  
 
-
+\comentario{Quizás mover las figuras repetidas a un anexo}
 \begin{figure}
   \centering
   \fbox{\includegraphics[width=1.0\textwidth]{Plots/dvfs_results/0-4_all_juno.eps}}
@@ -927,7 +927,7 @@ a una ejecución normal.\\
 
 \begin{figure}
   \centering
-    \begin{subfigure}{0.85\textwidth}
+    \begin{subfigure}{0.75\textwidth}
       \centering
       \fbox{\includegraphics[width=0.9\textwidth]{Plots/dvfs_results/8192-124_0-4_juno.eps}}
       \caption{\juno}
@@ -935,7 +935,7 @@ a una ejecución normal.\\
 
     \vspace{0.5cm}
 
-    \begin{subfigure}{0.85\textwidth}
+    \begin{subfigure}{0.75\textwidth}
       \centering
       \fbox{\includegraphics[width=0.9\textwidth]{Plots/dvfs_results/8192-124_0-4_odroid.eps}}
       \caption{\odroid}
@@ -954,4 +954,44 @@ resultados de las políticas P4-P6 que se muestran en la siguiente sección.
 
 \subsection{Análisis de resultados para las políticas P4-P6}
 \subsubsection{Análisis del tamaño de cola óptimo para aplicar la política}
+Mientras que las políticas anteriores dividían el espacio de frecuencias en
+partes iguales respecto al tamaño máximo de la cola, las políticas P4-P6 no
+disponen de un punto claro en la ejecución donde desactivar el cluster
+correspondiente. Para determinar cuál es el mejor punto en el que la
+política debe actuar se han realizado una serie de experimentos que varían
+el momento de .
+
+
+
+\begin{figure}
+  \centering
+    \begin{subfigure}{0.75\textwidth}
+      \centering
+      \fbox{\includegraphics[width=0.9\textwidth]{Plots/sched_results/P4_juno.eps}}
+      \caption{P4}
+    \end{subfigure}
+
+    \vspace{0.5cm}
+
+    \begin{subfigure}{0.75\textwidth}
+      \centering
+      \fbox{\includegraphics[width=0.9\textwidth]{Plots/sched_results/P5_juno.eps}}
+      \caption{P5}
+    \end{subfigure}  
+  \caption{Resultados para los experimentos P4 y P5 sobre la plataforma
+    \juno.}
+  \label{fig:detalle:p1-p4}
+\end{figure}
+
+
+
 \subsubsection{Análisis de resultados}
+
+
+
+
+%-- Configuraciones para emacs --
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "./principal.tex"
+%%% End:
