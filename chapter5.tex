@@ -958,22 +958,22 @@ resultados de las políticas P4-P6 que se muestran en la siguiente sección.
 
 
 \subsection{Análisis de resultados para las políticas P4-P6}
-%\subsubsection{Análisis del tamaño de cola óptimo para aplicar la política}
 Mientras que las políticas anteriores dividían el espacio de frecuencias en
 partes iguales respecto al tamaño máximo de la cola, las políticas P4-P6 no
 disponen de un punto claro en la ejecución donde desactivar el cluster
 correspondiente. Para determinar el momento en el que aplicar la política,
 se han diseñado una serie de experimentos variando el momento en el que se
 desactiva el cluster en función del número actual de tareas listas frente
-al número máximo hasta el momento. Los experimentos realizados contemplan
-desde un tamaño del $50\%$ del tamaño máximo, decreciendo en intervalos de
-un $10\%$ hasta finalizar en un tamaño del $10\%$ respecto al tamaño
-máximo. Mencionar que este porcentaje no se encuentra relacionado con el
-tiempo de ejecución, sino con el número de tareas listas en cada
-momento. Como dato informativo, la tabla~\ref{tab:tam-colas-tiempo} muestra
-para cada configuración del tamaño de la matriz y bloque (columnas), y para
-cada experimento lanzado (filas), el porcentaje del tiempo de ejecución en
-el que el cluster se encuentra desactivado.
+al número máximo de tareas listas simultáneas hasta el momento. Los
+experimentos realizados contemplan ejecuciones desde un tamaño del $50\%$
+del tamaño máximo, decreciendo en intervalos de un $10\%$ hasta finalizar
+en un tamaño del $10\%$ respecto al tamaño máximo. Mencionar que este
+porcentaje no se encuentra relacionado con el tiempo de ejecución, sino con
+el número de tareas listas en cada momento. Como dato informativo, la
+tabla~\ref{tab:tam-colas-tiempo} muestra para cada configuración del tamaño
+de la matriz y bloque (columnas), y para cada experimento lanzado (filas),
+el porcentaje del tiempo de ejecución en el que el cluster se encuentra
+desactivado para la política P4 y la plataforma \juno.\\
 
 
 \begin{table}
@@ -1018,35 +1018,68 @@ el que el cluster se encuentra desactivado.
 \end{table}
 
 
-Las figuras~\ref{fig:p4-p5} muestran el comportamiento de las políticas P4
-y P5 para la plataforma \odroid, combinando para cada configuración de
-tamaño de matriz y bloque los distintos tamaños de cola
-experimentados. Adicionalmente, se incorpora las medidas realizadas sobre
-el planificador \botlev para poder comparar los resultados.\\
-A grandes rasgos, es posible extraer un conjunto de conclusiones generales
-a ambas políticas:
+La figura~\ref{fig:p4-p5} muestra el comportamiento de las políticas P4 y
+P5 para la plataforma \juno, combinando para cada configuración de tamaño
+de matriz y bloque los distintos tamaños de cola experimentados. 
+Adicionalmente, se incorpora las medidas realizadas sobre el planificador
+\botlev para poder comparar los resultados (columna izquierda en cada
+conjunto de datos).\\
 
-\begin{itemize}
-\item Variar el momento en el que el cluster se desactiva tiene un impacto
-  muy significativo en el rendimiento final de la ejecución, tanto para
-  desactivar el cluster de cores LITTLE (política P4) como para desactivar
-  el cluster de cores big (política P5). Si se comparan los resultados de
-  ambas plataformas, la pérdida de rendimiento es mayor en la plataforma
-  \juno frente a la plataforma \odroid. La causa de este hecho es la
-  configuración de su cluster: al únicamente poseer 2 cores big
-  (Cortex-A57) frente a los 4 que posee la plataforma \odroid (Cortex-A15),
-  si se desactiva el cluster de cores LITTLE las tareas se reparten entre
-  un menor número de cores, explotando un menor grado de paralelismo.
-  Esta diferencia no es tan elevada en la política P5, pues al desactivar
-  el cluster de cores big, ambas plataformas tiene el cluster LITTLE
-  formado por el mismo número de núcleos, por lo que el grado de
-  paralelismo que se consigue es el mismo.
-\item Al igual que en las políticas anteriores, el impacto en la potencia
-  instantánea es mucho mayor sobre la política que desactiva los cores big,
-  frente a la que desactiva el cluster LITTLE. Además, al igual que el
-  rendimiento, el impacto que tiene el punto en el que se desactiva el
-  cluster sobre la potencia instantánea es muy elevado.
-\end{itemize}
+La primera observación que se puede realizar sobre los datos obtenidos es
+el impacto muy significativo que posee variar el punto de desactivado del
+cluster sobre el rendimiento final de la aplicación, tanto desactivando el
+cluster \LITTLE (política P4) como desactivando el cluster \BIG (política
+P5). La tabla~\ref{tab:p4-p5:gflops} muestra el rendimiento alcanzado por
+cada configuración del problema, política y plataforma según el momento
+elegido para desactivar el cluster correspondiente. Nótese que mientras que
+en la plataforma \juno es la política P4 la que obtiene peor rendimiento
+frente a la política P5, en la plataforma \odroid sucede al contrario. Una
+de las causas que provoca este hecho se encuentra en el tamaño de cada
+cluster en cada una de las plataformas. En \juno, el cluster \BIG se
+encuentra formado únicamente por dos núcleos, mientras que el cluster
+\LITTLE se encuentra formado por cuatro. Al desactivar el cluster \LITTLE,
+únicamente se disponen de dos núcleos donde ejecutar las tareas, por lo que
+el grado de paralelismo explotado es menor que si se desactiva el cluster
+\BIG. Como conclusión adicional, se puede observar cómo, a pesar de que el
+rendimiento de un core \BIG (Cortex-A57 en este caso) es más elevado que el
+rendimiento de un core \LITTLE (\mbox{Cortex-A53}), realizar la ejecución sobre
+cuatro cores \LITTLE obtiene un rendimiento mayor que realizarla sobre
+únicamente dos cores \BIG.\\
+
+
+\begin{table}
+  \centering
+  \caption{Rendimiento obtenido para las políticas P4 y P5 en ambas
+    plataformas en relación a una ejecución normal con \botlev.}
+  \label{tab:p4-p5:gflops}
+  {\scriptsize
+    \begin{tabular}{rcccccccccccc}
+      \toprule
+      \phantom{a} & \phantom{a} & \multicolumn{5}{c}{\juno} & \phantom{a} & \multicolumn{5}{c}{\odroid}\\
+      \phantom{a} & \phantom{a} & 10\% & 20\% & 30\% & 40\% & 50\% & \phantom{a} & 10\% & 20\% & 30\% & 40\% & 50\% \\\hline
+
+{\sc P4} & \phantom{a} & 52.18\% & 59.56\% & 67.33\% & 78.29\% & 85.87\% & \phantom{a} & 70.477\% & 75.93\% & 82.19\% & 87.55\% & 91.43\%\\
+{\sc P5} & \phantom{a} & 58.2\% & 62.99\% & 69.85\% & 76.05\% & 84.77\% & \phantom{a} &61.96\% & 67.85\% & 74.59\% & 82.03\% & 90.27\%\\\bottomrule
+    \end{tabular}
+  }
+\end{table}
+
+Mientras que en la política P4 el impacto en la potencia instantánea media
+no es muy elevado, en la política P5, desactivar el cluster \BIG tiene un
+impacto muy significativo en ambas plataformas. Este hecho ocurría también
+en las políticas anteriores, donde bajar la frecuencia al cluster \BIG
+proporcionaba mejores resultados (en términos de potencia) que bajarla al
+cluster \LITTLE. 
+
+
+Aunque este resultado era esperado ya qeu según la gráfica de3 potencias,
+los LITTLE consumen tan poco que es absurdo reducir mucho por ahí, si
+embargo, los big consumen tanto que un ligero cambio es enorme para el
+resultado final
+
+
+
+
 
 
 Como se puede apreciar en la figura, la política P4 encargada de desactivar
@@ -1087,6 +1120,9 @@ de la aplicación.
 
 
 \todo{Falta añadir P6, y revisar / comentar algo más de p4-p5}
+
+
+
 
 %-- Configuraciones para emacs --
 %%% Local Variables:
