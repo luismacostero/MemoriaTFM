@@ -6,6 +6,7 @@
 \section{Descripción de la estrategia de optimización}
 
 \subsection{DVFS sobre la arquitectura big.LITTLE}
+\label{sec:DVFS_BIGLITTLE}
 
 \subsection{Evaluación de rendimiento/eficiencia energética de las tareas}
 
@@ -42,79 +43,83 @@
 
 
 \section{Políticas de reducción de consumo}
-En esta sección se detallan las políticas desarrolladas para intentar
+En esta sección se detallan las diversas políticas desarrolladas para 
 reducir el consumo energético en una arquitectura asimétrica. Las políticas
 se encuentran divididas en dos grandes grupos: un primer grupo formado por
-politicas basadas en escalado de brecuencia, y un segundo grupo formado por
-políticas encargadas de modificar la asignación de las tareas a los
-diferentes \wts del \emph{runtime} (es decir, a los diferentes núcleos de
-la arquitectura).
+politicas basadas en {\em escalado de frecuencia}, y un segundo grupo formado por
+políticas encargadas de modificar la {\em asignación de las tareas} a los
+diferentes \wts generados por el \emph{runtime} (y por tanto, a los diferentes núcleos que
+componen la arquitectura).
 
-\subsection[{Basadas en escalado de frecuencia (P1, P2, P2' y P3)}]{Basadas en escalado de frecuencia}
+\subsection[{Políticas basadas en escalado de frecuencia (P1, P2, P2' y P3)}]{Políticas basadas en escalado de frecuencia}
 
 
 \subsubsection{Política P1}
+
 Durante la ejecución de un programa paralelo mediante un paradigma basado
-en tareas, puede ocurrir el caso en el que en cierto momento de la
-ejecución del problema la mayor parte de tareas listas para ser ejecutadas
-sean tareas críticas, provocando que nuevas tareas no puedan estar listas
-para ejecución hasta que estas tareas críticas finalicen. Este
-comportamiento podría reflejarse en una aplicación cuyo grafo de
+en tareas, es común que, en cierto punto de la ejecución paralela,
+la mayor parte de tareas listas para ser ejecutadas
+sean tareas pertenecientes al {\em camino crítico}, provocando que nuevas tareas no puedan 
+pasar a considerarte listas para ejecución hasta que las tareas críticas finalicen. 
+
+Este comportamiento podría reflejarse en una aplicación cuyo grafo de
 dependencias se encogiera muy rápidamente en algún punto intermedio de la
 ejecución, para luego volverse a expandir rápidamente (un árbol con forma
-de diábolo). En este árbol, las tareas del cuello de botella del medio
-serían tareas críticas ya que son prioritarias para que la ejecución
-continúe su ejecución, y además, en el momento que esto ocurra, un gran
-número de tareas estarán listas para ser ejecutadas y
-poder continuar la ejecución del problema.\\
-Este problema aplicado al planificador botlev (descrito en la
-sección~\ref{s3:botlev}) supondría que en el momento en el que el árbol se
-estreche, la cola de tareas no críticas tendría un tamaño mucho inferior al
-de tareas críticas, y por tanto los cores LITTLE tendrían mucha menor carga
-de trabajo que los cores big. Esto ocurriría mientras que los cores big
-finalicen la ejecución de sus tareas críticas y se preparen más tareas para
-ejecutar por los cores LITTLE.\\
-Aunque una forma de intentar paliar este problema sería obligar a que los
-cores lentos también ejecutaran tareas críticas, esto podría provocar que
-se retrase la finalización de una tarea crítica, ya que aunque su ejecución
-aunque puede comenzar antes (pues se disponen de más cores para distribuir
-el mismo número de tareas), el rendimiento de los cores LITTLE es mucho
-inferior que el de los cores big, provocando retrasos en la ejecución,
-incluso llegando a aumentar el problema del cuello de botella.
+de diábolo). En este tipo de árbol, las tareas ``centrales''
+serían críticas, ya que son prioritarias para que la ejecución paralela
+prosiga, y además, en el momento que esto ocurra, un gran
+número de tareas serán liberadas para ser ejecutadas y
+poder continuar la ejecución del problema.
 
-La política P1 intenta reducir este problema desde un enfoque distinto. La
-idea principal que se encuentra detrás de esta política es la de aprovechar
-estos momentos en los que la carga de trabajo sobre los cores lentos es
-menor para intentar disminuir el consumo energético aplicando una reducción
-de frecuencia sobre el cluster LITTLE. Como se podía ver en la
-figura~\ref{fig:modelo_consumo}, reducir la frecuencia al cluster LITTLE
-implica que la potencia instantánea consumida disminuye. Es cierto que al
-reducir la frecuencia de los cores el tiempo usado en ejecutar una tarea
-aumenta, pero como esta técnica únicamente se aplica en los momentos en los
-que la ejecución está limitada por el gran número de tareas críticas y el
-bajo número de tareas no críticas, se espera que el impacto final en el
-rendimiento no sea muy elevado.\\
-La forma en la que se ha decidido aplicar esta política sobre botlev
-consiste en monitorizar constantemente el número de tareas tanto críticas
-como no críticas listas para ser ejecutadas (reflejado en el tamaño de las
+Este problema, aplicado al planificador \botlev, (descrito en la
+sección~\ref{s3:botlev}) supondría que en el momento en el que el árbol se
+estreche, la cola de tareas no críticas tendría un tamaño muy inferior a la
+de tareas críticas, y por tanto los cores \LITTLE tendrían mucha menor carga
+de trabajo que los cores \BIG. Este fenómeno se da mientras los cores big
+finalizan la ejecución de sus tareas críticas y se liberan más tareas para
+ejecutar en los cores \LITTLE.
+
+Una forma de intentar paliar este problema consiste en forzar a que los
+núcleos lentos también ejecuten tareas críticas; este decisión, sin embargo, puede provocar 
+un retraso en la finalización de las tareas críticas, ya que aunque su ejecución
+puede comenzar antes (pues se disponen de más núcleos para distribuir
+el mismo número de tareas), el rendimiento de los núcleos \LITTLE es muy
+inferior que el de los cores \BIG, provocando retrasos en la ejecución e
+incluso llegando a agravar el cuello de botella anteriormente mencionado.
+
+La política P1 intenta solventar este problema desde un enfoque distinto. La
+idea principal consiste en aprovechar los períodos de tiempo en los que la carga 
+de trabajo sobre los núcleos lentos es menor para disminuir el consumo energético, 
+{\em forzando una reducción de frecuencia} sobre el cluster \LITTLE. 
+Como se podía ver en la Figura~\ref{fig:modelo_consumo}, reducir la frecuencia al cluster \LITTLE
+implica que la potencia instantánea disipada disminuye. Aunque es cierto que al
+reducir la frecuencia de los núcleos el tiempo empleado en ejecutar una tarea
+aumenta, esta técnica únicamente se aplica en aquellas fases de la ejecución paralela en las que
+la ejecución está limitada por el gran número de tareas críticas y el
+bajo número de tareas no críticas; por tanto, es esperable que el impacto final en el
+rendimiento no sea elevado, y sí lo sea la reducción de consumo energético.
+
+La forma en la que se ha aplicado esta política sobre \botlev
+consiste en monitorizar constantemente el número de tareas, tanto críticas
+como no críticas, listas para ser ejecutadas (reflejado en el tamaño de las
 colas internas del planificador), y actuar en función a la relación entre
-el tamaño de ambas colas. La figura~\ref{s5:fig:listing-p1} muestra un
-fragmento esquemático del código encargado de realizar esta tarea. Este
-método es invocado cada vez que el tamaño de una cola cambia (ya sea porque
+el tamaño de ambas colas. La Figura~\ref{s5:fig:listing-p1} muestra un
+fragmento esquemático del código encargado de realizar esta tarea. El
+método es invocado cada vez que el tamaño de una cola es modificado (ya sea porque
 una tarea comienza su ejecución, o porque una tarea se encuentra lista para
-ser ejecutada y es insertada en una cola). Como se puede ver en la
+ser ejecutada y es insertada en una cola). Como se puede observar en la
 línea~\ref{s5:lst:p1-calculoPrincipal(a)}, la frecuencia a la que cambiar
 el cluster se calcula como una proporción directa entre el tamaño de ambas
-colas, así, si el número de tareas críticas es el doble que el de las
+colas; así, por ejemplo, si el número de tareas críticas es el doble que el de las
 tareas no críticas, la frecuencia se disminuye un ``escalón''; si el tamaño
 es el triple, la frecuencia se disminuye hasta el tercer escalón de
-frecuencia, etc. Recordar que los valores de frecuencia que puede tomar el
+frecuencia, etc. Cabe recordar que los valores de frecuencia que puede tomar el
 cluster están limitados por el kernel del sistema operativo, como se
-mencionó en la sección~\todo{ref}. La
+mencionó en la sección~\ref{sec:BIG_LITTLE}. La
 línea~\ref{s5:lst:p1-calculoPrincipal(b)} asegura que la frecuencia final
-no es menor que la menor frecuencia soportada. Destacar que con este método
-se consigue que el cambio de frecuencia en el cluster se realice de manera
-escalonada según varía el tamaño de las colas.\\
+no es menor que la menor frecuencia soportada. Por tanto, en esta política,
+el cambio de frecuencia en el cluster se realiza de manera
+escalonada según varía el tamaño de las colas.
 
 \begin{figure}
   \centering
@@ -142,22 +147,22 @@ int P1(int bigQueueSize, int littleQueueSize){
 Adicionalmente al comportamiento general de esta política, hay que
 distinguir dos casos especiales que merecen ser mencionados: el caso en el
 que no exista ninguna tarea crítica lista para ser ejecutada, y el caso
-opuesto en el que todas las tareas listas sean críticas y los cores lentos
+opuesto, en el que todas las tareas listas sean críticas y los cores lentos
 estén totalmente ociosos. En estos casos, las
 líneas~\ref{s5:lst:p1-casoEsp1}-\ref{s5:lst:p1-casoEsp2} se encargan de
 aumentar la frecuencia al máximo directamente en caso de que todas las
 tareas sean no críticas, o de disminuir la frecuencia al mínimo en caso de
 que no exista ninguna tarea no crítica que ejecutar.
 
-La figura~\ref{s5:fig:P1-evo} muestra el comportamiento de esta política
-para una factoriación de Cholesky de 1024 elementos con precisión simple
-dividida en bloques de 64 elementos. La gráfica superior muestra el estado
+La Figura~\ref{s5:fig:P1-evo} muestra el comportamiento de esta política
+para una factorización de Cholesky de sobre una matriz de dimensión $1024 \times 1024$ usando  precisión simple y
+dividida en bloques de $64 \times 64$ elementos. La gráfica superior muestra el estado
 de las colas durante la ejecución del problema, mientras que la gráfica
-inferior muestra la frecuencia del cluster de cores lentos durante toda la
-ejecución del problema. Como se puede apreciar, al inicio de la ejecución
-donde el número de tareas críticas es elevado, la frecuencia se reduce de
+inferior muestra la frecuencia del cluster de núcleos \LITTLE en cada momento 
+de la ejecución del problema. Como se puede apreciar, al inicio de la ejecución
+(cuando el número de tareas críticas es elevado), la frecuencia se reduce de
 manera escalonada en función de la relación entre el tamaño de ambas
-colas. Una vez que el número de tareas no críticas aumenta, el cluster se
+colas. Una vez el número de tareas no críticas aumenta, el cluster se
 mantiene a máxima frecuencia durante la mayor parte de la ejecución hasta
 que esta se encuentra en las fases finales donde el número de tareas
 críticas vuelve a ser elevado respecto al número de tareas no críticas y la
@@ -228,7 +233,7 @@ empeorar tanto el rendimiento como el consumo energético. Para evitar que
 suceda este hecho, las políticas P2 y P2' han sido diseñadas para modificar
 la frecuencia sobre el cluster de cores LITTLE, y así intentar no causar un
 gran impacto sobre el rendimiento. Además, las políticas han sido
-desarrolladas sobre el planificador botlev descrito en la
+desarrolladas sobre el planificador \botlev descrito en la
 sección~\ref{s3:botlev}, con el objetivo de intentar asegurar que las
 tareas críticas se ejecutan en los cores big para así evitar que se
 retrasen si se ejecutaran en un core LITTLE con la frecuencia disminuida.\\
@@ -304,7 +309,7 @@ máxima y mínima del mismo.
 La política P3 es similar a la política anterior P2, pero realizando el
 escalado de frecuencias sobre el cluster de cores big en vez de cores
 LITTLE. De manera similar a la anterior, la política ha sido implementada
-sobre el planificador botlev implementado sobre \ompss para intentar
+sobre el planificador \botlev implementado sobre \ompss para intentar
 minimizar el impacto negativo sobre las tareas críticas. La
 figura~\ref{s5:fig:P3-evo} muestra los distintos cambios de frecuencia que
 se han realizado en función del número de tareas listas para ser
@@ -476,12 +481,12 @@ bool CoresCfg::puedoEjecutar(int coreId){
 \end{figure}
 
 La política P5 realiza el mismo procedimiento, pero para el cluster de
-cores big. Ambas políticas están implementadas sobre el planificador botlev
+cores big. Ambas políticas están implementadas sobre el planificador \botlev
 para así asegurar que la ejecución de tareas críticas siguen siendo en
 cores big. Sin embargo, al apagar los cores big, hay que tener en cuenta
 que es necesario que las tareas críticas se ejecuten en cores LITTLE si los
 big no están disponibles para que la ejecución no se quede bloqueada por
-las tareas críticas (opción \texttt{--steal=1} en botlev).\\
+las tareas críticas (opción \texttt{--steal=1} en \botlev).\\
 La figura~\ref{fig:P4-evo} muestra un ejemplo de esta política para la
 ejecución de una factorización de Cholesky. La gráfica superior muestra la
 ejecución de las diferentes tareas por los distintos \wts, cada uno
@@ -701,7 +706,7 @@ anteriormente\footnote{En este capítulo todos los experimentos han sido
 distintas ejecuciones de una factorización de Cholesky para distintas
 configuraciones de tamaño de matriz y bloque. Para comprobar si estas
 políticas presentan una mejora energética real, los resultados son
-comparados con una ejecución normal utilizando el planificador botlev sobre
+comparados con una ejecución normal utilizando el planificador \botlev sobre
 el \emph{runtime} \ompss (esta ejecución se denomina P0 en los experimentos
 realizados). Para poder observar el comportamiento con detalle y poder
 extraer mejores conclusiones, de todos los experimentos se extraen las tres
@@ -730,8 +735,8 @@ generales:
   formado por las matrices de tamaño pequeño ($m \le 2048$), y un segundo
   grupo formado por las matrices de mayor tamaño. La principal diferencia
   radica en el rendimiento de las distintas políticas respecto a la
-  ejecución normal sobre botlev: mientras que en el segundo grupo el
-  rendimiento se aproxima al de una ejecución normal con botlev (aunque
+  ejecución normal sobre \botlev: mientras que en el segundo grupo el
+  rendimiento se aproxima al de una ejecución normal con \botlev (aunque
   casi siempre inferior), en el primer grupo la diferencia de rendimiento
   es muy elevada. Esta diferencia provoca no solo un rendimiento
   computacional menor, sino que el rendimiento energético también es mucho
@@ -744,7 +749,7 @@ generales:
 \item Mientras que las políticas P1, P2 y P2' obtienen un rendimiento
   energético muy similar a la ejecución normal sin aplicar ninguna
   política, la política P3 obtiene un rendimiento energético mucho mayor
-  que la ejecución con botlev sobre \ompss.
+  que la ejecución con \botlev sobre \ompss.
 \end{itemize}  
 
 \comentario{Quizás mover las figuras repetidas a un anexo}
@@ -754,7 +759,7 @@ generales:
   
   \caption[Medidas experimentales para las políticas desde P1 a P3 en \juno]{Medidas
     experimentales para las políticas desde P1 a P3 para la plataforma \juno. La política P0
-    representa a una ejecución normal con botlev. Las etiquetas del eje x
+    representa a una ejecución normal con \botlev. Las etiquetas del eje x
     representan el tamaño de la matriz y de bloque utilizado para el experimento.}
   \label{fig:resultados:all-0-3:juno}
 \end{figure}
@@ -764,13 +769,13 @@ generales:
   \fbox{\includegraphics[width=1.0\textwidth]{Plots/dvfs_results/0-4_all_odroid.eps}}
   \caption[Medidas experimentales para las políticas desde P1 a P3 en \odroid]{Medidas
     experimentales para las políticas desde P1 a P3 en la plataforma \odroid. La política P0
-    representa a una ejecución normal con botlev. Las etiquetas del eje x
+    representa a una ejecución normal con \botlev. Las etiquetas del eje x
     representan el tamaño de la matriz y de bloque utilizado para el experimento.}
   \label{fig:resultados:all-0-3:odroid}
 \end{figure}
 
 Prestando más atención a la política P1, se observa que no presenta una
-gran diferencia respecto a la ejecución normal con botlev. La causa de este
+gran diferencia respecto a la ejecución normal con \botlev. La causa de este
 hecho está relacionada con el DAG asociado a la factorización de Cholesky,
 el cual se caracteriza por una rápida explosión de tareas al comienzo de la
 ejecución, provocando que el número de tareas críticas sea inferior al
@@ -784,14 +789,14 @@ prácticamente iguales, únicamente variando el conjunto de frecuencias sobre
 las que elegir para realizar el escalado de frecuencia. Respecto a la
 mejora del rendimiento energético, que es el objetivo final buscado, no se
 consigue superar el rendimiento alcanzado por una ejecución normal de
-botlev, sin embargo, se observa que la potencia instantánea media consumida
+\botlev, sin embargo, se observa que la potencia instantánea media consumida
 ha disminuido. Este dato, junto con el hecho de que el rendimiento
 energético (GFLOPS/watio) no disminuye considerablemente respecto a la
 ejecución normal, hacen que las políticas P2 y P2' representen una posible
 solución para arquitecturas cuya potencia instantánea máxima está limitada
 por motivos de diseño. La tabla~\ref{tab:mejora-potencia} representan la
 disminución de potencia en watios respecto a la ejecución normal de
-botlev. Como se puede observar, salvo el primer grupo de matrices que
+\botlev. Como se puede observar, salvo el primer grupo de matrices que
 identificábamos antes, el resultado es bueno para todas las políticas,
 obteniendo disminuciones de potencia entorno a 0.25 watios para las
 políticas P2 y P2', y reducciones entorno a 1 watio para la política P3
@@ -836,7 +841,7 @@ sobre la plataforma \juno.
 
 
 Como se observa en la figura, la política que mayor rendimiento energético
-alcanza, incluso superando a una ejecución normal con botlev es la política
+alcanza, incluso superando a una ejecución normal con \botlev es la política
 P3. La política, caracterizada por disminuir frecuencia sobre el cluster de
 cores big, consigue, a costa de obtener un menor rendimiento, una mejora
 elevada de rendimiento energético frente al resto de políticas y a la
@@ -859,7 +864,7 @@ limitada (similar a las políticas anteriores).
 	{Mejora de rendimiento energético absoluta (en GFLOPS/Watio) para
   la factorización de Cholesky utilizando distintas políticas P1 a P3
   respecto a una ejecución estándar del mismo problema utilizando el
-  planificador botlev sobre \ompss, sobre la plataforma \juno.}
+  planificador \botlev sobre \ompss, sobre la plataforma \juno.}
   \label{s5:table:mejora-gflopsw}
   \ra{1.2}
   \ca{2pt}
@@ -1017,7 +1022,7 @@ Las figuras~\ref{fig:p4-p5} muestran el comportamiento de las políticas P4
 y P5 para la plataforma \odroid, combinando para cada configuración de
 tamaño de matriz y bloque los distintos tamaños de cola
 experimentados. Adicionalmente, se incorpora las medidas realizadas sobre
-el planificador botlev para poder comparar los resultados.\\
+el planificador \botlev para poder comparar los resultados.\\
 A grandes rasgos, es posible extraer un conjunto de conclusiones generales
 a ambas políticas:
 
@@ -1048,7 +1053,7 @@ Como se puede apreciar en la figura, la política P4 encargada de desactivar
 el cluster LITTLE no consigue ninguna mejora energética para ningún
 experimento realizado, sino que además en todos ellos empeora el
 resultado. Sin embargo, la política P5 consigue una eficiencia energética
-similar a la ejecución normal con botlev, y adicionalmente consigue reducir
+similar a la ejecución normal con \botlev, y adicionalmente consigue reducir
 la potencia instantánea media de la ejecución. Como se puede apreciar, la
 eficiencia energética conseguida es independiente del tamaño elegido para
 aplicar la política, causado por la enorme reducción de la potencia

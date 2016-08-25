@@ -168,11 +168,11 @@ kernels computacionales básicos de álgebra lineal proporcionados por LAPACK
 \label{s3:botlev}
 
 En servidores equipados con uno o más aceleradores --por ejemplo, procesadores gráficos--, versiones especializadas de los
-planificadores de tareas que acompañan a OmpSs, StarPU, MAGMA, Kaapi y {\tt libflame} (añadir referencias!!) son capaces
+planificadores de tareas que acompañan a OmpSs, StarPU, MAGMA, Kaapi y {\tt libflame}~\cite{libflameref} son capaces
 de planificar tareas a núcleos de propósito general (CPUs en adelante) o a aceleradores (por ejemplo, procesadores gráficos
 --GPUs-- o Intel Xeon Phi), asignando tareas a cada tipo de recurso en función de sus propiedades, y aplicando técnicas
 como caches gestionadas por software o mapeado de tareas explotando la localidad de datos (véanse, entre 
-otros,~\cite{Quintana:2008:PMA,CPE:CPE1463,Augonnet:2011:SUP:1951453.1951454,5470941,Gautier:2013:XRS:2510661.2511383}. Este
+otros,~\cite{Quintana:2008:PMA,CPE:CPE1463,Augonnet:2011:SUP:1951453.1951454,5470941,Gautier:2013:XRS:2510661.2511383}). Este
 tipo de adaptaciones, además, permiten la gestión transparente de transferencias de datos entre distintos espacios de 
 memoria, característica principale en sistemas heterogéneos modernos.
 
@@ -373,7 +373,7 @@ de registros vectoriales y tamaño/grado de asociatividad de cada nivel de cache
 \subsection{Implementación multihebra consciente de la asimetría}
 
 La implementación de \gemm\ en BLIS obtiene un rendimiento cercano al rendimiento pico de la arquitectura,
-como tanto en sistemas multinúcleo como sistemas aceleradores~\cite{BLIS2,BLIS3}. 
+tanto en sistemas multinúcleo como sistemas aceleradores~\cite{BLIS2,BLIS3}. 
 Estos estudios han derivado en versiones de la implementación conscientes de la asimetría sobre arquitecturas ARM big.LITTLE
 bajo el modelo de ejecución GTS. Concretamente, versión multihebra consciente de la asimetría descrita en~\cite{asymBLIS} 
 integra las siguientes tres técnicas:
