@@ -953,13 +953,110 @@ resultados de las políticas P4-P6 que se muestran en la siguiente sección.
 
 
 \subsection{Análisis de resultados para las políticas P4-P6}
-\subsubsection{Análisis del tamaño de cola óptimo para aplicar la política}
+%\subsubsection{Análisis del tamaño de cola óptimo para aplicar la política}
 Mientras que las políticas anteriores dividían el espacio de frecuencias en
 partes iguales respecto al tamaño máximo de la cola, las políticas P4-P6 no
 disponen de un punto claro en la ejecución donde desactivar el cluster
-correspondiente. Para determinar cuál es el mejor punto en el que la
-política debe actuar se han realizado una serie de experimentos que varían
-el momento de .
+correspondiente. Para determinar el momento en el que aplicar la política,
+se han diseñado una serie de experimentos variando el momento en el que se
+desactiva el cluster en función del número actual de tareas listas frente
+al número máximo hasta el momento. Los experimentos realizados contemplan
+desde un tamaño del $50\%$ del tamaño máximo, decreciendo en intervalos de
+un $10\%$ hasta finalizar en un tamaño del $10\%$ respecto al tamaño
+máximo. Mencionar que este porcentaje no se encuentra relacionado con el
+tiempo de ejecución, sino con el número de tareas listas en cada
+momento. Como dato informativo, la tabla~\ref{tab:tam-colas-tiempo} muestra
+para cada configuración del tamaño de la matriz y bloque (columnas), y para
+cada experimento lanzado (filas), el porcentaje del tiempo de ejecución en
+el que el cluster se encuentra desactivado.
+
+
+\begin{table}
+  \centering
+  \caption{Porcentaje de tiempo de ejecución en el que el cluster se
+    encuentra desactivado en función del momento elegido para desactivar.}
+  \label{tab:tam-colas-tiempo}
+  {\scriptsize
+    \begin{tabular}{cccccccccccccccc}
+      \toprule
+      \multicolumn{2}{c}{\phantom{a}} & \multicolumn{14}{c}{Tamaño de la matriz \texttt{(m)} y
+                                        de bloque \texttt{(b)}.} \\ \cmidrule{2-16}
+      \phantom{4} & \texttt{(m)} & \multicolumn{2}{c}{1024} & \multicolumn{2}{c}{2048} &                                                                         \multicolumn{2}{c}{4096} & \multicolumn{2}{c}{4608} & \multicolumn{2}{c}{5120} & \multicolumn{2}{c}{6144} & \multicolumn{2}{c}{8192} \\
+      \phantom{a} & \texttt{(b)} & 64 & 128 & 128 & 256 & 256 & 512 & 256 & 512 & 512 & 1024 & 512 & 1024 & 512 & 1024 \\ \hline
+
+{\sc 50\%} & \phantom{a} &69.36 & 45.83 & 39.34 & 55.83 & 43.44 & 50.83 & 39.39 & 38.48 & 40.91 & 42.07 & 39.15 & 35.24 & 40.32 & 48.33 \\
+{\sc 40\%} & \phantom{a} &68.20 & 31.25 & 29.29 & 48.75 & 29.41 & 33.33 & 30.61 & 32.73 & 32.73 & 30.54 & 32.83 & 30.42& 30.15 & 37.92 \\
+{\sc 30\%} & \phantom{a} &63.42 & 34.58 & 20.89 & 48.33 & 21.14 & 32.50 & 20.88 & 24.85 & 25.00 & 28.06 & 23.08 & 25.43& 21.81 & 33.75 \\
+{\sc 20\%} & \phantom{a} &20.40 & 17.92 & 11.64 & 34.17 & 11.40 & 31.67 & 11.97 & 17.27 & 18.41 & 21.04 & 14.56 & 19.12& 13.11 & 26.67 \\
+{\sc 10\%} & \phantom{a} &23.10 & 15.00 & 4.90  & 27.92 & 5.27  & 20.00 & 4.87 & 11.52  & 9.55 & 15.13 &7.69 & 10.3 & 5.64 & 12.92 \\ \bottomrule
+    \end{tabular}
+    \caption*{Política 4 - \juno}
+  }
+
+%   {\scriptsize
+%     \begin{tabular}{cccccccccccccccc}
+%       \toprule
+%       \multicolumn{2}{c}{\phantom{a}} & \multicolumn{14}{c}{Tamaño de la matriz \texttt{(m)} y
+%                                         de bloque \texttt{(b)}.} \\ \cmidrule{2-16}
+%       \phantom{4} & \texttt{(m)} & \multicolumn{2}{c}{1024} & \multicolumn{2}{c}{2048} &                                                                         \multicolumn{2}{c}{4096} & \multicolumn{2}{c}{4608} & \multicolumn{2}{c}{5120} & \multicolumn{2}{c}{6144} & \multicolumn{2}{c}{8192} \\
+%       \phantom{a} & \texttt{(b)} & 64 & 128 & 128 & 256 & 256 & 512 & 256 & 512 & 512 & 1024 & 512 & 1024 & 512 & 1024 \\ \hline
+
+% {\sc 50\%} & \phantom{a} &      80.88 & 63.75 & 80.82 & 57.08 & 67.34 & 53.75 & 72.37 & 53.33 & 54.55 & 0.00 & 43.41 & 0.00 & 55.15 & 60.00 \\
+% {\sc 40\%} & \phantom{a} &      32.84 & 52.50 & 57.90 & 51.25 & 54.90 & 45.00 & 54.65 & 43.33 & 45.68 & 0.00 & 35.30 & 0.00 & 34.19 & 50.83 \\
+% {\sc 30\%} & \phantom{a} &      54.90 & 28.33 & 34.38 & 44.58 & 59.93 & 40.00 & 22.37 & 40.00 & 31.82 & 0.00 & 28.98 & 0.00 & 23.96 & 42.50 \\
+% {\sc 20\%} & \phantom{a} &      19.79 & 35.83 & 21.69 & 30.83 & 26.41 & 32.92 & 39.47 & 27.27 & 29.32 & 0.00 & 19.64 & 0.00 & 12.38 & 31.25 \\
+% {\sc 10\%} & \phantom{a} &      9.80 & 0.00 & 13.73 & 25.00 & 15.20 & 22.50 & 9.69 & 22.42 & 19.77 & 0.00 & 12.64 & 0.00 & 8.21 & 22.50 \\\bottomrule
+%     \end{tabular}
+%     \caption*{Política 4 - \odroid}
+%   }
+
+\end{table}
+
+
+Las figuras~\ref{fig:p4-p5} muestran el comportamiento de las políticas P4
+y P5 para la plataforma \odroid, combinando para cada configuración de
+tamaño de matriz y bloque los distintos tamaños de cola
+experimentados. Adicionalmente, se incorpora las medidas realizadas sobre
+el planificador botlev para poder comparar los resultados.\\
+A grandes rasgos, es posible extraer un conjunto de conclusiones generales
+a ambas políticas:
+
+\begin{itemize}
+\item Variar el momento en el que el cluster se desactiva tiene un impacto
+  muy significativo en el rendimiento final de la ejecución, tanto para
+  desactivar el cluster de cores LITTLE (política P4) como para desactivar
+  el cluster de cores big (política P5). Si se comparan los resultados de
+  ambas plataformas, la pérdida de rendimiento es mayor en la plataforma
+  \juno frente a la plataforma \odroid. La causa de este hecho es la
+  configuración de su cluster: al únicamente poseer 2 cores big
+  (Cortex-A57) frente a los 4 que posee la plataforma \odroid (Cortex-A15),
+  si se desactiva el cluster de cores LITTLE las tareas se reparten entre
+  un menor número de cores, explotando un menor grado de paralelismo.
+  Esta diferencia no es tan elevada en la política P5, pues al desactivar
+  el cluster de cores big, ambas plataformas tiene el cluster LITTLE
+  formado por el mismo número de núcleos, por lo que el grado de
+  paralelismo que se consigue es el mismo.
+\item Al igual que en las políticas anteriores, el impacto en la potencia
+  instantánea es mucho mayor sobre la política que desactiva los cores big,
+  frente a la que desactiva el cluster LITTLE. Además, al igual que el
+  rendimiento, el impacto que tiene el punto en el que se desactiva el
+  cluster sobre la potencia instantánea es muy elevado.
+\end{itemize}
+
+
+Como se puede apreciar en la figura, la política P4 encargada de desactivar
+el cluster LITTLE no consigue ninguna mejora energética para ningún
+experimento realizado, sino que además en todos ellos empeora el
+resultado. Sin embargo, la política P5 consigue una eficiencia energética
+similar a la ejecución normal con botlev, y adicionalmente consigue reducir
+la potencia instantánea media de la ejecución. Como se puede apreciar, la
+eficiencia energética conseguida es independiente del tamaño elegido para
+aplicar la política, causado por la enorme reducción de la potencia
+instantánea media al desactivar el cluster big. Desactivar el cluster en
+una fase temprana de la ejecución proporciona una gran reducción de la
+potencia y obtiene una eficiencia energética similar a no desactivar el
+cluster durante toda la ejecución, pero a costa de reducir el rendimiento
+de la aplicación.
 
 
 
@@ -980,15 +1077,11 @@ el momento de .
     \end{subfigure}  
   \caption{Resultados para los experimentos P4 y P5 sobre la plataforma
     \juno.}
-  \label{fig:detalle:p1-p4}
+  \label{fig:p4-p5}
 \end{figure}
 
 
-
-\subsubsection{Análisis de resultados}
-
-
-
+\todo{Falta añadir P6, y revisar / comentar algo más de p4-p5}
 
 %-- Configuraciones para emacs --
 %%% Local Variables:
