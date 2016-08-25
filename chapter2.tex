@@ -168,11 +168,23 @@ utilizado y el entorno experimental para la medición de consumo usado en parte 
 
 \subsubsection{\odroid}
 
-\odroid es una
+\odroid es una placa de desarrollo desarrollada por la empresa {\em Hardkernel}, equipada con un SoC Samsung
+Exynos 5422, que implementa una arquitectura big.LITTLE de 32 bits, compuesta por cuatro núcleos ARM Cortex-A15
+funcionando a una frecuencia máxima de XX Ghz (formando el cluster de núcleos big), y cuatro núcleos ARM Cortex-A7 funcionando a una frecuencia
+máxima de XX Ghz (formando el cluster de núcleos LITTLE). Ambos tipos de núcleos implementan la microarquitectura
+ARMv7a, con procesamiento fuera de orden (en el caso del Cortex-A15) o en orden (en el caso del Cortex-A7). A nivel
+de jerarquía de memoria, los núcleos de cada cluster comparten una cache L2 de 2 Mbytes en el caso del cluster bit 
+y 512 Kbytes para el cluster LITTLE. En ambos casos, cada núcleo contiene una cache L1 de 64 Kbytes, divididos en 
+32 Kbytes de datos y 32 Kbytes de instrucciones. Por último, la jerarquía de memoria se completa con una memoria
+principal DDR3 con una capacidad de 2 Gbytes.
 
 \subsubsection{\juno}
 
+\todo{Buscar datos para Juno y calcar el párrafo anterior.}
+
 \subsection{Software utilizado}
+
+\todo{Buscar versiones de kernel, compilador y bibliotecas utilizadas en \odroid y \juno}
 
 \subsection{Entorno de medición de consumo}
 
