@@ -1065,7 +1065,7 @@ La primera observación que se puede realizar sobre los datos obtenidos es
 el impacto muy significativo que posee variar el punto de desactivado del
 cluster sobre el rendimiento final de la aplicación, tanto desactivando el
 cluster \LITTLE (política P4) como desactivando el cluster \BIG (política
-P5). La tabla~\ref{tab:p4-p5:gflops} muestra el rendimiento alcanzado por
+P5). La Tabla~\ref{tab:p4-p5:gflops} muestra el rendimiento alcanzado por
 cada configuración del problema, política y plataforma según el momento
 elegido para desactivar el cluster correspondiente. Nótese que mientras que
 en la plataforma \juno es la política P4 la que obtiene peor rendimiento
@@ -1080,7 +1080,7 @@ el grado de paralelismo explotado es menor que si se desactiva el cluster
 rendimiento de un core \BIG (Cortex-A57 en este caso) es más elevado que el
 rendimiento de un core \LITTLE (\mbox{Cortex-A53}), realizar la ejecución sobre
 cuatro cores \LITTLE obtiene un rendimiento mayor que realizarla sobre
-únicamente dos cores \BIG.\\
+únicamente dos cores \BIG.
 
 
 \begin{table}
@@ -1129,18 +1129,19 @@ Como se puede apreciar en la figura, tanto la política P4 como la política
 P5 no consiguen obtener la mejora energética buscada. Mientras que la
 política P4 obtiene resultados muy inferiores a la ejecución con \botlev,
 la política P5 alcanza resultados cercanos. La
-tabla~\ref{tab:mejora-gflopsw-p5} muestra con detalle la diferencia de
+Tabla~\ref{tab:mejora-gflopsw-p5} muestra con detalle la diferencia de
 rendimiento energético con la ejecución de referencia con \botlev para la
-política P5 con cada configuración de tamaño.\\
-Como se puede observar, y aunque la política P5 no consiga obtener mejoras
+política P5 con cada configuración de tamaño.
+
+A la vista de los resultados, y aunque la política P5 no consiga obtener mejoras
 en el rendimiento energético, señalar que consigue resultados similares a
-la ejecución normal reduciendo la potencia instantánea consumida, aunque a
+la ejecución convencional reduciendo la potencia instantánea consumida, aunque a
 costa de reducir el rendimiento computacional. Sin embargo, esta política
 puede tener su utilidad en problemas donde su ejecución esté limitada por
 la potencia consumida y no tanto por el rendimiento conseguido, pudiendo
 alcanzar un compromiso entre rendimiento y potencia sin afectar al
 rendimiento energético final escogiendo el valor adecuado para determinar
-cuándo desactivar el cluster.\\
+cuándo desactivar el cluster.
 
 %%% GFLOPSW %%%%
 \begin{table}
