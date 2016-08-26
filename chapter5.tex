@@ -517,25 +517,23 @@ ejecución de una factorización de Cholesky. La gráfica superior muestra la
 ejecución de las diferentes tareas por los distintos \wts, cada uno
 asignado a un núcleo distinto en orden de aparición. La ejecución ha sido
 realizada sobre la plataforma \juno, por lo que los 4 primeros núcleos
-corresponden a cores LITTLE, mientras que los dos siguientes a cores
-big. La segunda gráfica muestra la evolución del tamaño de las colas en
+corresponden a núcleos \LITTLE, mientras que los dos siguientes a núcleos
+\big. La segunda gráfica muestra la evolución del tamaño de las colas en
 función del tiempo. Como se puede observar, la ejecución de las tareas se
-realiza de manera normal hasta que el tamaño de la cola decrece por debajo
-del 25\% del tamaño máximo (el experimento se configuró con este valor). En
-ese momento, los cores LITTLE dejan de recibir tareas mientras que los big
-continúan su ejecución normal. Una vez que el número de tareas vuelve a
+realiza de manera convencional hasta que el tamaño de la cola decrece por debajo
+del 25\% del tamaño máximo (en este caso, el experimento se configuró con este valor
+con fines meramente ilustrativos). En ese momento, los núcleos \LITTLE dejan de recibir tareas mientras que los \BIG
+continúan su ejecución habitual. Una vez que el número de tareas vuelve a
 incrementarse, los cores lentos vuelven a activarse y a ejecutar tareas,
 hasta que al final de la ejecución el tamaño de la cola vuelve a decrecer
 y el cluster se desactiva hasta finalizar la ejecución. Aunque el primer
-\wt está asociado a un core LITTLE, también es considerado como el \wt
+\wt está asociado a un núcleo \LITTLE, también es considerado como el \wt
 principal del planificador, por lo que es el encargado de ejecutar la parte
 del código no paralela (en color verde). La mayor parte del tiempo que se
 encuentra ejecutando este código corresponde a tareas del propio
 planificador, o a la espera de que finalice la ejecución paralela (marcada
 por una etiqueta \texttt{\#pragma omp taskwait} en el código secuencial),
-por lo que el impacto final no es muy significativo.
-
-
+por lo que el impacto final sobre el consumo energético no es significativo.
 
 \begin{figure}
   \centering
@@ -581,42 +579,42 @@ por lo que el impacto final no es muy significativo.
 
 \subsubsection{Política P6}
 \label{sec:p6}
+
 Una de las muchas funcionalidades que ofrece el kernel Linux es la de poder
-activar y desactivar cores a demanda y de manera dinámica. En cualquier
+activar y desactivar núcleos bajo demanda y de manera dinámica. En cualquier
 momento de la ejecución, un núcleo puede ser desactivado, y este desaparece
 del sistema, siendo totalmente transparente para cualquier aplicación en
-ejecución. Esto implica que si se decide apagar un core, todos los procesos
+ejecución. Esto implica que si se decide apagar un núcleo, todos los procesos
 asociados a ese núcleo son migrados a otro de manera totalmente
 transparente al proceso en ejecución, el número total de cores disminuye y
 cualquier llamada a una función del kernel considerará la nueva
 configuración hardware creada como la configuración real de la
-máquina. Esta funcionalidad permite, entre muchas cosas, la de generar
+máquina. Esta funcionalidad permite, por ejemplo, generar dinámicamente
 arquitecturas diferentes utilizando el mismo hardware.
 
 Esta funcionalidad aplicada a una arquitectura big.LITTLE teóricamente
-proporciona que en cualquier momento de la ejecución se pueda desactivar
-uno de los dos cluster de la máquina, convirtiendo a la arquitectura en una
-plataforma totalmente simétrica. En la práctica, no todas las versiones
-del kernel permiten apagar el core 0, por lo que no es posible apagar el
-cluster entero que contiene a este core.
+conlleva que en cualquier momento de la ejecución se pueda desactivar
+uno de los dos cluster de la máquina, convirtiendo la arquitectura en una
+plataforma totalmente simétrica \footnote{En la práctica, no todas las versiones
+del kernel permiten apagar el núcleo 0, por lo que en estos casos, no es posible apagar el
+completametne el cluster que contiene a este núcleo}.
 
-Para realizar un estudio del impacto que tiene apagar cores sobre el
-consumo energético, se ha realizado el experimento de desactivar uno a uno
-los cores de un mismo cluster mientras se mide el consumo. Además, para
+Para realizar un estudio del efecto del apagado selectivo de núcleos sobre el
+consumo energético, se ha realizado el experimento de desactivar, uno a uno,
+los núcleos de un mismo cluster mientras se monitoriza el consumo. Además, para
 evitar errores en las medidas, se ha establecido un tiempo de espera entre
-apagado de dos cores, y adicionalmente se ha ejecutado el test asociado a
-un core que no se fuera a apagar, evitando así problemas al migrar el
-proceso de un core a otro. La figura~\ref{s5:fig:apagadoCores} muestra las
-mediciones del consumo energético en las dos plataformas: la figura
-superior para la plataforma \juno y la inferior para la plataforma \odroid.
+apagado de dos núcleos, y adicionalmente se ha ejecutado el test de carga asociado a
+un núcleo que no se fuera a apagar, evitando así problemas al migrar el
+proceso de un núcleo a otro. La Figura~\ref{s5:fig:apagadoCores} muestra las
+mediciones del consumo energético en las dos plataformas: 
+\juno (gráfica superior) y \odroid (gráfica inferior).
 
-\comentario{Bajar el numero de puntos. Tarda mucho en renderizar}
 \begin{figure}
   \centering
   \begin{subfigure}{0.9\textwidth}
     \centering
     \fbox{\includegraphics[width=0.75\linewidth]{Plots/Modelos_consumo/apagadoJuno.eps}}
-    \caption{Plataforma \juno: 2 cores big A57 y 4 cores LITTLE A53.}
+    \caption{Plataforma \juno: 2 núcleos \BIG A57 y 4 núcleos \LITTLE A53.}
       \label{}
     \end{subfigure}
 
@@ -626,7 +624,7 @@ superior para la plataforma \juno y la inferior para la plataforma \odroid.
       \centering
       \setlength{\fboxsep}{20pt} %No tienen el mismo margen :(
       \fbox{\includegraphics[width=0.66\linewidth]{Plots/Modelos_consumo/apagadoOdroid.eps}}
-      \caption{Plataforma \odroid: 4 cores big A15 y 4 cores LITTLE A7.}
+      \caption{Plataforma \odroid: 4 núcleos \BIG A15 y 4 núcleos \LITTLE A7.}
       \label{}
     \end{subfigure}  
     
@@ -634,18 +632,19 @@ superior para la plataforma \juno y la inferior para la plataforma \odroid.
   cada cluster]{Consumo energético en reposo en función del número de núcleos
     activos del sistema y de la plataforma. La versión del kernel Linux
     instalada en la plataforma \odroid no permite apagar los el cluster
-    LITTLE de manera completa.}
+    \LITTLE de manera completa.}
   \label{s5:fig:apagadoCores}
 \end{figure}
 
+\todo{Si puedes, añade las unidades en el eje Y}.
 
-Las gráficas muestran el consumo energético (en Watios) durante todo el
+Las gráficas muestran la potencia instantánea observada (en Watios) durante todo el
 experimento en el eje vertical, mientras que el eje horizontal corresponde
 a las distintas fases por las que ha ido pasando el experimento. Por cada
 plataforma, la gráfica superior muestra el experimento apagando los cores
-del cluster big, indicándose en el eje x el número de cores activos del
-cluster en cada momento, mientras que la gráfica inferior muestra el mismo
-experimento para el cluster LITTLE. La diferencia de aspecto entre las
+del cluster \BIG, indicándose en el eje x el número de núcleos activos del
+cluster en cada momento; la gráfica inferior muestra el mismo
+experimento para el cluster \LITTLE. La diferencia de aspecto entre las
 gráficas de ambas plataformas se produce por la forma en la que se han
 realizado las medidas: mientras que en la plataforma \odroid los medidores
 poseen una frecuencia de muestreo máxima de 4 muestras por segundo (y por
@@ -653,7 +652,8 @@ eso el aspecto \emph{lineal} de la gráfica), el entorno de medición de la
 plataforma \juno permite una mayor frecuencia de muestreo, por lo que la
 gráfica presenta un mayor ruido (esta es la causa de que la gráfica no
 presente una forma de línea, sino que los valores oscilan por encima y
-debajo del valor medio real).\\
+debajo del valor medio real).
+
 Observando los resultados de las gráficas se pueden extraer las siguientes
 conclusiones:
 
@@ -662,30 +662,30 @@ conclusiones:
   en lo referente al consumo energético.
 \item Mientras que la versión del kernel Linux utilizada en la plataforma
   \juno permite apagar todos los cores del sistema, la versión utilizada en
-  la plataforma \odroid no permite apagar el core 0, por lo que no es
-  posible desactivar el cluster LITTLE completo.
-\item En la plataforma \odroid, desactivar un cierto número de cores sin
+  la plataforma \odroid no permite apagar el núcleo 0, por lo que no es
+  posible desactivar el cluster \LITTLE completo.
+\item En la plataforma \odroid, desactivar un cierto número de núcleos sin
   llegar a desactivar el cluster completo no tiene ningún impacto
   significativo en el consumo energético. Sin embargo, para esta
-  plataforma, desactivar todos los cores del cluster big produce que el
-  consumo sea casi nulo.
+  plataforma, desactivar todos los núcleos del cluster \BIG conlleva que 
+		la potencia instantánea caiga a niveles prácticamente nulos.
 \end{enumerate}
 
 
-Intentando aprovechar que el consumo es casi nulo cuando el cluster de
-cores big se desactiva por completo en la plataforma \odroid, la política
+Aprovechando la caída de pontencia cuando el cluster de
+núcleos \BIG se desactiva por completo en la plataforma \odroid, la política
 P6 ha sido desarrollada como una modificación de la política anterior, pero
 además de no asignar tareas a estos cores, realiza un apagado controlado de
 los mismos. Para realizar esta modificación, el cambio introducido sobre el
-código de la figura~\ref{fig:P4-puedo-ejecutar} afecta a la
-línea~\ref{lst:p4-c} en la que en vez de disminuir la frecuencia del
+código de la Figura~\ref{fig:P4-puedo-ejecutar} afecta a la
+línea~\ref{lst:p4-c}, en la que en vez de disminuir la frecuencia del
 cluster, se realiza una llamada al código encargado de realizar el apagado
 de los distintos núcleos, mostrado en la
-figura~\ref{s5:fig:apagadoCores}. Como se puede observar, el apagado del
-core se realiza escribiendo el valor 0 en el fichero del sistema que se
+Figura~\ref{s5:fig:apagadoCores}. Como se puede observar, el apagado del
+núcleo se realiza escribiendo el valor 0 en el fichero del sistema ({\sc sysFS}) que se
 encuentra en la ruta
-\texttt{/sys/devices/system/cpu/cpu<cpuId>/online}. Esta operación se
-encuentra protegida por un cerrojo para evitar problemas de concurrencia
+\texttt{/sys/devices/system/cpu/cpu<cpuId>/online}. Esta operación se ha protegido
+mediante un cerrojo para evitar problemas de concurrencia
 durante la ejecución.
 
 
@@ -723,7 +723,9 @@ int d, a;
 
 
 \section{Resultados experimentales}
+
 \subsection{Análisis de la mejora energética para las políticas P1-P3}
+
 El primer conjunto de experimentos que se muestran a continuación tiene
 como objetivo principal comprobar el nivel de eficiencia energética desde
 la política P1 hasta la política P3, las cuales corresponden a políticas
@@ -733,53 +735,57 @@ anteriormente\footnote{En este capítulo todos los experimentos han sido
 distintas ejecuciones de una factorización de Cholesky para distintas
 configuraciones de tamaño de matriz y bloque. Para comprobar si estas
 políticas presentan una mejora energética real, los resultados son
-comparados con una ejecución normal utilizando el planificador \botlev sobre
+comparados con una ejecución convencional utilizando el planificador \botlev sobre
 el \emph{runtime} \ompss (esta ejecución se denomina P0 en los experimentos
 realizados). Para poder observar el comportamiento con detalle y poder
 extraer mejores conclusiones, de todos los experimentos se extraen las tres
 siguientes medidas:
 \begin{enumerate}
-\item Rendimiento computacional medido en GFLOPS. Distintos rendimientos
+\item Rendimiento computacional medido en GFLOPS\footnote{1 GFLOP equivale a $1e9$ operaciones en 
+		punto flotante por segundo.}. Distintos rendimientos
   sobre la misma configuración del problema sirven para indicar
   diferencias en el tiempo de ejecución.
-\item Muestreo de la potencia media instantánea (en watios). Los medidores
-  permiten extraer el muestreo de potencia diferenciado por clusters.
-\item Rendimiento energético medido en GFLOPS/Watio, como resultado de
+
+\item Muestreo de la potencia media (en Watios). Los medidores
+  permiten extraer el muestreo de potencia diferenciado por clusters, aunque
+		en este caso se muestra agregada para ambos cluster.
+
+\item Eficiencia o rendimiento energético medido en GFLOPS/Watio, como resultado de
   combinar las dos medidas anteriores.
 \end{enumerate}
 
-En las
-figuras~\ref{fig:resultados:all-0-3:juno}~y~\ref{fig:resultados:all-0-3:odroid}
+En las Figuras~\ref{fig:resultados:all-0-3:juno}~y~\ref{fig:resultados:all-0-3:odroid}
 se muestran de manera conjunta los resultados obtenidos para la plataforma
-\juno y para la plataforma \odroid respectivamente. Las gráficas
-representan de manera conjunta las tres medidas mencionadas anteriormente
+\juno y para la plataforma \odroid, respectivamente. Las gráficas
+representan de manera conjunta las tres métricas mencionadas anteriormente
 para las políticas P1 a P3 para un amplio conjunto de tamaños de matriz y
-bloque.\\
-A grandes rasgos, es posible extraer un conjunto de observaciones
-generales:
+bloque.
+
+A grandes rasgos, es posible extraer un conjunto de observaciones generales:
+
 \begin{itemize}
-\item Se pueden distinguir dos grupos bien diferenciados: un primer grupo
+\item Atendiendo exclusivamente al tamaño de problema, se pueden distinguir 
+	dos grupos bien diferenciados: un primer grupo
   formado por las matrices de tamaño pequeño ($m \le 2048$), y un segundo
   grupo formado por las matrices de mayor tamaño. La principal diferencia
   radica en el rendimiento de las distintas políticas respecto a la
   ejecución normal sobre \botlev: mientras que en el segundo grupo el
   rendimiento se aproxima al de una ejecución normal con \botlev (aunque
   casi siempre inferior), en el primer grupo la diferencia de rendimiento
-  es muy elevada. Esta diferencia provoca no solo un rendimiento
-  computacional menor, sino que el rendimiento energético también es mucho
+  es muy elevada, siempre a favor de \botlev. Esta diferencia provoca no solo un rendimiento
+  computacional menor, sino una eficiencia energética considerablemente
   inferior. Además, hay que destacar que esta diferencia es más elevada en
   la plataforma \odroid que en la plataforma \juno.
 \item El comportamiento de todas las políticas es similar en ambas
   plataformas, dando una mayor validez a los datos. Además, la proporción
-  entre el número de cores big y LITTLE varía entre una plataforma y otra,
+  entre el número de núcleos \BIG y \LITTLE varía entre una plataforma y otra,
   dando mayor relevancia a los datos.
 \item Mientras que las políticas P1, P2 y P2' obtienen un rendimiento
-  energético muy similar a la ejecución normal sin aplicar ninguna
+  energético muy similar a la ejecución convencional sin aplicar ninguna
   política, la política P3 obtiene un rendimiento energético mucho mayor
   que la ejecución con \botlev sobre \ompss.
 \end{itemize}  
 
-\comentario{Quizás mover las figuras repetidas a un anexo}
 \begin{figure}
   \centering
   \fbox{\includegraphics[width=1.0\textwidth]{Plots/dvfs_results/0-4_all_juno.eps}}
@@ -802,13 +808,14 @@ generales:
 \end{figure}
 
 Prestando más atención a la política P1, se observa que no presenta una
-gran diferencia respecto a la ejecución normal con \botlev. La causa de este
+gran diferencia respecto a la ejecución convencional utilizando \botlev. La causa de este
 hecho está relacionada con el DAG asociado a la factorización de Cholesky,
 el cual se caracteriza por una rápida explosión de tareas al comienzo de la
 ejecución, provocando que el número de tareas críticas sea inferior al
 número de tareas no críticas durante casi toda la ejecución. Como trabajo
 futuro se considera experimentar esta política sobre otros problemas donde
-su DAG se abra y cierre durante la ejecución.\\
+su DAG se abra y cierre sucesivamente durante la ejecución.
+
 Respecto a las políticas P2 y P2', no presentan una gran diferencia entre
 ellas en los resultados, tanto en el rendimiento en GFLOPS, como el consumo
 de energía. La razón de este parecido radica en que las políticas son
@@ -816,17 +823,18 @@ prácticamente iguales, únicamente variando el conjunto de frecuencias sobre
 las que elegir para realizar el escalado de frecuencia. Respecto a la
 mejora del rendimiento energético, que es el objetivo final buscado, no se
 consigue superar el rendimiento alcanzado por una ejecución normal de
-\botlev, sin embargo, se observa que la potencia instantánea media consumida
+\botlev; sin embargo, se observa que la potencia instantánea media consumida
 ha disminuido. Este dato, junto con el hecho de que el rendimiento
 energético (GFLOPS/watio) no disminuye considerablemente respecto a la
 ejecución normal, hacen que las políticas P2 y P2' representen una posible
 solución para arquitecturas cuya potencia instantánea máxima está limitada
-por motivos de diseño. La tabla~\ref{tab:mejora-potencia} representan la
+por motivos de diseño o por el entorno de ejecución (por ejemplo, sistemas
+alimentados por baterías). La Tabla~\ref{tab:mejora-potencia} representa la
 disminución de potencia en watios respecto a la ejecución normal de
 \botlev. Como se puede observar, salvo el primer grupo de matrices que
-identificábamos antes, el resultado es bueno para todas las políticas,
-obteniendo disminuciones de potencia entorno a 0.25 watios para las
-políticas P2 y P2', y reducciones entorno a 1 watio para la política P3
+identificábamos anteriormente, el resultado es bueno para todas las políticas,
+obteniendo disminuciones de potencia cercanas a 0.25 watios para las
+políticas P2 y P2', y reducciones de hasta 1 watio para la política P3
 sobre la plataforma \juno.
 
 %%% WATIOS %%%%
@@ -869,13 +877,13 @@ sobre la plataforma \juno.
 
 Como se observa en la figura, la política que mayor rendimiento energético
 alcanza, incluso superando a una ejecución normal con \botlev es la política
-P3. La política, caracterizada por disminuir frecuencia sobre el cluster de
-cores big, consigue, a costa de obtener un menor rendimiento, una mejora
+P3. Esta política, caracterizada por disminuir frecuencia sobre el cluster de
+núcleos \BIG consigue, a costa de obtener un menor rendimiento, una mejora
 elevada de rendimiento energético frente al resto de políticas y a la
-ejecución normal. La tabla~\ref{s5:table:mejora-gflopsw} indica la mejora
-de gflops/watio de cada política y para cada configuración de tamaño tanto
+ejecución normal. La Tabla~\ref{s5:table:mejora-gflopsw} indica la mejora
+en términos gflops/watio de cada política y para cada configuración de tamaño tanto
 en la plataforma \juno como en la plataforma \odroid. Como se puede
-observar, la mejora es efectiva para matrices de tamaño mayor a 2048,
+observar, la mejora es muy significativa para matrices de tamaño mayor a 2048,
 alcanzando una mejora aproximada de 1 GFLOP/watio en la plataforma \juno, y
 una mejora entorno a 0.4 GFLOP/watio en la plataforma
 \odroid. Adicionalmente a esta mejora, la política P3 también consigue
@@ -934,28 +942,28 @@ limitada (similar a las políticas anteriores).
 
 
 La razón de que la política P3 posea unos mejores resultados frente al
-resto de políticas se puede observar en la figura~\ref{fig:detalle:p1-p4},
+resto de políticas se puede observar en la Figura~\ref{fig:detalle:p1-p4},
 la cual muestra los datos obtenidos para una configuración concreta del
-problema (en este caso, para una matriz de 8192 elementos divida en bloques
-de tamaño 1024 elementos). Como se puede observar en la figura, la
+problema (en este caso, para una matriz de $8192 \times 8192$ elementos divida en bloques
+de dimensión 1024). Como se puede observar en la figura, la
 disminución de la potencia media en las políticas P1, P2 y P2' sobre el
-cluster LITTLE es ínfima frente a la perdida de rendimiento, seguramente
+cluster \LITTLE es ínfima frente a la perdida de rendimiento, seguramente
 causada por el alto grado de eficiencia energética que posee un procesador
-LITTLE, provocando que no exista mejora en el rendimiento energético. Sin
+\LITTLE, provocando que no exista mejora en el rendimiento energético. Sin
 embargo, la política P3 provoca una gran reducción de la potencia en el
-cluster big, mayor en proporción que la pérdida de rendimiento,
-consiguiendo así una mejora en el rendimiento energético elevada.\\
+cluster \BIG, mayor en proporción que la pérdida de rendimiento,
+consiguiendo así una mejora en la eficiencia energética muy elevada.
 
 Si se observa con detalle la gráfica, una consecuencia de la política P3 es
-el aumento de la potencia en el cluster LITTLE. La cause de este aumento es
-que al disminuir la frecuencia del cluster big, las tareas en ejecución
+el aumento de la potencia en el cluster \LITTLE. La causa de este aumento es
+que al disminuir la frecuencia del cluster \BIG, las tareas en ejecución
 tardan más en finalizar, por lo que existe un mayor número de tareas listas
 para ser ejecutadas, y mientras que en una ejecución normal existen
-momentos en los que el cluster de cores LITTLE se encuentra ocioso ya que
+momentos en los que el cluster de núcleos \LITTLE se encuentra ocioso ya que
 no existen tareas listas, en esta política el cluster sí tiene tareas para
 ejecutar en todo momento. Sin embargo, a pesar del aumento de potencia en el
-cluster de cores LITTLE, la eficiencia energética sigue siendo mayor frente
-a una ejecución normal.\\
+cluster de núcleos \LITTLE, la eficiencia energética sigue siendo mayor frente
+a una ejecución normal.
 
 \begin{figure}
   \centering
@@ -977,32 +985,32 @@ a una ejecución normal.\\
   \label{fig:detalle:p1-p4}
 \end{figure}
 
-\comentario{¿?}
-Por último, destacar como una posible conclusión a estos experimentos, cómo
-el cluster LITTLE refleja que no posee mucho margen de mejora energética,
-mientras que el cluster big sí. Este hecho se verá respaldado por los
-resultados de las políticas P4-P6 que se muestran en la siguiente sección.
-
+%%Por último, destacar como una posible conclusión a estos experimentos, cómo
+%%el cluster LITTLE refleja que no posee mucho margen de mejora energética,
+%%mientras que el cluster big sí. Este hecho se verá respaldado por los
+%%resultados de las políticas P4-P6 que se muestran en la siguiente sección.
 
 \subsection{Análisis de resultados para las políticas P4-P6}
+
 \subsubsection{Políticas P4 y P5}
-Mientras que las políticas anteriores dividían el espacio de frecuencias en
+
+Mientras las políticas anteriores dividían el espacio de frecuencias en
 partes iguales respecto al tamaño máximo de la cola, las políticas P4-P6 no
 disponen de un punto claro en la ejecución donde desactivar el cluster
 correspondiente. Para determinar el momento en el que aplicar la política,
 se han diseñado una serie de experimentos variando el momento en el que se
 desactiva el cluster en función del número actual de tareas listas frente
-al número máximo de tareas listas simultáneas hasta el momento. Los
+al número máximo de tareas listas simultáneas \todo{No entiendo lo de simultáneas,
+reescribe esta frase para que sea más clara} hasta el momento. Los
 experimentos realizados contemplan ejecuciones desde un tamaño del $50\%$
 del tamaño máximo, decreciendo en intervalos de un $10\%$ hasta finalizar
-en un tamaño del $10\%$ respecto al tamaño máximo. Mencionar que este
+en un tamaño del $10\%$ respecto al tamaño máximo. Este
 porcentaje no se encuentra relacionado con el tiempo de ejecución, sino con
-el número de tareas listas en cada momento. Como dato informativo, la
-tabla~\ref{tab:tam-colas-tiempo} muestra para cada configuración del tamaño
+el número de tareas listas en cada momento. A modo informativo, la
+Tabla~\ref{tab:tam-colas-tiempo} muestra para cada configuración del tamaño
 de la matriz y bloque (columnas), y para cada experimento lanzado (filas),
 el porcentaje del tiempo de ejecución en el que el cluster se encuentra
-desactivado para la política P4 y la plataforma \juno.\\
-
+desactivado para la política P4 y la plataforma \juno.
 
 \begin{table}
   \centering
@@ -1046,12 +1054,12 @@ desactivado para la política P4 y la plataforma \juno.\\
 \end{table}
 
 
-La figura~\ref{fig:p4-p5} muestra el comportamiento de las políticas P4 y
+La Figura~\ref{fig:p4-p5} muestra el comportamiento de las políticas P4 y
 P5 para la plataforma \juno, combinando para cada configuración de tamaño
 de matriz y bloque los distintos tamaños de cola experimentados. 
-Adicionalmente, se incorpora las medidas realizadas sobre el planificador
+Adicionalmente, se incorporan las medidas realizadas sobre el planificador
 \botlev para poder comparar los resultados (columna izquierda en cada
-conjunto de datos).\\
+conjunto de datos).
 
 La primera observación que se puede realizar sobre los datos obtenidos es
 el impacto muy significativo que posee variar el punto de desactivado del
