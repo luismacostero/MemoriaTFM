@@ -155,13 +155,14 @@ tareas sean no críticas, o de disminuir la frecuencia al mínimo en caso de
 que no exista ninguna tarea no crítica que ejecutar.
 
 La Figura~\ref{s5:fig:P1-evo} muestra el comportamiento de esta política
-para una factorización de Cholesky de sobre una matriz de dimensión $1024 \times 1024$ usando  precisión simple y
-dividida en bloques de $64 \times 64$ elementos. La gráfica superior muestra el estado
-de las colas durante la ejecución del problema, mientras que la gráfica
-inferior muestra la frecuencia del cluster de núcleos \LITTLE en cada momento 
-de la ejecución del problema. Como se puede apreciar, al inicio de la ejecución
-(cuando el número de tareas críticas es elevado), la frecuencia se reduce de
-manera escalonada en función de la relación entre el tamaño de ambas
+para una factorización de Cholesky sobre una matriz de dimensión
+$1024 \times 1024$ usando precisión simple y dividida en bloques de
+$64 \times 64$ elementos. La gráfica superior muestra el estado de las
+colas durante la ejecución del problema, mientras que la gráfica inferior
+muestra la frecuencia del cluster de núcleos \LITTLE en cada momento de la
+ejecución del problema. Como se puede apreciar, al inicio de la ejecución
+(cuando el número de tareas críticas es elevado), la frecuencia se reduce
+de manera escalonada en función de la relación entre el tamaño de ambas
 colas. Una vez el número de tareas no críticas aumenta, el cluster se
 mantiene a máxima frecuencia durante la mayor parte de la ejecución hasta
 que esta se encuentra en las fases finales donde el número de tareas
@@ -555,6 +556,7 @@ por lo que el impacto final no es muy significativo.
 
 
 \subsubsection{Política P6}
+\label{sec:p6}
 Una de las muchas funcionalidades que ofrece el kernel Linux es la de poder
 activar y desactivar cores a demanda y de manera dinámica. En cualquier
 momento de la ejecución, un núcleo puede ser desactivado, y este desaparece
@@ -958,6 +960,7 @@ resultados de las políticas P4-P6 que se muestran en la siguiente sección.
 
 
 \subsection{Análisis de resultados para las políticas P4-P6}
+\subsubsection{Políticas P4 y P5}
 Mientras que las políticas anteriores dividían el espacio de frecuencias en
 partes iguales respecto al tamaño máximo de la cola, las políticas P4-P6 no
 disponen de un punto claro en la ejecución donde desactivar el cluster
@@ -1064,37 +1067,7 @@ cuatro cores \LITTLE obtiene un rendimiento mayor que realizarla sobre
   }
 \end{table}
 
-Mientras que en la política P4 el impacto en la potencia instantánea media
-no es muy elevado, en la política P5, desactivar el cluster \BIG tiene un
-impacto muy significativo en ambas plataformas. Este hecho ocurría también
-en las políticas anteriores, donde bajar la frecuencia al cluster \BIG
-proporcionaba mejores resultados (en términos de potencia) que bajarla al
-cluster \LITTLE. 
 
-
-Aunque este resultado era esperado ya qeu según la gráfica de3 potencias,
-los LITTLE consumen tan poco que es absurdo reducir mucho por ahí, si
-embargo, los big consumen tanto que un ligero cambio es enorme para el
-resultado final
-
-
-
-
-
-
-Como se puede apreciar en la figura, la política P4 encargada de desactivar
-el cluster LITTLE no consigue ninguna mejora energética para ningún
-experimento realizado, sino que además en todos ellos empeora el
-resultado. Sin embargo, la política P5 consigue una eficiencia energética
-similar a la ejecución normal con \botlev, y adicionalmente consigue reducir
-la potencia instantánea media de la ejecución. Como se puede apreciar, la
-eficiencia energética conseguida es independiente del tamaño elegido para
-aplicar la política, causado por la enorme reducción de la potencia
-instantánea media al desactivar el cluster big. Desactivar el cluster en
-una fase temprana de la ejecución proporciona una gran reducción de la
-potencia y obtiene una eficiencia energética similar a no desactivar el
-cluster durante toda la ejecución, pero a costa de reducir el rendimiento
-de la aplicación.
 
 
 
@@ -1119,10 +1092,134 @@ de la aplicación.
 \end{figure}
 
 
-\todo{Falta añadir P6, y revisar / comentar algo más de p4-p5}
+Como se puede apreciar en la figura, tanto la política P4 como la política
+P5 no consiguen obtener la mejora energética buscada. Mientras que la
+política P4 obtiene resultados muy inferiores a la ejecución con \botlev,
+la política P5 alcanza resultados cercanos. La
+tabla~\ref{tab:mejora-gflopsw-p5} muestra con detalle la diferencia de
+rendimiento energético con la ejecución de referencia con \botlev para la
+política P5 con cada configuración de tamaño.\\
+Como se puede observar, y aunque la política P5 no consiga obtener mejoras
+en el rendimiento energético, señalar que consigue resultados similares a
+la ejecución normal reduciendo la potencia instantánea consumida, aunque a
+costa de reducir el rendimiento computacional. Sin embargo, esta política
+puede tener su utilidad en problemas donde su ejecución esté limitada por
+la potencia consumida y no tanto por el rendimiento conseguido, pudiendo
+alcanzar un compromiso entre rendimiento y potencia sin afectar al
+rendimiento energético final escogiendo el valor adecuado para determinar
+cuándo desactivar el cluster.\\
+
+%%% GFLOPSW %%%%
+\begin{table}
+  \centering
+  \caption[Mejora eficiencia energética para la política P5]{Mejora relativa a la ejecución sobre \botlev de la eficiencia energética para la política P5 en ambas plataformas.}
+  \label{tab:mejora-gflopsw-p5}
+  {\scriptsize
+    \begin{tabular}{cccccccccccccccc}
+      \toprule
+  \multicolumn{2}{c}{\phantom{a}} & \multicolumn{14}{c}{Tamaño de la matriz \texttt{(m)} y
+                                        de bloque \texttt{(b)}.} \\ \cmidrule{2-16}
+      \phantom{4} & \texttt{(m)} & \multicolumn{2}{c}{1024} & \multicolumn{2}{c}{2048} &                                                                         \multicolumn{2}{c}{4096} & \multicolumn{2}{c}{4608} & \multicolumn{2}{c}{5120} & \multicolumn{2}{c}{6144} & \multicolumn{2}{c}{8192} \\
+      \phantom{a} & \texttt{(b)} & 64 & 128 & 128 & 256 & 256 & 512 & 256 & 512 & 512 & 1024 & 512 & 1024 & 512 & 1024 \\ \hline
 
 
 
+{\sc 10\%} & \phantom{a} & \br{-3.666} & \fg{4.066} & \br{-2.797} & \br{-1.841} & \br{-0.523} & \br{-0.270} & \br{-0.515} & \br{-0.370} & \br{-0.324} & \fg{0.045} & \br{-0.328} & \br{-0.076} & \br{-0.440} & \br{-0.222} \\               
+{\sc 20\%} & \phantom{a} & \br{-3.978} & \fg{1.981} & \br{-2.589} & \br{-1.773} & \br{-0.303} & \br{-0.162} & \br{-0.478} & \br{-0.234} & \br{-0.247} & \br{-0.001} & \br{-0.269} & \fg{0.002} & \br{-0.283} & \br{-0.133} \\
+{\sc 30\%} & \phantom{a} & \br{-4.033} & \br{-0.991} & \br{-2.248} & \br{-1.422} & \br{-0.154} & \br{-0.120} & \br{-0.267} & \br{-0.134} & \br{-0.122} & \fg{0.001} & \br{-0.152} & \br{-0.035} & \br{-0.286} & \br{-0.025} \\ 
+{\sc 40\%} & \phantom{a} & \br{-3.693} & \fg{1.560} & \br{-2.451} & \br{-1.077} & \fg{0.055} & \br{-0.057} & \br{-0.154} & \br{-0.008} & \br{-0.022} & \br{-0.017} & \br{-0.057} & \br{-0.014} & \br{-0.193} & \fg{0.001} \\
+{\sc 50\%} & \phantom{a} & \br{-4.037} & \br{-1.470} & \br{-1.052} & \br{-0.881} & \fg{0.156} & \fg{0.038} & \fg{0.065} & \fg{0.013} & \fg{0.052} & \br{-0.005} & \fg{0.002} & \br{-0.033} & \br{-0.114} & \fg{0.080}\\\bottomrule
+    \end{tabular}
+    \caption*{\odroid}
+  }
+  {\scriptsize
+    \begin{tabular}{cccccccccccccccc}
+      \toprule
+      \multicolumn{2}{c}{\phantom{a}} & \multicolumn{14}{c}{Tamaño de la matriz \texttt{(m)} y
+                                        de bloque \texttt{(b)}.} \\ \cmidrule{2-16}
+      \phantom{4} & \texttt{(m)} & \multicolumn{2}{c}{1024} & \multicolumn{2}{c}{2048} &                                                                         \multicolumn{2}{c}{4096} & \multicolumn{2}{c}{4608} & \multicolumn{2}{c}{5120} & \multicolumn{2}{c}{6144} & \multicolumn{2}{c}{8192} \\
+      \phantom{a} & \texttt{(b)} & 64 & 128 & 128 & 256 & 256 & 512 & 256 & 512 & 512 & 1024 & 512 & 1024 & 512 & 1024 \\ \hline
+
+
+{\sc 10\%} & \phantom{a} &\br{-1.451} & \br{-1.876} & \br{-0.921} & \br{-0.322} & \br{-0.218} & \fg{0.356} & \br{-0.270} & \fg{0.065} & \br{-0.043} & \br{-0.063} & \fg{0.067} & \br{-0.000} & \br{-0.051} & \fg{0.393} \\
+{\sc 20\%} & \phantom{a} &\br{-1.317} & \br{-1.578} & \br{-0.805} & \fg{0.079} & \br{-0.317} & \fg{0.159} & \br{-0.373} & \fg{0.009} & \br{-0.110} & \fg{0.037} & \fg{0.062} & \fg{0.046} & \br{-0.033} & \fg{0.397} \\
+{\sc 30\%} & \phantom{a} &\br{-1.428} & \br{-1.727} & \br{-0.818} & \br{-0.143} & \br{-0.130} & \fg{0.269} & \br{-0.329} & \br{-0.104} & \br{-0.064} & \br{-0.039} & \fg{0.005} & \br{-0.015} & \br{-0.055} & \fg{0.393} \\
+{\sc 40\%} & \phantom{a} &\br{-1.392} & \br{-1.593} & \br{-0.837} & \fg{0.037} & \br{-0.150} & \fg{0.273} & \br{-0.220} & \fg{0.066} & \br{-0.066} & \br{-0.047} & \fg{0.037} & \fg{0.005} & \br{-0.047} & \fg{0.315} \\
+{\sc 50\%} & \phantom{a} &\br{-1.184} & \br{-1.447} & \br{-0.453} & \fg{0.015} & \br{-0.159} & \fg{0.320} & \br{-0.126} & \br{-0.022} & \br{-0.004} & \fg{0.003} & \fg{0.070} & \fg{0.1\
+02} & \br{-0.061} & \fg{0.286}\\
+
+\bottomrule
+    \end{tabular}
+    \caption*{\juno}
+  }
+\end{table}
+
+
+\subsubsection{Política P6}
+La figura~\ref{fig:detalle:p5-p6} compara los resultados obtenidos mediante
+la política P5 y P6. Como se comentaba en la sección~\ref{sec:p6},
+desactivar un core a nivel del kernel tiene un coste asociado al tener que
+migrar los procesos a un core activo, hecho que se refleja en que el
+rendimiento obtenido en los experimentos para la política P6 sea menor al
+obtenido para la política P5. Sin embargo, como en la plataforma \odroid
+desactivar el cluster \BIG supone un consumo cercano a cero, las medidas
+para la potencia instantánea son muy inferiores a las obtenidas provocando
+que los cores estuvieran \emph{idle} pero sin llegar a
+desactivarlos. Combinando estos dos resultados se obtiene el rendimiento
+energético mostrado en la tabla~\tab:mejora-gflops-p6}. Como se puede
+apreciar, la mejora en el consumo de potencia es superior a la pérdida de
+rendimiento, consiguiendo ganancias en el rendimiento energético, haciendo
+a esta política una solución válida para obtener una mejora de rendimiento
+energético consiguiendo reducciones considerables de la potencia disipada
+durante la ejecución.
+
+\begin{figure}
+  \centering
+
+  \begin{subfigure}{0.9\textwidth}
+    \centering
+    \fbox{\includegraphics[width=0.9\textwidth]{Plots/sched_results/P5_odroid.eps}}
+    \caption*{Política P5}
+  \end{subfigure}
+  
+  \begin{subfigure}{0.9\textwidth}
+    \centering
+    \fbox{\includegraphics[width=0.9\textwidth]{Plots/sched_results/P6_odroid.eps}}
+    \caption*{Política P6}
+  \end{subfigure}
+
+  \caption{Resultados de los experimentos realizados para las políticas P5
+    y P6 sobre \odroid.}
+  \label{fig:detalle:p5-p6}
+\end{figure}
+
+
+
+\begin{table}
+  \centering
+  \caption[Mejora eficiencia energética para la política P6]{Mejora de la
+    eficiencia energética para la política P6.}
+  \label{tab:mejora-gflopsw-p6}
+  {\scriptsize
+    \begin{tabular}{cccccccccccccccc}
+      \toprule
+  \multicolumn{2}{c}{\phantom{a}} & \multicolumn{14}{c}{Tamaño de la matriz \texttt{(m)} y
+                                        de bloque \texttt{(b)}.} \\ \cmidrule{2-16}
+      \phantom{4} & \texttt{(m)} & \multicolumn{2}{c}{1024} & \multicolumn{2}{c}{2048} &                                                                         \multicolumn{2}{c}{4096} & \multicolumn{2}{c}{4608} & \multicolumn{2}{c}{5120} & \multicolumn{2}{c}{6144} & \multicolumn{2}{c}{8192} \\
+      \phantom{a} & \texttt{(b)} & 64 & 128 & 128 & 256 & 256 & 512 & 256 & 512 & 512 & 1024 & 512 & 1024 & 512 & 1024 \\ \hline
+
+
+{\sc 10\%} & \phantom{a} &\br{-4.984} & \br{-5.028} & \br{-3.400} & \br{-2.671} & \br{-0.160} & \br{-0.085} & \br{-0.021} & \fg{0.009} & \fg{0.015} & \br{-0.019} & \br{-0.008} & \fg{0.023} & \fg{0.239} & \fg{0.325}\\
+{\sc 20\%} & \phantom{a} &\br{-4.956} & \br{-4.707} & \br{-3.278} & \br{-2.745} & \fg{0.004} & \br{-0.053} & \fg{0.034} & \br{-0.031} & \fg{0.008} & \fg{0.006} & \fg{0.008} & \br{-0.024} & \fg{0.350} & \fg{0.350} \\
+{\sc 30\%} & \phantom{a} &\br{-4.718} & \br{-4.830} & \br{-3.490} & \br{-2.578} & \fg{0.124} & \fg{0.070} & \fg{0.162} & \fg{0.036} & \fg{0.047} & \fg{0.009} & \fg{0.052} & \br{-0.047} & \fg{0.127} & \fg{0.347} \\
+{\sc 40\%} & \phantom{a} &\br{-4.922} & \br{-4.442} & \br{-3.210} & \br{-2.465} & \fg{0.146} & \fg{0.023} & \fg{0.285} & \fg{0.071} & \fg{0.086} & \fg{0.034} & \fg{0.043} & \br{-0.006} & \fg{0.124} & \fg{0.408} \\
+{\sc 50\%} & \phantom{a} &\br{-4.893} & \br{-3.923} & \br{-3.233} & \br{-2.291} & \fg{0.060} & \fg{0.018} & \fg{0.144} & \fg{0.060} & \fg{0.085} & \br{-0.012} & \fg{0.039} & \br{-0.035} & \fg{0.051} & \fg{0.367} \\
+
+\bottomrule
+    \end{tabular}
+  }
+
+\end{table}
 
 %-- Configuraciones para emacs --
 %%% Local Variables:
