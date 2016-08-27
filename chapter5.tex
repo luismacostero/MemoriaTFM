@@ -358,28 +358,28 @@ de dimensión 512 en precisión simple.
 
 
 Como se puede observar en la gráfica, la ejecución se puede dividir en dos
-partes bien diferenciadas: una primera parte hasta que alcanza la cola el tamaño
-máximo, y una segunda parte en la que el número de tareas críticas
+partes bien diferenciadas: una primera parte hasta que alcanza la cola el
+tamaño máximo, y una segunda parte en la que el número de tareas listas
 desciende constantemente. Estas dos partes están totalmente relacionadas
 con el grafo de dependencias de una factorización de Cholesky, donde existe
 una primera fase en la que se crean un gran número de tareas y se expande
 el árbol, y una segunda fase donde las tareas se van ejecutando y el árbol
 se cierra paulatinamente.
 
-Debido a que el cálculo del tamaño máximo de la cola se realiza de manera dinámica,
-en la primera fase se realizan cambios de frecuencia continuamente a causa
-de ligeros cambios en el tamaño de la cola hasta que se consigue
-estabilizar la cota superior, y poder aplicar la política de manera
-correcta. Una vez alcanzado el tamaño máximo de la cola, se observa
+Debido a que el cálculo del tamaño máximo de la cola se realiza de manera
+dinámica, en la primera fase se realizan cambios de frecuencia
+continuamente a causa de ligeros cambios en el tamaño de la cola hasta que
+se consigue estabilizar la cota superior, y poder aplicar la política de
+manera correcta. Una vez alcanzado el tamaño máximo de la cola, se observa
 como el espacio está dividido en varios escalones, cada uno correspondiente
-a una frecuencia distinta. En algunos puntos en los que el tamaño de la
-cola crece en alguna unidad, se observa que la frecuencia oscila hasta que
-se vuelve a estabilizar el decrecimiento del número de tareas. \todo{Reescribir siguiente frase} Esto se
-observa fácilmente al comienzo de la fase en la que el procesador se
-encuentra a una frecuencia de 950 MHz, como la caída del número de tareas
-es elevada y en algunos puntos la frecuencia se disminuye a 800MHz. También
-se puede observar en la fase final de la ejecución, donde la frecuencia
-varía entre 450MHz y 625MHz.
+a una frecuencia distinta, y según el tamaño de la cola va disminuyendo y
+cambiando de escalón, las frecuencias son modificadas. Puede darse el caso
+en el que el tamaño de la cola esté variando continuamente entre dos
+escalones, produciendo que la frecuencia oscile hasta que el tamaño de la
+cola se vuelva a estabilizar. Esta situación se puede apreciar al principio
+del escalón asociado a 950MHz, donde se aprecia como un ligero descenso del
+número de tareas produce que la frecuencia oscile entre 800MHz y 950MHz.
+
 
 \subsection[Basadas en planificación de tareas (P4, P5 y P6)]{Basadas en planificación de tareas}
 
@@ -438,10 +438,9 @@ condiciones cuando se ejecute el problema:
   argumento \texttt{--smp-workers=<n>}.
 \item Cada \wt debe estar asignado a un núcleo único de la placa,
   provocando que un \wt siempre ejecute tareas en el mismo núcleo durante
-  todo el problema. Esta condición unida a la anterior implica que existe una
-  relación directa ({\em afinidad}) entre cada núcleo y cada \wt del \emph{runtime}. En
-  \nanos, este comportamiento se consigue desactivando la opción contraria
-		mediante el argumento \texttt{--disable-binding}.\todo{Esto es así?}
+  todo el problema. Esta condición unida a la anterior implica que existe
+  una relación directa ({\em afinidad}) entre cada núcleo y cada \wt del
+  \emph{runtime}.
 \item Aunque se tenga control sobre qué tarea se ejecuta en qué \wt (y por
   tanto en qué núcleo), existen ciertas tareas pertenecientes al propio
   \emph{runtime} o al código no paralelo del programa sobre el que no se
@@ -636,8 +635,6 @@ mediciones del consumo energético en las dos plataformas:
   \label{s5:fig:apagadoCores}
 \end{figure}
 
-\todo{Si puedes, añade las unidades en el eje Y}.
-
 Las gráficas muestran la potencia instantánea observada (en Watios) durante todo el
 experimento en el eje vertical, mientras que el eje horizontal corresponde
 a las distintas fases por las que ha ido pasando el experimento. Por cada
@@ -786,6 +783,7 @@ A grandes rasgos, es posible extraer un conjunto de observaciones generales:
   que la ejecución con \botlev sobre \ompss.
 \end{itemize}  
 
+\comentario{Rehacer gráfica para aprovechar el espacio}
 \begin{figure}
   \centering
   \fbox{\includegraphics[width=1.0\textwidth]{Plots/dvfs_results/0-4_all_juno.eps}}
@@ -997,20 +995,20 @@ a una ejecución normal.
 Mientras las políticas anteriores dividían el espacio de frecuencias en
 partes iguales respecto al tamaño máximo de la cola, las políticas P4-P6 no
 disponen de un punto claro en la ejecución donde desactivar el cluster
-correspondiente. Para determinar el momento en el que aplicar la política,
-se han diseñado una serie de experimentos variando el momento en el que se
-desactiva el cluster en función del número actual de tareas listas frente
-al número máximo de tareas listas simultáneas \todo{No entiendo lo de simultáneas,
-reescribe esta frase para que sea más clara} hasta el momento. Los
-experimentos realizados contemplan ejecuciones desde un tamaño del $50\%$
-del tamaño máximo, decreciendo en intervalos de un $10\%$ hasta finalizar
-en un tamaño del $10\%$ respecto al tamaño máximo. Este
-porcentaje no se encuentra relacionado con el tiempo de ejecución, sino con
-el número de tareas listas en cada momento. A modo informativo, la
-Tabla~\ref{tab:tam-colas-tiempo} muestra para cada configuración del tamaño
-de la matriz y bloque (columnas), y para cada experimento lanzado (filas),
-el porcentaje del tiempo de ejecución en el que el cluster se encuentra
-desactivado para la política P4 y la plataforma \juno.
+correspondiente. Al igual que en las otras políticas, se ha decidido que
+este punto esté reflejado por la relación entre el tamaño actual de la cola
+de tareas listas frente al tamaño máximo alcanzado hasta el momento. Los
+experimentos realizados contemplan desde ejecuciones que desactivan el
+cluster cuando el número de tareas listas para ejecución es un $50\%$ del
+tamaño máximo alcanzado, decreciendo hasta un punto de corte del $10\%$
+respecto al tamaño máximo en intervalos de un $10\%$ del tamaño máximo.
+Nótese que este porcentaje no se encuentra relacionado con el tiempo de
+ejecución, sino con el número de tareas listas en cada momento. A modo
+informativo, la Tabla~\ref{tab:tam-colas-tiempo} muestra para cada
+configuración del tamaño de la matriz y bloque (columnas), y para cada
+experimento lanzado (filas), el porcentaje del tiempo de ejecución en el
+que el cluster se encuentra desactivado para la política P4 y la plataforma
+\juno.
 
 \begin{table}
   \centering
