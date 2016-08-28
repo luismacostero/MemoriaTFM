@@ -8,45 +8,56 @@
 \subsection{Introducción a las arquitecturas asimétricas}
 \label{sec:arch_asym}
 
-Desde la aparición de los procesadores multinúcleo, y tras su auge durante la pasada
-década como respuesta a las limitaciones en el incremento de la frecuencia de reloj
-impuestas por la tecnología, este tipo de arquitecturas se han convertido en un pilar
-clave en el desarrollo de arquitecturas de altas prestaciones, reuniendo a la vez
-una gran capacidad de cálculo y una eficiencia energética notable.
+Desde la aparición de los procesadores multinúcleo, y tras su auge durante
+la pasada década como respuesta a las limitaciones en el incremento de la
+frecuencia de reloj impuestas por la tecnología, este tipo de arquitecturas
+se han convertido en un pilar clave en el desarrollo de arquitecturas de
+altas prestaciones, reuniendo a la vez una gran capacidad de cálculo y una
+eficiencia energética notable.
 
-Históricamente, los procesadores multinúcleo han estado formados por varias 
-Unidades de Procesamiento (PUs), típicamente con idénticas características entre ellas.
-Sin embargo, a medida que la ley de escalabilidad de Dennard~\cite{Den74} comienza a 
-ver su fin, los sistemas heterogéneos se han convertido en las arquitecturas más 
-atractivas en el campo de la computación de altas prestaciones. Este tipo de sistemas,
-típicamente equipados con núcleos de procesamiento de propósito general y aceleradores
-hardware de propósito específico, exhiben características, tanto desde el punto de vista
-de las prestaciones como del consumo energético, que responden a las necesidades actuales
-exigidas por los grandes problemas que surgen en diversos ámbitos de la ciencia y la
-ingeniería.
+Históricamente, los procesadores multinúcleo han estado formados por varias
+Unidades de Procesamiento (PUs), típicamente con idénticas características
+entre ellas.  Sin embargo, a medida que la ley de escalabilidad de
+Dennard~\cite{Den74} comienza a ver su fin, los sistemas heterogéneos se
+han convertido en las arquitecturas más atractivas en el campo de la
+computación de altas prestaciones. Este tipo de sistemas, típicamente
+equipados con núcleos de procesamiento de propósito general y aceleradores
+hardware de propósito específico, exhiben características, tanto desde el
+punto de vista de las prestaciones como del consumo energético, que
+responden a las necesidades actuales exigidas por los grandes problemas que
+surgen en diversos ámbitos de la ciencia y la ingeniería.
 
-Dentro de los sistemas heterogéneos es posible realizar una segunda clasificación en función de que los
-distintos núcleos dispongan de distintos repertorios de instrucciones ({\em heterogeneous-ISA}) 
-o utilicen el mismo repertorio de instrucciones ({\em single-ISA}). Estos últimos se denominan
-habitualmente procesadores asimétricos ({\em asymmetric single-ISA CMP o ASISA-CMP})~\cite{survey_asym}.
+Dentro de los sistemas heterogéneos es posible realizar una segunda
+clasificación en función de que los distintos núcleos dispongan de
+distintos repertorios de instrucciones ({\em heterogeneous-ISA}) o utilicen
+el mismo repertorio de instrucciones ({\em single-ISA}). Estos últimos se
+denominan habitualmente procesadores asimétricos ({\em asymmetric
+  single-ISA CMP o ASISA-CMP})~\cite{survey_asym}.
 
-En un procesador multinúcleo asimétrico (AMP), las diferencias entre los distintos núcleos se
-deben a distinta microarquitecturas (asimetría física) o se trata de procesadores con la misma
-microarquitectura pero distinta frecuencia o tamaño de cache (asimetría virtual). En ocasiones,
-se usan técnicas de escalado dinámico de voltaje y frecuencia (DVFS) para emular procesadores 
-asimétricos a partir de núcleos simétricos, consiguiendo así un sistema con asimetría virtual. Las
-ventajas de este tipo de arquitecturas dependen del escenario en el que son utilizadas; en la 
-actualidad, el uso de arquitecturas asimétricas es una tendencia en alza en el mercado de 
-dipositivos móviles, en el que el tipo de tareas a ejecutar y su criticalidad es altamente 
-heterogéneo, y el tiempo de vida de las baterías es un bien escaso y muy a tener en cuenta.
+En un procesador multinúcleo asimétrico (AMP), las diferencias entre los
+distintos núcleos se deben a distinta microarquitecturas (asimetría física)
+o se trata de procesadores con la misma microarquitectura pero distinta
+frecuencia o tamaño de cache (asimetría virtual). En ocasiones, se usan
+técnicas de escalado dinámico de voltaje y frecuencia (DVFS) para emular
+procesadores asimétricos a partir de núcleos simétricos, consiguiendo así
+un sistema con asimetría virtual. Las ventajas de este tipo de
+arquitecturas dependen del escenario en el que son utilizadas; en la
+actualidad, el uso de arquitecturas asimétricas es una tendencia en alza en
+el mercado de dispositivos móviles, en el que el tipo de tareas a ejecutar y
+su criticalidad es altamente heterogéneo, y el tiempo de vida de las
+baterías es un bien escaso y muy a tener en cuenta.
 
-Dentro de las arquitecturas multinúcleo asimétricas, tienen especial relevancia los procesadores de la familia
-ARM, que se denominan big.LITTLE para reflejar que incluyen procesadores potentes ({\em big})
-junto con procesadores de menor rendimiento y mucho menor consumo ({\em LITTLE})[Jeff]. Por
-ejemplo, se pueden combinar núcleos Cortex-A15 (big) con Cortex-A7 (LITTLE), si nos referimos al repertorio de
-instrucciones de 32 bits (ARMv7), o Cortex A57 (big) con A53 (Little) para el caso de 64 bits
-(ARMv8). Uno de los ejemplos reales más utilizados a día de hoy es el SoC Samsung Exynos (véase Figura~\ref{fig:exynos})
- en sus versiones de 32 y 64 bits, ampliamente utilizado en dispositivos móviles de última generación.
+Dentro de las arquitecturas multinúcleo asimétricas, tienen especial
+relevancia los procesadores de la familia ARM, que se denominan big.LITTLE
+para reflejar que incluyen procesadores potentes ({\em big}) junto con
+procesadores de menor rendimiento y mucho menor consumo ({\em
+  LITTLE})[Jeff]. Por ejemplo, se pueden combinar núcleos Cortex-A15 (big)
+con Cortex-A7 (LITTLE), si nos referimos al repertorio de instrucciones de
+32 bits (ARMv7), o Cortex A57 (big) con A53 (Little) para el caso de 64
+bits (ARMv8). Uno de los ejemplos reales más utilizados a día de hoy es el
+SoC Samsung Exynos (véase Figura~\ref{fig:exynos}) en sus versiones de 32 y
+64 bits, ampliamente utilizado en dispositivos móviles de última
+generación.
 
 \begin{figure}[th!]
 \begin{center}
@@ -168,23 +179,67 @@ utilizado y el entorno experimental para la medición de consumo usado en parte 
 
 \subsubsection{\odroid}
 
-\odroid es una placa de desarrollo desarrollada por la empresa {\em Hardkernel}, equipada con un SoC Samsung
-Exynos 5422, que implementa una arquitectura big.LITTLE de 32 bits, compuesta por cuatro núcleos ARM Cortex-A15
-funcionando a una frecuencia máxima de XX Ghz (formando el cluster de núcleos big), y cuatro núcleos ARM Cortex-A7 funcionando a una frecuencia
-máxima de XX Ghz (formando el cluster de núcleos LITTLE). Ambos tipos de núcleos implementan la microarquitectura
-ARMv7a, con procesamiento fuera de orden (en el caso del Cortex-A15) o en orden (en el caso del Cortex-A7). A nivel
-de jerarquía de memoria, los núcleos de cada cluster comparten una cache L2 de 2 Mbytes en el caso del cluster bit 
-y 512 Kbytes para el cluster LITTLE. En ambos casos, cada núcleo contiene una cache L1 de 64 Kbytes, divididos en 
-32 Kbytes de datos y 32 Kbytes de instrucciones. Por último, la jerarquía de memoria se completa con una memoria
-principal DDR3 con una capacidad de 2 Gbytes.
+\odroidxu es una placa de desarrollo desarrollada por la empresa {\em
+  Hardkernel}, equipada con un SoC Samsung Exynos 5422, que implementa una
+arquitectura \big.\LITTLE de 32 bits, compuesta por cuatro núcleos ARM
+Cortex-A15 funcionando a una frecuencia máxima de 1.3 GHz (formando el
+cluster de núcleos \BIG), y cuatro núcleos ARM Cortex-A7 funcionando a una
+frecuencia máxima de 1.3 GHz (formando el cluster de núcleos \LITTLE). Ambos
+tipos de núcleos implementan la microarquitectura ARMv7a, con procesamiento
+fuera de orden (en el caso del Cortex-A15) o en orden (en el caso del
+Cortex-A7). A nivel de jerarquía de memoria, los núcleos de cada cluster
+comparten una cache L2 de 2 Mbytes en el caso del cluster \BIG y 512 Kbytes
+para el cluster \LITTLE. En ambos casos, cada núcleo contiene una cache L1
+de 64 Kbytes, divididos en 32 Kbytes de datos y 32 Kbytes de
+instrucciones. Por último, la jerarquía de memoria se completa con una
+memoria principal DDR3 con una capacidad de 2 Gbytes.
 
 \subsubsection{\juno}
 
-\todo{Buscar datos para Juno y calcar el párrafo anterior.}
+\junodp es una placa de desarrollo desarrollada por ARM, equipada con un
+SoC que implementa una arquitectura \BIG.\LITTLE de 64 bits, compuesta por
+dos núcleos ARM Cortex-A57 con una frecuencia máxima de 1.1 GHz (los cuales
+forman el cluster \BIG), y cuatro núcleos ARM Cortex-A53 funcionando a una
+frecuencia máxima de 800 MHz (formando el cluster de núcleos
+\LITTLE). Ambos tipos de núcleos implementan la microarquitectura ARMv8-A,
+donde los núcleos \BIG realizan una ejecución fuera de orden con una
+profundidad del \emph{pipeline} de 15 etapas, mientras que los núcleos
+\LITTLE realizan una ejecución en orden con un \emph{pipeline} de 8 etapas.
+Respecto a la jerarquía de memoria, cada cluster posee una cache L2 de
+tamaño 2 MBytes para el cluster \BIG y de 1 MByte para el cluster
+\LITTLE. Cada núcleo del cluster \BIG posee una caché L1 divida en 48
+Kbytes de instrucciones y 32 Kbytes de datos. Los núcleos del cluster
+\LITTLE poseen todos ellos una caché L1 de 32 KBytes. Por último, la
+jerarquía se completa con una memoria principal DDR3 de tamaño 8 GBytes.
+
 
 \subsection{Software utilizado}
+A continuación se muestra el software utilizado en cada una de las
+plataformas para realizar los distintos experimentos. El software base
+instalado en cada una de las máquinas es el siguiente:
 
-\todo{Buscar versiones de kernel, compilador y bibliotecas utilizadas en \odroid y \juno}
+\begin{tabular}[h!]{lcccc}
+  \phantom{a} & \phantom{aa} &\odroid & \phantom{aa} &\juno \\\hline
+  \emph{Kernel} & \phantom{aa} &3.10.51+ & \phantom{aa} &3.10.63\\
+  \emph{Compilador GCC/G++} & \phantom{aa} &4.8 &\phantom{aa} & 4.9.1 \\
+\end{tabular}
+
+
+Adicionalmente al sistema base, se ha utilizado el siguiente software con
+las mismas versiones en ambas plataformas:
+\begin{itemize}
+\item Modificación del \emph{runtime} \nanos~\cite{nanos} para incorporar los distintos
+  experimentos realizados. Las modificaciones se han realizado sobre la
+  versión 0.10a.
+\item Compilador fuente-a-fuente \mercurium~\cite{Mercurium} versión 2.0.0, que permite
+  traducir el código anotado a un binario ejecutable por \nanos.
+\item Librería \extrae~\cite{Extrae} para obtener trazas de ejecución de código
+  anotado. Versión 3.2.1.
+\item Herramienta Paraver~\cite{Paraver} para visualizar las trazas extraídas por
+  \extrae. Versión 4.5.6.
+\end{itemize}
+
+\todo{Faltarían las librerías utilizadas y sus versiones.}
 
 \subsection{Entorno de medición de consumo}
 
