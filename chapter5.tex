@@ -30,51 +30,62 @@ del procesador de manera dinámica en tiempo de ejecución con el objetivo de
 obtener una mejora energética o disminuir la potencia instantánea
 consumida. En la actualidad, esta técnica ha cobrado especial relevancia en
 los dispositivos móviles, donde la duración de la batería es un factor muy
-importante. Sin embargo, esta técnica no se limita solamente a este tipo de
-dispositivos, sino a cualquier tipo de procesador que lo soporte. Como
-ejemplo del uso de esta técnica, destacar las implementaciones comerciales
-de Intel para sus CPUs denominada \emph{Intel SpeedStep}, o las de AMD
-denominadas \emph{AMD Cool'n'Quiet} para procesadores destinados a
-servidores y equipos de sobremesa, y \emph{AMD PowerNow!}  para
-procesadores orientados a dispositivos móviles. Además, destacar que este
-tipo de técnicas no sólo se puede realizar sobre procesadores de propósito
-general, como puede ser la implementación de AMD denominada \emph{AMD
-  PowerTune} sobre GPUs y APUs.
+importante a tener en cuenta. Sin embargo, esta técnica no se limita
+solamente a este tipo de dispositivos, sino a cualquier tipo de procesador
+que lo soporte. Como ejemplo del uso de esta técnica, destacar las
+implementaciones comerciales de Intel para sus CPUs denominada \emph{Intel
+  SpeedStep}, o las de AMD denominadas \emph{AMD Cool'n'Quiet} para
+procesadores destinados a servidores y equipos de sobremesa, y \emph{AMD
+  PowerNow!}  para procesadores orientados a dispositivos móviles. Además,
+destacar que este tipo de técnicas no sólo se puede realizar sobre
+procesadores de propósito general, como puede ser la implementación de AMD
+denominada \emph{AMD PowerTune} para GPUs y APUs.
 
-Respecto a los procesadores de la familia big.LITTLE de ARM, estos también
-poseen soporte para realizar escalado de frecuencia, sin embargo, este
-soporte se realiza a nivel de cluster y no de núcleo, lo que implica que un
-cambio de frecuencia en uno de los núcleos implica el mismo cambio de
-frecuencia en el resto de núcleos del mismo cluster. Además, el conjunto de
-frecuencias válidas para cada cluster se encuentra reducido al conjunto
-mostrado en la tabla~\ref{tab:cjto-freqs}.
-
+La familia de procesadores big.LITTLE de ARM también poseen soporte para
+realizar escalado de frecuencia, aunque únicamente se permite realizar el
+escalado a nivel de cluster y no de núcleo, lo que implica que todos los
+núcleos del cluster siempre van a estar ejecutándose a la misma
+frecuencia. Además, las frecuencias a las que puede operar el cluster se
+encuentran limitadas a un conjunto cerrado impuesto por el diseño
+interno. Para las dos plataformas sobre las que se han desarrollado los
+experimentos, la tabla~\ref{tab:cjto-freqs} muestra el conjunto de
+frecuencias a las que cada cluster puede ejecutarse.
 
 \begin{table}
   \centering
-  \begin{tabular}{ll}
-    \toprule
-    Cluster & Frecuencias soportadas \\\hline
-    Cortex-A7    & \{800MHz, 900MHz, 1GHz, 1.1GHz, 1.2GHz, 1.3GHz\}\\
-    Cortex-A15& \{800MHz, 900MHz, 1GHz, 1.1GHz, 1.2GHz,
-                               1.3GHz\}\\\\
-    Cortex-A53& \{450MHz, 575MHz, 700MHz, 775MHz,
-                                850MHz\}\\
-    Cortex-A57& \{450MHz, 625MHz, 800MHz, 950MHZ, 1100MHz\}\\\bottomrule
-  \end{tabular}
-  \caption{Conjunto de frecuencias válidas para los clusters utilizados.}
-  \label{tab:cjto-freqs}
+  {
+    \ca{8pt}
+    \begin{tabular}{ll}
+      Cluster & Frecuencias soportadas \\\hline
+      Cortex-A7    & \{800MHz, 900MHz, 1GHz, 1.1GHz, 1.2GHz, 1.3GHz\}\\
+      Cortex-A15& \{800MHz, 900MHz, 1GHz, 1.1GHz, 1.2GHz,
+                  1.3GHz\}\\\\
+      Cortex-A53& \{450MHz, 575MHz, 700MHz, 775MHz,
+                  850MHz\}\\
+      Cortex-A57& \{450MHz, 625MHz, 800MHz, 950MHZ, 1100MHz\}\\\bottomrule
+    \end{tabular}
+  }
+    \caption{Conjunto de frecuencias válidas para los clusters utilizados.}
+    \label{tab:cjto-freqs}
 \end{table}
+
 El acceso de a esta característica de los procesadores en el kernel Linux
 se realiza a través del subsistema \emph{cpufreq}, el cuál proporciona la
-librería \texttt{libcpufreq}, y los ejecutables \texttt{cpufreq-set} y
-\texttt{cpufreq-info} que permiten obtener y modificar la frecuencia de cada
-núcleo en tiempo de ejecución. 
+librería \texttt{libcpufreq} y los ejecutables \texttt{cpufreq-set} y
+\texttt{cpufreq-info} que permiten obtener y modificar la frecuencia de
+cada núcleo en tiempo de ejecución. 
 
 \subsection{Evaluación de rendimiento/eficiencia energética de las tareas}
 
-\todo{Pequeña descripción de rendimiento/eficiencia basada en los resultados que se muestran,
-para motivar el trabajo.}
+La figura~\ref{fig:modelo_consumo} muestra la potencia instantánea
+consumida por cada cluster en función del número de núcleos activos y la
+frecuencia de ejecución del mismo. Aunque el experimento se ha realizado
+ejecutando varias llamadas en paralelo para realizar una multiplicación de
+matrices (una llamada por cada núcleo activo), se ha comprobado
+experimentalmente que todas las tareas que forman parte de la factorización
+de Cholesky utilizan el 100\% de la capacidad del núcleo correspondiente,
+independientemente de a qué cluster o plataforma pertenezca, haciendo que
+los resultados mostrados sean válidos para cualquier tarea.
 
 \begin{figure}
   \centering
@@ -105,6 +116,8 @@ para motivar el trabajo.}
 \end{figure}
 
 
+\todo{Pequeña descripción de rendimiento/eficiencia basada en los resultados que se muestran,
+para motivar el trabajo.}
 
 
 
@@ -900,7 +913,7 @@ sobre la plataforma \juno.
   \caption{Mejora de la potencia instantánea media para las políticas P1-P3.}
   \label{tab:mejora-potencia}
   {\scriptsize
-    \begin{tabular}{cccccccccccccccc}
+    \begin{tabular}{lccccccccccccccc}
       \toprule
       \multicolumn{2}{c}{\phantom{a}} & \multicolumn{14}{c}{Tamaño de la matriz \texttt{(m)} y
                                         de bloque \texttt{(b)}.} \\ \cmidrule{2-16}
@@ -915,7 +928,7 @@ sobre la plataforma \juno.
     \caption*{\juno}
   }
   {\scriptsize
-    \begin{tabular}{cccccccccccccccc}
+    \begin{tabular}{lccccccccccccccc}
       \toprule
       \multicolumn{2}{c}{\phantom{a}} & \multicolumn{14}{c}{Tamaño de la matriz \texttt{(m)} y
                                         de bloque \texttt{(b)}.} \\ \cmidrule{2-16}
@@ -962,7 +975,7 @@ limitada (similar a las políticas anteriores).
   \ca{2pt}
   
   {\scriptsize
-    \begin{tabular}{cccccccccccccccc}
+    \begin{tabular}{lccccccccccccccc}
       \toprule
       \multicolumn{2}{c}{\phantom{a}} & \multicolumn{14}{c}{Tamaño de la matriz \texttt{(m)} y
                     de bloque \texttt{(b)}.} \\ \cmidrule{2-16}
@@ -981,7 +994,7 @@ limitada (similar a las políticas anteriores).
 
 
   {\scriptsize
-    \begin{tabular}{cccccccccccccccc}
+    \begin{tabular}{lccccccccccccccc}
       \toprule
       \multicolumn{2}{c}{\phantom{a}} & \multicolumn{14}{c}{Tamaño de la matriz \texttt{(m)} y
                                         de bloque \texttt{(b)}.} \\ \cmidrule{2-16}
@@ -1075,7 +1088,7 @@ que el cluster se encuentra desactivado para la política P4 y la plataforma
     encuentra desactivado en función del momento elegido para desactivar.}
   \label{tab:tam-colas-tiempo}
   {\scriptsize
-    \begin{tabular}{cccccccccccccccc}
+    \begin{tabular}{lccccccccccccccc}
       \toprule
       \multicolumn{2}{c}{\phantom{a}} & \multicolumn{14}{c}{Tamaño de la matriz \texttt{(m)} y
                                         de bloque \texttt{(b)}.} \\ \cmidrule{2-16}
@@ -1146,7 +1159,7 @@ cuatro cores \LITTLE obtiene un rendimiento mayor que realizarla sobre
     plataformas en relación a una ejecución normal con \botlev.}
   \label{tab:p4-p5:gflops}
   {\scriptsize
-    \begin{tabular}{rcccccccccccc}
+    \begin{tabular}{lcccccccccccc}
       \toprule
       \phantom{a} & \phantom{a} & \multicolumn{5}{c}{\juno} & \phantom{a} & \multicolumn{5}{c}{\odroid}\\
       \phantom{a} & \phantom{a} & 10\% & 20\% & 30\% & 40\% & 50\% & \phantom{a} & 10\% & 20\% & 30\% & 40\% & 50\% \\\hline
@@ -1206,7 +1219,7 @@ cuándo desactivar el cluster.
   \caption[Mejora eficiencia energética para la política P5]{Mejora relativa a la ejecución sobre \botlev de la eficiencia energética para la política P5 en ambas plataformas.}
   \label{tab:mejora-gflopsw-p5}
   {\scriptsize
-    \begin{tabular}{cccccccccccccccc}
+    \begin{tabular}{lccccccccccccccc}
       \toprule
   \multicolumn{2}{c}{\phantom{a}} & \multicolumn{14}{c}{Tamaño de la matriz \texttt{(m)} y
                                         de bloque \texttt{(b)}.} \\ \cmidrule{2-16}
@@ -1224,7 +1237,7 @@ cuándo desactivar el cluster.
     \caption*{\odroid}
   }
   {\scriptsize
-    \begin{tabular}{cccccccccccccccc}
+    \begin{tabular}{lccccccccccccccc}
       \toprule
       \multicolumn{2}{c}{\phantom{a}} & \multicolumn{14}{c}{Tamaño de la matriz \texttt{(m)} y
                                         de bloque \texttt{(b)}.} \\ \cmidrule{2-16}
@@ -1292,7 +1305,7 @@ durante la ejecución.
     eficiencia energética para la política P6.}
   \label{tab:mejora-gflopsw-p6}
   {\scriptsize
-    \begin{tabular}{cccccccccccccccc}
+    \begin{tabular}{lccccccccccccccc}
       \toprule
   \multicolumn{2}{c}{\phantom{a}} & \multicolumn{14}{c}{Tamaño de la matriz \texttt{(m)} y
                                         de bloque \texttt{(b)}.} \\ \cmidrule{2-16}

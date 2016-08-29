@@ -78,27 +78,76 @@ gestionadas automáticamente por el planificador.
 
 \subsection{OmpSs. Modelo de programación y planificación de tareas}
 
-OmpSs es uno de los modelos de programación paralela a nivel de tareas más extendidos a día de hoy. A grandes
-rasgos, el diseño del modelo de programación se basa en la inclusión de directivas (o {\tt pragma}s) similares
-a las utilizadas en otros modelos de programación paralela, como OpenMP. Sin embargo, dichas directivas se limitan
-en su mayoría, a la anotación de ciertos bloques de código (típicamente funciones) para informar de su carácter de
-{\em tareas}, es decir, unidades básicas de planificación a los recursos computacionales disponibles. Dicha planificación
-se difiere hasta el momento de la ejecución del código, en el que un {\em planificador de tareas} o 
-{\em runtime} (en el caso de OmpSs, llamado Nanox) se encarga de mapear, de forma eficiente, su ejecución al 
-mejor recurso computacional disponible en un momento dado.  
+OmpSs es uno de los modelos de programación paralela a nivel de tareas más
+extendidos a día de hoy. A grandes rasgos, el diseño del modelo de
+programación se basa en la inclusión de directivas (o {\tt pragma}s)
+similares a las utilizadas en otros modelos de programación paralela, como
+OpenMP. Sin embargo, dichas directivas se limitan en su mayoría, a la
+anotación de ciertos bloques de código (típicamente funciones) para
+informar de su carácter de {\em tareas}, es decir, unidades básicas de
+planificación a los recursos computacionales disponibles. Dicha
+planificación se difiere hasta el momento de la ejecución del código, en el
+que un {\em planificador de tareas} o {\em runtime} (en el caso de OmpSs,
+llamado Nanox) se encarga de mapear, de forma eficiente, su ejecución al
+mejor recurso computacional disponible en un momento dado.
 
 \subsubsection{El modelo de programación OmpSs}
 
-Con el fin de ayudar al programador en la construcción de un DAG completo y correcto partiendo de un código secuencial,
-OmpSs proporciona mecanismos sencillos y no invasivos. En dicho modelo, el programador 
-utiliza directivas similares a OpenMP ({\tt pragma}s) para anotar rutinas existentes en el código como tareas, indicando
-a la vez la direccionalidad de sus operandos (entrada, salida o entrada/salida) a través de cláusulas adicionales. A 
-grandes rasgos, el planificador de OmpSs descompone el código (transformado previamente a través del compilador 
-fuente-a-fuente Mercurium~\cite{Mercurium}) en un conjunto de tareas, identificando las dependencias entre ellas, 
-y lanzando a ejecución únicamente {\em tareas listas} (es decir, aquellas cuyas dependencias han sido satisfechas)
-para su ejecución en los distintos núcleos computacionales del sistema.
+Con el fin de ayudar al programador en la construcción de un DAG completo y
+correcto partiendo de un código secuencial, OmpSs proporciona mecanismos
+sencillos y no invasivos. En dicho modelo, el programador utiliza
+directivas similares a OpenMP ({\tt pragma}s) para anotar rutinas
+existentes en el código como tareas, indicando a la vez la direccionalidad
+de sus operandos (entrada, salida o entrada/salida) a través de cláusulas
+adicionales. A grandes rasgos, el planificador de OmpSs descompone el
+código (transformado previamente a través del compilador fuente-a-fuente
+Mercurium~\cite{Mercurium}) en un conjunto de tareas, identificando las
+dependencias entre ellas, y lanzando a ejecución únicamente {\em tareas
+  listas} (es decir, aquellas cuyas dependencias han sido satisfechas) para
+su ejecución en los distintos núcleos computacionales del
+sistema. Adicionalmente a las directivas proporcionadas para la creación de
+tareas, OmpSs proporciona un conjunto de directivas orientadas a la
+sincronización de las distintas tareas.
 
 \subsubsection{Planificación de tareas en OmpSs. El planificador Nanox}
+
+Cuando un código anotado es ejecutado sobre el planificador Nanox, este
+comienza creando un conjunto de hilos denominados \wts, los cuales van a
+ser los encargados de ejecutar las distintas tareas que están listas para
+ejecución. Al primero de los hilos creados se le denomina \emph{master
+  thread}, y es el encargado de, aparte de ejecutar tareas listas como
+cualquier otro \wt, ejecutar el código secuencial del programa
+original. Mientras que no existan tareas listas para ser ejecutadas, el
+resto de \wts permanecerán inactivos a la espera de su creación. Notar que
+al contrario que el modelo de OpenMP, Nanox no crea un nuevo hilo por cada
+tarea a ejecutar, sino que crea un conjunto de hilos al inicio de la
+aplicación, y son estos los encargados de ejecutar todas las tareas del
+programa, finalizando su vida al acabar la ejecución del programa.
+
+Cuando un \wt finaliza la ejecución de una tarea, este realiza dos acciones
+sobre el \emph{runtime}:
+\begin{enumerate}
+\item El \wt informa al \emph{runtime} de la finalización de la tarea. Al
+  finalizar la tarea, se comprueban qué nuevas tareas están listas para ser
+  ejecutadas ya que se han satisfecho todas sus dependencias. Cuando se
+  determina que una tarea está lista para ejecución, se informa al módulo
+  encargado del planificador para que la almacene y trate de acuerdo a la
+  política implementada.
+\item El \wt solicita una nueva tarea para ejecutar al módulo
+  planificador. El módulo planificador, en función de la política que se
+  haya decidido usar, y del \wt que solicite la tarea, decidirá qué tarea
+  debe ejecutar. En caso de no existir ninguna tarea lista para ejecutar, o
+  el \wt no sea el idóneo para ejecutar ninguna de las tareas existentes,
+  este pasa a estado inactivo hasta la creación de nuevas tareas, evitando
+  así consumir recursos de manera innecesaria.
+\end{enumerate}
+
+Durante la ejecución de una tarea, un \wt puede encontrarse una anotación
+para la creación de una nueva tarea. Si esto ocurre, el \wt informa al
+\emph{runtime} para que cree la tarea correspondiente, y la inserte al DAG
+del problema, esperando a que todas sus dependencias sean satisfechas y la
+nueva tarea esté lista para su ejecución.
+
 
 \subsection{Ejemplo: paralelización de la factorización de Cholesky}
 
