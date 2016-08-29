@@ -24,8 +24,52 @@ consciente de la asimetría.
 
 \subsection{DVFS sobre la arquitectura big.LITTLE}
 \label{sec:DVFS_BIGLITTLE}
+Las siglas DVFS (\emph{Dynamic voltage frecuency scaling}) representan a un
+conjunto de técnicas caracterizadas por variar la frecuencia o el voltaje
+del procesador de manera dinámica en tiempo de ejecución con el objetivo de
+obtener una mejora energética o disminuir la potencia instantánea
+consumida. En la actualidad, esta técnica ha cobrado especial relevancia en
+los dispositivos móviles, donde la duración de la batería es un factor muy
+importante. Sin embargo, esta técnica no se limita solamente a este tipo de
+dispositivos, sino a cualquier tipo de procesador que lo soporte. Como
+ejemplo del uso de esta técnica, destacar las implementaciones comerciales
+de Intel para sus CPUs denominada \emph{Intel SpeedStep}, o las de AMD
+denominadas \emph{AMD Cool'n'Quiet} para procesadores destinados a
+servidores y equipos de sobremesa, y \emph{AMD PowerNow!}  para
+procesadores orientados a dispositivos móviles. Además, destacar que este
+tipo de técnicas no sólo se puede realizar sobre procesadores de propósito
+general, como puede ser la implementación de AMD denominada \emph{AMD
+  PowerTune} sobre GPUs y APUs.
 
-\todo{Hablar de DVFS, frecuencias soportadas por cada SoC, libcpufreq\ldots}
+Respecto a los procesadores de la familia big.LITTLE de ARM, estos también
+poseen soporte para realizar escalado de frecuencia, sin embargo, este
+soporte se realiza a nivel de cluster y no de núcleo, lo que implica que un
+cambio de frecuencia en uno de los núcleos implica el mismo cambio de
+frecuencia en el resto de núcleos del mismo cluster. Además, el conjunto de
+frecuencias válidas para cada cluster se encuentra reducido al conjunto
+mostrado en la tabla~\ref{tab:cjto-freqs}.
+
+
+\begin{table}
+  \centering
+  \begin{tabular}{ll}
+    \toprule
+    Cluster & Frecuencias soportadas \\\hline
+    Cortex-A7    & \{800MHz, 900MHz, 1GHz, 1.1GHz, 1.2GHz, 1.3GHz\}\\
+    Cortex-A15& \{800MHz, 900MHz, 1GHz, 1.1GHz, 1.2GHz,
+                               1.3GHz\}\\\\
+    Cortex-A53& \{450MHz, 575MHz, 700MHz, 775MHz,
+                                850MHz\}\\
+    Cortex-A57& \{450MHz, 625MHz, 800MHz, 950MHZ, 1100MHz\}\\\bottomrule
+  \end{tabular}
+  \caption{Conjunto de frecuencias válidas para los clusters utilizados.}
+  \label{tab:cjto-freqs}
+\end{table}
+El acceso de a esta característica de los procesadores en el kernel Linux
+se realiza a través del subsistema \emph{cpufreq}, el cuál proporciona la
+librería \texttt{libcpufreq}, y los ejecutables \texttt{cpufreq-set} y
+\texttt{cpufreq-info} que permiten obtener y modificar la frecuencia de cada
+núcleo en tiempo de ejecución. 
 
 \subsection{Evaluación de rendimiento/eficiencia energética de las tareas}
 
@@ -56,7 +100,7 @@ para motivar el trabajo.}
       \label{fig:modelo_consumo-juno}
     \end{subfigure}  
 
-  \caption{Medidas de consumo energético por núcleo y plataforma.}
+	\caption{Medidas de consumo energético por núcleo y plataforma. \todo{Hay algunas etiquetas en inglés (eje X) y otras en castellano (eje Y)}}
   \label{fig:modelo_consumo}
 \end{figure}
 

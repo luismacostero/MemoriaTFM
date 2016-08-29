@@ -68,7 +68,7 @@ generación.
 
 En los últimos años, además, la utilización de este tipo de arquitecturas de muy bajo consumo se ha
 convertido en un campo de investigación en pleno auge en la ruta hacia la construcción de futuros
-supercomputadores que alcancen la barrera del Exaflop [REF ROAD TO EXAFLOP y MontBLANC]. La construcción
+supercomputadores que alcancen la barrera del Exaflop~\cite{Road,MontBlanc}. La construcción
 de este tipo de computadores y su posible idoneidad de cara a llegar a (y superar) dicha barrera
 los ha convertido en un candidato más que factible a la hora de desarrollar técnicas y códigos
 que exploten de manera eficiente todos los recursos computacionales que ofrecen.
@@ -134,8 +134,6 @@ de la carga computacional asociada a cada uno de ellos y la disponibilidad de n�
    \caption{Modos de operación de las arquitecturas big.LITTLE actuales.}
    \label{fig:modes}
 \end{figure}
-
-\comentario{Falta traducir figura}
 
 
 La Figura~\ref{fig:modes} ofrece una visión esquemática de estos tres modelos de ejecución
@@ -218,11 +216,13 @@ A continuación se muestra el software utilizado en cada una de las
 plataformas para realizar los distintos experimentos. El software base
 instalado en cada una de las máquinas es el siguiente:
 
+\begin{center}
 \begin{tabular}[h!]{lcccc}
   \phantom{a} & \phantom{aa} &\odroid & \phantom{aa} &\juno \\\hline
   \emph{Kernel} & \phantom{aa} &3.10.51+ & \phantom{aa} &3.10.63\\
   \emph{Compilador GCC/G++} & \phantom{aa} &4.8 &\phantom{aa} & 4.9.1 \\
-\end{tabular}\\
+\end{tabular}
+\end{center}
 
 
 Adicionalmente al sistema base, se ha utilizado el siguiente software con
@@ -233,7 +233,7 @@ las mismas versiones en ambas plataformas:
   versión 0.10a.
 \item Compilador fuente-a-fuente \mercurium~\cite{Mercurium} versión 2.0.0, que permite
   traducir el código anotado a un binario ejecutable por \nanos.
-\item Librería \extrae~\cite{Extrae} para obtener trazas de ejecución de código
+\item Biblioteca \extrae~\cite{Extrae} para obtener trazas de ejecución de código
   anotado. Versión 3.2.1.
 \item Herramienta Paraver~\cite{Paraver} para visualizar las trazas extraídas por
   \extrae. Versión 4.5.6.
@@ -244,7 +244,7 @@ las mismas versiones en ambas plataformas:
 \subsection{Entorno de medición de consumo}
 
 Para el desarrollo del Capítulo~\ref{ch:chapter5} se han utilizado dos entornos experimentales de medición de consumo
-energético sobre las plataformas \odroid y \juno. Ambos entornos se basan en sendas adaptaciones del software {\tt pmlib}~\cite{pmlib},
+energético sobre las plataformas \odroid y \juno. Ambos entornos se basan en sendas adaptaciones del software {\tt pmlib}~\cite{AlonsoICPP12},
 desarrollado por la Universidad Jaume I de Castellón; dicha herramienta, desarrollada en lenguaje Python, implementa un paradigma
  cliente/servidor, en el que la parte servidora se encarga de recoger continuamente muestras de potencia instantánea disipada
 por cierto dispositivo, mientras que la utilización de una API propia permite instrumentar los códigos a perfilar desde el
@@ -258,9 +258,9 @@ Ambos entornos difieren en la forma en la que las muestras de consumo energétic
 en la placa y basados en resistencias de {\em shunt}. Dichos sensores ofrecen lecturas independientes para el consumo energético
 del cluster formado por los Cortex-A7, Cortex-A15, GPU y RAM, con una frecuencia de refresco de cuatro muestras por segundo.
 
-\item[\juno:] El servidor {\tt pmlib} ha sido adaptado para recoger los datos de consumo desde un DAQ XX fabricado por National
+\item[\juno:] El servidor {\tt pmlib} ha sido adaptado para recoger los datos de consumo desde un DAQ fabricado por National
 Instruments. Dicho dispositivo, a su vez, recoge muestras de potencia instantánea a partir de las resistencias de {\em shunt}
-integradas en la plataforma, con lecturas actualizadas cada XX segundos e independientes para el cluster formado por los 
+integradas en la plataforma, con lecturas actualizadas con una frecuencia de 1000 muestras por segundo e independientes para el cluster formado por los 
 Cortex-A53, Cortex-A57, GPU y resto del sistema.
 
 \end{description}

@@ -137,26 +137,29 @@ en otros ámbitos, el desarrollo específico de este tipo de implementaciones es
 
 \subsection{Requisitos a nivel de tarea en el ámbito del álgebra lineal}
 
-\comentario{Hay que reescribir esta sección}
-
 Por último, cabe destacar que son necesarios ciertos requisitos adicionales en la implementación multihebra de BLIS
 que opera sobre el modelo propuesto. Considérese el kernel \gemm y la descripción de alto nivel proporcionada en la Figura~\ref{lst:gemm}. 
 Como se ha descrito anteriormente, resulta necesario distribuir el espacio de iteraciones de alguno de los bucles entre los dos tipos de núcleos
 que conforman un VC; siguiendo las directivas de paralelización descritas en~\cite{BLIS3}, se distinguen a continuación dos escenarios de reparto posibles:
 
 \begin{itemize}
-	\item En arquitecturas donde cada VC está compuesto por igual número de núcleos de cada tipo (por ejemplo, \odroid) \ldots
+	\item En arquitecturas donde cada VC está compuesto por igual número de núcleos de cada tipo (por ejemplo, \odroid) realizar un reparto
+		de los bucles externos (1~ó~3) acorde a las características de cada tipo de procesador dentro de un VC resulta suficiente, debido
+		a que ambos clusters no comparten cache L2.
 
-	\item En arquitecturas donde cada VC está compuesto por distinto número de núcleos de cada tipo (por ejemplo, \juno) \ldots
+	\item En arquitecturas donde cada VC está compuesto por distinto número de núcleos de cada tipo (por ejemplo, \juno) realizar
+		un reparto de los bucles externos (1~ó~3) entre clusters, y un reparto homogéneo de alguno de los bucles internos (4~ó~5) para realizar
+		una división final del espacio de iteraciones entre aquellos núcleos replicados dentro de un mismo cluster.
 
 \end{itemize}
 
-For our objective, we still have to distribute the iteration space between the Cortex-A15 and the Cortex-A7 but, since there is only one resource of each type per VC,
-there is no need to partition the loops internal to the macro-kernel. 
-Furthermore, we note that the optimal strides for Loop~1 are in practice quite
-large ({\tt nc} is in the order of a few thousands for ARM big.LITTLE cores), while the optimal values for Loop~3 are much more reduced
-({\tt mc} is 32 for the Cortex-A7 and 156 for the Cortex-A15). Therefore, we target Loop~3 in our data-parallel implementation of BLIS for
-VCs, which we can expect to easily yield a proper workload balancing.
+
+%For our objective, we still have to distribute the iteration space between the Cortex-A15 and the Cortex-A7 but, since there is only one resource of each type per VC,
+%there is no need to partition the loops internal to the macro-kernel. 
+%Furthermore, we note that the optimal strides for Loop~1 are in practice quite
+%large ({\tt nc} is in the order of a few thousands for ARM big.LITTLE cores), while the optimal values for Loop~3 are much more reduced
+%({\tt mc} is 32 for the Cortex-A7 and 156 for the Cortex-A15). Therefore, we target Loop~3 in our data-parallel implementation of BLIS for
+%VCs, which we can expect to easily yield a proper workload balancing.
 
 %That is, both the number of cores to use, and the distribution of those cores between the fast and slow processing units are transparent and 
 %fully configurable by the user. 
