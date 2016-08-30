@@ -8,8 +8,56 @@
 \label{ch:chapter1}
 
 \section{Motivación}
+En los últimos años, el consumo energético ha emergido como una de las
+principales barreras que ha frenado la mejora de rendimiento en los
+sistemas de cómputo, desde dispositivos móviles hasta grandes centros de
+procesamiento de datos. Con el fin de mejorar la eficiencia energética,
+resulta necesario explotar mayores grados de especialización en el
+hardware. Las arquitecturas actuales proporcionan diversos tipos de
+heterogeneidad, que van desde configuraciones heterogéneas en CPDs, hasta
+procesadores con aceleradores hardware integrados en el propio chip,
+plataformas híbridas formadas por procesadores de propósito general (CPUs)
+y aceleradores de propósito específico (como pueden ser GPUs, Intel Xeon
+Phi, etx.), multicores asimétricos (AMPSs) con repertorio común de
+instrucciones o multicores heterogéneos con múltiples repertorios de
+instrucciones~\cite{FuMi11,KoSh13}.
+
+La correcta explotación del rendimiento y la eficiencia energética
+ofrecidos por estas arquitecturas conlleva, de forma necesaria, un
+incremento en la complejidad del software que permita, de forma lo más
+transparente posible para el usuario final, la adaptación de aplicaciones
+ya existentes o de nuevo desarrollo para aumentar el rendimiento y reducir
+su consumo energético~\cite{OsTo10,SKC+15}. Uno de los principales retos en
+este sentido es la correcta asignación de trabajo a los recursos
+computacionales existentes, de modo que, de forma simultánea, se optimice
+su grado de ocupación y la adaptación del recurso escogido a la tarea
+específica a desarrollar. En respuesta a estas necesidades, una de las
+soluciones propuestas por la comunidad científica es el desarrollo de
+modelos de programación que expongan el paralelismo a nivel de tareas,
+explotado en tiempo de ejecución por planificadores de tareas (comúnmente
+conocidos como runtimes [VMC+14]). Esta capa de software es capaz de
+gestionar de forma transparente al usuario los procesos de gestión de
+dependencias de datos entre tareas, las transferencias de datos en entornos
+heterogéneos, y el mapeado eficiente entre tipos de tareas y de procesador,
+entre otros aspectos.
+
+Atendiendo a las arquitecturas subyacentes, el trabajo se centra en una de
+las familias de arquitecturas con más perspectiva de futuro de entre las
+anteriormente mencionadas: procesadores multinúcleo asimétricos (AMPs) de
+bajo consumo, y en concreto, procesadores de la familia big.LITTLE de ARM.
+Este tipo de configuraciones ha suscitado gran interés en el mercado de las
+aplicaciones y ecosistemas móviles, debido a la especialización de cada
+tipo de procesador ante tareas concretas. Esta especialización se suele
+traducir en la activación/desactivación de cada tipo de núcleo en función
+de la demanda computacional o prioridad de las aplicaciones en ejecución, o
+de las limitaciones energéticas ligadas a cada escenario concreto de
+ejecución.
+
+
 
 \section{Objetivos}
+
+
 
 \section{Metodología y plan de trabajo}
 
