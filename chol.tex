@@ -1,36 +1,44 @@
-En este capítulo se describen distintos enfoques software a la hora de explotar el paralelismo 
-existente en las arquitecturas paralelas más extendidas actualmente, incluyendo sistemas multinúcleo y 
-arquitecturas heterogéneas, haciendo especial hincapié en los mecanismos existentes a la hora de
-explotar sistemas asimétricos. Se describen las dos soluciones con mayor aceptación a día de hoy. 
-La Sección~\ref{sec:tareas} introduce los mecanismos e implementaciones más extendidas para la
-extracción y explotación de paralelismo a nivel de tareas. 
-La Sección~\ref{sec:bibliotecas} incide en el desarrollo de bibliotecas paralelas, extrayendo
-paralelismo a nivel de datos.
-En ambos casos, se tomará como hilo conductor un ámbito concreto: el desarrollo de códigos matemáticos
-dentro del ámbito del álgebra lineal, ya que serán estos códigos los utilizados en la descripción
-del trabajo realizado en próximos capítulos.
-Finalmente, la Sección~\ref{sec:comparativa} realiza una breve comparativa entre ambos enfoques,
-destacando las ventajas e inconvenientes de cada uno de ellos desde el punto de vista del rendimiento
+En este capítulo se describen distintos enfoques software a la hora de
+explotar el paralelismo existente en las arquitecturas paralelas más
+extendidas actualmente, incluyendo sistemas multinúcleo y arquitecturas
+heterogéneas con memoria compartida, haciendo especial hincapié en los
+mecanismos existentes a la hora de explotar sistemas asimétricos. Se
+describen las dos soluciones con mayor aceptación a día de hoy.  La
+Sección~\ref{sec:tareas} introduce los mecanismos e implementaciones más
+extendidas para la extracción y explotación de paralelismo a nivel de
+tareas.  La Sección~\ref{sec:bibliotecas} incide en el desarrollo de
+bibliotecas paralelas, extrayendo paralelismo a nivel de datos.  En ambos
+casos, se tomará como hilo conductor un ámbito concreto: el desarrollo de
+códigos matemáticos dentro del ámbito del álgebra lineal, ya que serán
+estos códigos los utilizados en la descripción del trabajo realizado en
+próximos capítulos.  Finalmente, la Sección~\ref{sec:comparativa} realiza
+una breve comparativa entre ambos enfoques, destacando las ventajas e
+inconvenientes de cada uno de ellos desde el punto de vista del rendimiento
 y de la facilidad de programación.
 
 
 \section{Modelos de programación basados en paralelismo a nivel de tareas}
 \label{sec:tareas}
 
-El DAG asociado con un algoritmo o rutina es una representación gráfica del paralelismo de tareas asociado a ella,
-e, idealmente, un planificador de tareas en tiempo de ejecución podría explotar esta información para determinar
-distintas planificaciones (esto es, ordenación de tareas y asignación de las mismas a recursos computacionales
-disponibles) que satisfacen las dependencias fijadas en el DAG.
+El DAG (\emph{directed acyclic graph}) asociado con un algoritmo o rutina es
+una representación gráfica del paralelismo de tareas asociado a ella, e,
+idealmente, un planificador de tareas en tiempo de ejecución podría
+explotar esta información para determinar distintas planificaciones (esto
+es, ordenación de tareas y asignación de las mismas a recursos
+computacionales disponibles) que satisfacen las dependencias fijadas en el
+DAG.
 
 \subsection{Introducción al paralelismo a nivel de tareas. Estado del arte}
 
-Los modelos de programación basados en la extracción de paralelismo a nivel de tareas han demostrado
-su utilidad, particularmente en el campo del álgebra lineal~\cite{Abalenkovs}. En general, el objetivo
-principal radica en proporcionar al programador algún mecanismo para permitir expresar el paralelismo
-potencial a nivel de tareas existente en la aplicación, normalmente en forma de grafo de tareas, más un
-planificador de tareas (o runtime) que realice una planificación dinámica de las mismas, respetando
-las dependencias de datos entre ellas y a la vez permitiendo un correcto aprovechamiento
-de las unidades de procesamiento disponibles.
+Los modelos de programación basados en la extracción de paralelismo a nivel
+de tareas han demostrado su utilidad, particularmente en el campo del
+álgebra lineal~\cite{Abalenkovs}. En general, estos modelos proporcionan al
+programador en primer lugar un mecanismos para expresar el paralelismo
+potencial a nivel de tareas existente en la aplicación, normalmente en
+forma de grafo de tareas, y en segundo lugar un planificador de tareas (o
+runtime) que realice una planificación dinámica de las mismas, respetando
+las dependencias de datos entre ellas y a la vez permitiendo un correcto
+aprovechamiento de las unidades de procesamiento disponibles.
 
 Entre las propuestas e implementaciones más extendidas para este tipo de modelo de programación cabe
 destacar, entre otros, Cilk Plus, StarPU, Superglue, QUARK, Kaapi y OmpSs. 
@@ -43,21 +51,26 @@ años 90 en el MIT, distribuido de forma comercial más tarde por Intel, y liber
 de software libre (por ejemplo, GCC) más tarde. En su versión actual, Cilk no incorpora ningún soporte 
 específico para arquitecturas heterogénelas ni asimétricas.
 
-StarPU~\cite{starpuweb,Augonnet:2011:SUP:1951453.1951454,agullo:hal-01223573,agullo:hal-01120507} implementa un planificador de tareas en tiempo de ejecución y soporte de cara al programador
-a la hora de anotar tareas mediante pequeños fragmentos de código ({\em codelets}). Aunque el runtime se ha
-aplicado frecuentemente a la resolución de algoritmos numéricos, es de carácter generalista, y gestiona
-las transferencias de datos entre espacios de memoria (en arquiteturas heterogéneas) mediante
-una biblioteca que fuerza la coherencia de memoria e incluye prebúsqueda automática de datos.
+StarPU~\cite{starpuweb,Augonnet:2011:SUP:1951453.1951454,agullo:hal-01223573,agullo:hal-01120507}
+implementa un planificador de tareas en tiempo de ejecución y da soporte de
+cara al programador a la hora de anotar tareas mediante pequeños fragmentos
+de código ({\em codelets}). Aunque el runtime se ha aplicado frecuentemente
+a la resolución de algoritmos numéricos, es de carácter generalista, y
+gestiona las transferencias de datos entre espacios de memoria (en
+arquiteturas heterogéneas) mediante una biblioteca que fuerza la coherencia
+de memoria e incluye prebúsqueda automática de datos.
 
-Superglue~\cite{superglueweb,tillenius:superglue,tillenius:superglue2} es también un modelo basado en tareas, en el que las
-dependencias de datos se represetan usando versiones en lugar de grafos de dependencias. El runtime 
-realiza la planificación de las tareas considerando que todos los procesadores
-son idénticos, pero tiene en cuenta el uso de recursos de cada tarea para evitar problemas
-de contención.
+Superglue~\cite{superglueweb,tillenius:superglue,tillenius:superglue2} es
+también un modelo basado en tareas, en el que las dependencias de datos se
+representan usando versiones en lugar de grafos de dependencias. El runtime
+realiza la planificación de las tareas considerando que todos los
+procesadores son idénticos, pero tiene en cuenta el uso de recursos de cada
+tarea para evitar problemas de contención.
 
-Quark ({\em QUeing And Runtime for Kernels})~\cite{quarkweb,icl:609,Haidar} es un runtime que permite la 
-ejecución dinámica de tareas con depedencias de datos en sistemas multinúcleo
-con memoria compartida; forma parte de la biblioteca de álgebra lineal PLASMA~\cite{Abalenkovs}.
+Quark ({\em QUeing And Runtime for Kernels})~\cite{quarkweb,icl:609,Haidar}
+es un runtime que permite la ejecución dinámica de tareas con dependencias
+de datos en sistemas multinúcleo con memoria compartida; forma parte de la
+biblioteca de álgebra lineal PLASMA~\cite{Abalenkovs}.
 
 Kaapi ({\em Kernel for Adaptive, Asynchronous Parallel and Interactive Programming})~\cite{kaapiweb,Gautier:2013:XRS:2510661.2511383,Gautier:2007:KTS:1278177.1278182}
 es una biblioteca C++ para programación basada en tareas similar a Cilk, desarrollada en el INRIA.
@@ -132,12 +145,11 @@ momento de iniciar la ejecución). El primero de estos \wts creados, a parte
 de ejecutar tareas igual que el resto de \wts, también es el encargado de
 ejecutar el código secuencial del programa, por lo que mientras que el
 resto de hilos pueden estar ociosos en el caso de no existir ninguna tarea
-lista para ejecución, este hilo siempre estará ejecutando ocupado. Notar
-que al contrario que en el modelo de ejecución usado por OpenMP, Nanox no
-crea un nuevo hilo por cada tarea a ejecutar, sino que crea un conjunto de
-hilos al inicio de la aplicación, y son estos los encargados de ejecutar
-todas las tareas del programa, finalizando su vida al acabar la ejecución
-del mismo.
+lista para ejecución, este hilo siempre estará ocupado. Notar que al
+contrario que en el modelo de ejecución usado por OpenMP, Nanox no crea un
+nuevo hilo por cada tarea a ejecutar, sino que crea un conjunto de hilos al
+inicio de la aplicación, y son estos los encargados de ejecutar todas las
+tareas del programa, finalizando su vida al acabar la ejecución de la misma.
 
 Cuando un \wt finaliza la ejecución de una tarea, este realiza dos acciones
 sobre el \emph{runtime}:
@@ -153,7 +165,7 @@ sobre el \emph{runtime}:
   planificador. El módulo planificador, en función de la política que se
   haya decidido usar, y del \wt que solicite la tarea, decidirá qué tarea
   debe ejecutar. En caso de no existir ninguna tarea lista para ejecutar, o
-  el \wt no sea el idóneo para ejecutar ninguna de las tareas listas
+  de que el \wt no sea el idóneo para ejecutar ninguna de las tareas listas
   existentes, este pasa a estado inactivo hasta la creación de nuevas
   tareas, evitando así consumir recursos de manera innecesaria.
 \end{enumerate}
@@ -169,11 +181,13 @@ ejecución.
 
 \subsection{Ejemplo: paralelización de la factorización de Cholesky}
 
-A continuación describimos los mecanismos utilizados para extraer paralelismo a nivel de tareas
-durante la ejecución de una operación específica de álgebra lineal densa, utilizando la Factorización
-de Cholesky como hilo conductor. Esta operación en particular es representativa de muchas
-otras factorizaciones utilizadas en la resolución de sistemas lineales, por lo que gran parte de las
-conclusiones extraídas sobre ella pueden ser aplicadas a otro tipo de operaciones similares ampliamente
+A continuación describimos los mecanismos utilizados para extraer
+paralelismo a nivel de tareas durante la ejecución de una operación
+específica de álgebra lineal densa, utilizando la Factorización de Cholesky
+como hilo conductor. Esta operación en particular es representativa de
+muchas otras factorizaciones utilizadas en la resolución de sistemas
+lineales, por lo que gran parte de las conclusiones extraídas sobre ella
+pueden ser aplicadas a otro tipo de operaciones similares ampliamente
 utilizadas en ciencia e ingeniería.
 %
 La Factorización de Cholesky descompone una matriz simétrica definida positiva
@@ -182,17 +196,18 @@ superior~\cite{GVL3}.
 
 \lstinputlisting[float=th!,frame=lines,caption=Implementación en lenguaje C de la factorización de Cholesky orientada a bloques.,label=lst:chol]{Codes/cholesky.c}
 
-El código de la Figura~\ref{lst:chol} muestra un código simplificado en lenguaje C para
-la factorización de una matriz {\tt A} de dimensiones {\tt n}$\times${\tt n}, 
-almacenada como un conjunto de {\tt s}$\times${\tt s} submatrices (bloques de datos) de dimensíón 
-{\tt b}$\times${\tt b}.
+El código del Listado~\ref{lst:chol} muestra un código simplificado en
+lenguaje C para la factorización de una matriz {\tt A} de dimensiones {\tt
+  n}$\times${\tt n}, almacenada como un conjunto de {\tt s}$\times${\tt s}
+submatrices (bloques de datos) de dimensión {\tt b}$\times${\tt b}.
 
-Esta rutina orientada a bloques descompone la operación global en una colección de kernels u operaciones
-fundamentales:
-{\tt po\_cholesky} (Factorización de Cholesky), {\tt tr\_solve} (resolución de un sistema triangular),
-{\tt ge\_multiply} (multiplicación de matrices), y 
-{\tt sy\_update} (actualización simétrica de rango-{\tt b}), que operan sobre cada bloque
-de datos de la matriz, y forman parte de las rutinas proporcionadas por los estándares LAPACK y BLAS. 
+Esta rutina orientada a bloques descompone la operación global en una
+colección de kernels u operaciones fundamentales: {\tt po\_cholesky}
+(Factorización de Cholesky), {\tt tr\_solve} (resolución de un sistema
+triangular), {\tt ge\_multiply} (multiplicación de matrices), y {\tt
+  sy\_update} (actualización simétrica de rango-{\tt b}), que operan sobre
+cada bloque de datos de la matriz, y forman parte de las rutinas
+proporcionadas por los estándares LAPACK~\cite{lapackweb} y BLAS~\cite{OpenBLAS}.
 
 \begin{figure}%[tbh!]
 \begin{center}
@@ -200,27 +215,30 @@ de datos de la matriz, y forman parte de las rutinas proporcionadas por los est�
 \end{center}
 	\caption[DAG con las tareas y dependencias de datos resultantes de la aplicación del código en la Figura~\ref{lst:chol}
          sobre una matriz compuesta por $4 \times 4$ bloques ({\tt s}=4).]
-	 {DAG con las tareas y dependencias de datos resultantes de la aplicación del código en la Figura~\ref{lst:chol}
-         sobre una matriz compuesta por $4 \times 4$ bloques ({\tt s}=4). Las etiquetas especifican el tipo de kernel/tarea
-         con la siguiente correspondencia: 
-         ``{\sf C}'' para la Factorización de Cholesky,
-         ``{\sf T}'' para la resolución de sistema triangular,
-         ``{\sf G}'' para la multiplicación de matrices, y
-         ``{\sf S}'' para la actualización simétrica de rango-{\tt b}. 
-	 Los subíndices (comenzando en 0) especifican la submatriz que la tarea correspondiente actualiza.}
+	 {DAG con las tareas y dependencias de datos resultantes de la
+           aplicación del código en el Listado~\ref{lst:chol} sobre una
+           matriz compuesta por $4 \times 4$ bloques ({\tt s}=4). Las
+           etiquetas especifican el tipo de kernel/tarea con la siguiente
+           correspondencia: ``{\sf C}'' para la Factorización de Cholesky,
+           ``{\sf T}'' para la resolución de sistema triangular, ``{\sf
+             G}'' para la multiplicación de matrices, y ``{\sf S}'' para la
+           actualización simétrica de rango-{\tt b}.  Los subíndices
+           (comenzando en 0) especifican la submatriz que la tarea
+           correspondiente actualiza.}
 \label{fig:dag}
 %\vspace{-0.5cm}
 \end{figure}
 
-El orden en el que dichos kernels son invocados durante la ejecución de la rutina, 
-así como las submatrices o bloques que cada kernel lee o escribe, genera un grafo acíclico dirigido (DAG)
-que refleja las dependiencias entre tareas (esto es, entre instancias de los kernels) y, por tanto,
-el paralelismo de tareas potencial de la operación.
-Por ejemplo, la Figura ~\ref{fig:dag} muestra el DAG con las tareas (nodos) y las dependencias de datos
-(arcos) intrínsecas a la ejecución del código de la Figura~\ref{lst:chol}, cuando éste se ejecuta sobre
-una matriz compuesta por $4 \times 4$ submatrices (esto es, cuando {\tt s}=4).  
+El orden en el que dichos kernels son invocados durante la ejecución de la
+rutina, así como las submatrices o bloques que cada kernel lee o escribe,
+genera un grafo acíclico dirigido (DAG) que refleja las dependiencias entre
+tareas (esto es, entre instancias de los kernels) y, por tanto, el
+paralelismo de tareas potencial de la operación.  Por ejemplo, la Figura
+~\ref{fig:dag} muestra el DAG con las tareas (nodos) y las dependencias de
+datos (arcos) intrínsecas a la ejecución del código del Listado~\ref{lst:chol}, cuando éste se ejecuta sobre una matriz compuesta
+por $4 \times 4$ submatrices (esto es, cuando {\tt s}=4).
 
-El código de la Figura~\ref{lst:chol_tasks} muestra las anotaciones necesarias por parte del programador para explotar
+El código del Listado~\ref{lst:chol_tasks} muestra las anotaciones necesarias por parte del programador para explotar
 el paralelismo a nivel de tareas inherente a la factorización de Cholesky usando OmpSs; cabe destacar las líneas etiquetadas
 con  anotaciones (directivas) ``{\tt \#pragma omp task}''.
 Las cláusulas {\tt in}, {\tt out} e {\tt inout} denotan la direccionalidad de los datos, y ayudan al planificador
@@ -286,7 +304,7 @@ causa de que no existan tareas listas para ejecutar, lo cual disminuiría el
 rendimiento global de la aplicación. La principal diferencia entre botlev y
 los planificadores tradicionales para sistemas heterogéneos es que \botlev
 toma las decisiones en tiempo dinámico sin necesidad de conocer de antemano
-información sobre las tareas, o al forma del árbol de dependencias.
+información sobre las tareas, o la forma del árbol de dependencias.
 
 Para determinar si una tarea pertenece al camino crítico o no en tiempo de
 ejecución, botlev asigna una prioridad a cada tarea en el momento de la
@@ -294,7 +312,7 @@ inserción en el grafo de dependencias, y la actualiza con la creación de
 nuevas tareas. Una vez que la tarea está lista para ser ejecutada (es
 decir, cuando todas las tareas que tenían relación con la tarea mediante el
 grafo de dependencias han finalizado su ejecución), a partir de su
-preferencia se realiza la decisión de si la tarea es considerada crítica o no.\\
+prioridad se realiza la decisión de si la tarea es considerada crítica o no.\\
 La prioridad de una tarea viene dada por un número entero positivo, el cuál
 representa la longitud del camino más largo desde la tarea actual hasta una
 tarea hoja del grafo de dependencias. Cuando una tarea es introducida en el
@@ -308,7 +326,7 @@ prioridad mayor antes (este es el caso de que la tarea pertenezca a un
 camino más largo en el que la nueva tarea no esté involucrada). El proceso
 de actualización finaliza cuando se actualiza la tarea raíz del árbol, o
 cuando se alcanza una tarea que pertenece a otro camino más largo que el
-actual. En la figura~\ref{s3:fig:botlev_tdg} se puede ver el camino crítico
+actual. En la Figura~\ref{s3:fig:botlev_tdg} se puede ver el camino crítico
 detectado para una factorización de Cholesky sobre una matriz dividida en
 $8\times8$ bloques. Hay que destacar que esta forma de calcular el camino
 crítico detecta las tareas que pertenecen al camino más largo, pero eso no
@@ -355,7 +373,7 @@ tarea se considera que pertenece al camino crítico si posee una prioridad
 mayor a cualquiera de las prioridades de las tareas anteriores, o si es
 hija directa de una tarea que se ha considerado crítica y tiene una
 prioridad de una unidad menor (es decir, es el siguiente nodo del camino
-crítico). En la figura~\ref{s3:fig:botlev_colas} se puede ver la evolución
+crítico). En la Figura~\ref{s3:fig:botlev_colas} se puede ver la evolución
 del tamaño de las colas para una factorización de Cholesky sobre una matriz
 de $8\times8$ bloques. La línea azul muestra el número de tareas no
 críticas listas para ser ejecutadas en función del momento de la ejecución
@@ -413,19 +431,25 @@ encuentra desactivado por defecto.
 
 \subsection{BLIS: implementación multihebra del estándar BLAS}
 
-A la hora de explotar el paralelismo potencial de una arquitectura, una segunda alternativa al efoque 
-basado en planificación a nivel de tareas (es decir, explotando paralelismo
-a nivel de tareas) consiste en el uso de kernels ya paralelizados, es decir, implementaciones
-de rutinas que particionan estáticamente el trabajo entre los recursos computacionales existentes, o 
-lo hacen aprovechando mecanismos sencillos de planificación como aquellos ofrecidos por OpenMP. Desde
-este punto de vista, el paralelismo no se extrae ya a nivel de tarea, sino a nivel de datos, de forma
-interna a cada tarea. Por ejemplo, en el ámbito del álgebra lineal, donde las dependencias de datos
-internos a cada tarea es sencilla, o cuando el número de núcleos en el sistema es reducido, esta 
-opción típicamente conlleva menos sobrecarga en tiempo de ejecución, y por tanto proporciona
-una solución más eficiente desde el punto de vista del rendimiento. A día de hoy, esta es la
-opción preferida y adoptada en bibliotecas comerciales y de software libre, como por ejemplo
-AMD ACML~\cite{ACML}, IBM ESSL~\cite{ESSL}, Intel MKL~\cite{mkl}, GotoBLAS~\cite{Goto:2008:AHP}, OpenBLAS~\cite{OpenBLAS} o BLIS~\cite{BLIS1}. Todas estas bibliotecas son implementaciones
-optimizadas de los estándares BLAS~\cite{blas1,blas2,blas3} y LAPACK~\cite{lapack}.
+A la hora de explotar el paralelismo potencial de una arquitectura, una
+segunda alternativa al efoque basado en planificación a nivel de tareas (es
+decir, explotando paralelismo a nivel de tareas) consiste en el uso de
+kernels ya paralelizados, es decir, implementaciones de rutinas que
+particionan estáticamente el trabajo entre los recursos computacionales
+existentes, o lo hacen aprovechando mecanismos sencillos de planificación
+como aquellos ofrecidos por OpenMP. Desde este punto de vista, el
+paralelismo no se extrae ya a nivel de tarea, sino a nivel de datos, de
+forma interna a cada tarea. Por ejemplo, en el ámbito del álgebra lineal,
+donde las dependencias de datos internos a cada tarea son sencillas, o
+cuando el número de núcleos en el sistema es reducido, esta opción
+típicamente conlleva menos sobrecarga en tiempo de ejecución, y por tanto
+proporciona una solución más eficiente desde el punto de vista del
+rendimiento. A día de hoy, esta es la opción preferida y adoptada en
+bibliotecas comerciales y de software libre, como por ejemplo AMD
+ACML~\cite{ACML}, IBM ESSL~\cite{ESSL}, Intel MKL~\cite{mkl},
+GotoBLAS~\cite{Goto:2008:AHP}, OpenBLAS~\cite{OpenBLAS} o
+BLIS~\cite{BLIS1}. Todas estas bibliotecas son implementaciones optimizadas
+de los estándares BLAS~\cite{blas1,blas2,blas3} y LAPACK~\cite{lapack}.
 
 A modo de ejemplo, y dado que utilizaremos BLIS como biblioteca subyacente para la ejecución de tareas
 individuales durante el resto del trabajo, se describe brevemente su funcionamiento, así como la posibilidad
@@ -439,22 +463,28 @@ de memoria, y un {\em macro-kernel} cuya función es la ejecución de las operac
 a cada operación. Internamente, BLIS implementa dicho macro-kernel como dos bucles adicionales sobre un 
 {\em micro-kernel} que, a su vez, está formado por un bucle sobre una actualización de rango 1.
 
-Para la siguiente descripción, únicamente consideraremos los tres bucles externos en la implementación de 
-BLIS para \gemm, para el producto $C:=C+A\cdot B$, donde $A,B,C$ son matrices de dimensión $m \times k$, $k\times n$ 
-y $m \times n$ respectivamente, almacenadas en los arrays {\tt A}, {\tt B} y {\tt C}; véase el código de la Figura~\ref{lst:gemm}.
-En dicho código, {\tt mc}, {\tt nc}, {\tt kc} con parámetros de configuradción que necesitan ser sintonizados para cada
-arquitectura teniendo en cuenta, entre otros, factores como la latencia de las unidades de punto flotante, número
-de registros vectoriales y tamaño/grado de asociatividad de cada nivel de cache~\cite{BLIS4}.
+Para la siguiente descripción, únicamente consideraremos los tres bucles
+externos en la implementación de BLIS para \gemm, para el producto
+$C:=C+A\cdot B$, donde $A,B,C$ son matrices de dimensión $m \times k$,
+$k\times n$ y $m \times n$ respectivamente, almacenadas en los arrays {\tt
+  A}, {\tt B} y {\tt C}; véase el código del Listado~\ref{lst:gemm}.  En
+dicho código, {\tt mc}, {\tt nc}, {\tt kc} son parámetros de configuración
+que necesitan ser sintonizados para cada arquitectura teniendo en cuenta,
+entre otros, factores como la latencia de las unidades de punto flotante,
+número de registros vectoriales y tamaño/grado de asociatividad de cada
+nivel de cache~\cite{BLIS4}.
 
 \lstinputlisting[float=th!,frame=lines,caption=Implementación de altas prestaciones de \gemm en BLIS.,label=lst:gemm]{Codes/gemm.c}
 
 \subsection{Implementación multihebra consciente de la asimetría}
 
-La implementación de \gemm\ en BLIS obtiene un rendimiento cercano al rendimiento pico de la arquitectura,
-tanto en sistemas multinúcleo como sistemas aceleradores~\cite{BLIS2,BLIS3}. 
-Estos estudios han derivado en versiones de la implementación conscientes de la asimetría sobre arquitecturas ARM big.LITTLE
-bajo el modelo de ejecución GTS. Concretamente, versión multihebra consciente de la asimetría descrita en~\cite{asymBLIS} 
-integra las siguientes tres técnicas:
+La implementación de \gemm\ en BLIS obtiene un rendimiento cercano al
+rendimiento pico de la arquitectura, tanto en sistemas multinúcleo como
+sistemas con aceleradores~\cite{BLIS2,BLIS3}.  Estos estudios han derivado en
+versiones de la implementación conscientes de la asimetría sobre
+arquitecturas ARM big.LITTLE bajo el modelo de ejecución
+GTS. Concretamente, versión multihebra consciente de la asimetría descrita
+en~\cite{asymBLIS} integra las siguientes tres técnicas:
 \begin{itemize}
 \item Un particionado dinámico 1-D del espacio de iteraciones para distribuir la carga de los bucles~1 y~3 sobre los dos
 	clusters (big y LITTLE).
@@ -499,10 +529,13 @@ Una biblioteca de funciones específicamente desarrollada para una arquitectura 
 de este sobrecoste y suele conseguir mejores y más predecibles rendimientos, especialmente en arquitecturas no homogéneas. Sin
 embargo, su desarrollo conlleva implementaciones específicas para cada tipo de arquitectura, lo que supone un esfuerzo no despreciable.
 
-En el siguiente capítulo, se propone una solución que combina las ventajas de cada uno de los dos enfoque: combinando un planificador
-no consciente de la asimetría (es decir, convencional) con una biblioteca para la ejecución de tareas optimizada para arquitecturas
-asimétricas, se consigue aunar facilidad de programación y uso --derivado del uso de un planificador de tareas estándar-- con altas
-prestaciones --derivadas de la utilización de una biblioteca desarrollada ad-hoc para este tipo de arquitecturas--.
+En el siguiente capítulo, se propone una solución que combina las ventajas
+de cada uno de los dos enfoques: combinando un planificador no consciente
+de la asimetría (es decir, convencional) con una biblioteca para la
+ejecución de tareas optimizada para arquitecturas asimétricas, se consigue
+aunar facilidad de programación y uso --derivado del uso de un planificador
+de tareas estándar-- con altas prestaciones --derivadas de la utilización
+de una biblioteca desarrollada ad-hoc para este tipo de arquitecturas--.
 
 %-- Configuraciones para emacs --
 %%% Local Variables:

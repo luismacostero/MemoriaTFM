@@ -16,33 +16,42 @@
 %
 \section{Planteamiento y objetivos generales}
 
-Este capítulo presenta un nuevo acercamiento hacia la utilización de planificadores de tareas
-no conscientes de la asimetría (en adelante nos referiremos a ellos como {\em convencionales})
-sobre arquitecturas asimétricas, explotando toda la capacidad de cómputo de las mismas sin que
-ello suponga una adaptación específica de las políticas de planificación de los mismos. Para ello,
-se aprovechan implementaciones de tareas conscientes de la asimetría, abstrayendo al runtime de
-dicha característica. 
+Este capítulo presenta un nuevo acercamiento hacia la utilización de
+planificadores de tareas no conscientes de la asimetría (en adelante nos
+referiremos a ellos como {\em convencionales}) sobre arquitecturas
+asimétricas, explotando toda la capacidad de cómputo de las mismas sin que
+ello suponga una adaptación específica de las políticas de planificación de
+los mismos. Para ello, se aprovechan implementaciones de tareas conscientes
+de la asimetría, abstrayendo al runtime de dicha característica.
 
-En primer lugar, se llevará a cabo una evaluación inicial de la implementación por bloques de 
-la factorización de Cholesky mostrada anteriormente en las Figuras~\ref{lst:chol} y \ref{lst:chol_tasks},
-utilizando el planificador convencional de OmpSs y una versión secuencial de BLIS. Las observaciones de
-dicho estudio servirán como base para la propuesta de solución introducida, consistente en el uso de
-un planificador convencional enlazado con una versión asimétrica de BLIS. Finalmente, se comparan los
-resultados obtenidos con los de los mismos códigos utilizando una versión de OmpSs consciente de la
-arquitectura; finalmente, estos resultados son analizados en detalle a través de trazas de ejecución.
+En primer lugar, se llevará a cabo una evaluación inicial de la
+implementación por bloques de la factorización de Cholesky mostrada
+anteriormente en los Listados~\ref{lst:chol} y \ref{lst:chol_tasks},
+utilizando el planificador convencional de OmpSs y una versión secuencial
+de BLIS. Las observaciones de dicho estudio servirán como base para la
+propuesta de la solución introducida, consistente en el uso de un
+planificador convencional enlazado con una versión asimétrica de BLIS. A
+continuación, se comparan los resultados obtenidos con los de los mismos
+códigos utilizando una versión de OmpSs consciente de la arquitectura;
+finalmente, estos resultados son analizados en detalle a través de trazas
+de ejecución.
 
 \subsection{Evaluación de runtimes convencionales en AMPs}
 \label{subsec:conv_eval}
 
-La Figura~\ref{fig:ompss_blis_oversubscription} muestra el rendimiento, en términos de GFLOPS (miles de millones de
-operaciones en coma flotante por segundo), mostrado por el runtime convencional de OmpSs para la factorización
-de Cholesky, variando el número de \wts entre~1 y~8 sobre la plataforma asimétrica \odroid; en el 
-experimento, se delega la asignación de \wts a núcleos al planificador del sistema operativo. En otras palabras,
-se está utilizando una versión no consciente de la asimetría del planificador de tareas en OmpSs.
-Para este experimento, se ha evaluado un rango lo suficientemente amplio de tamaños de bloque 
-({\tt b} en el código de la Figura~\ref{lst:chol}), aunque por simplicidad se reporta únicamente los
-resultados obtenidos para el valor de {\tt b} que optimiza el ratio de GFLOPS para cada dimensión
-del problema\footnote{En este capítulo, todos los experimentos se han realizado utilizando doble precisión.}.
+La Figura~\ref{fig:ompss_blis_oversubscription} muestra el rendimiento, en
+términos de GFLOPS (miles de millones de operaciones en coma flotante por
+segundo), mostrado por el runtime convencional de OmpSs para la
+factorización de Cholesky, variando el número de \wts entre~1 y~8 sobre la
+plataforma asimétrica \odroid; en el experimento, se delega la asignación
+de \wts a núcleos al planificador del sistema operativo. En otras palabras,
+se está utilizando una versión no consciente de la asimetría del
+planificador de tareas en OmpSs. Para este experimento, se ha evaluado un
+rango lo suficientemente amplio de tamaños de bloque ({\tt b} en el código
+del Listado~\ref{lst:chol}), aunque por simplicidad se reporta únicamente
+los resultados obtenidos para el valor de {\tt b} que optimiza el ratio de
+GFLOPS para cada dimensión del problema\footnote{En este capítulo, todos
+  los experimentos se han realizado utilizando doble precisión.}.
 
 \begin{figure}
 \centering
@@ -137,10 +146,14 @@ en otros ámbitos, el desarrollo específico de este tipo de implementaciones es
 
 \subsection{Requisitos a nivel de tarea en el ámbito del álgebra lineal}
 
-Por último, cabe destacar que son necesarios ciertos requisitos adicionales en la implementación multihebra de BLIS
-que opera sobre el modelo propuesto. Considérese el kernel \gemm y la descripción de alto nivel proporcionada en la Figura~\ref{lst:gemm}. 
-Como se ha descrito anteriormente, resulta necesario distribuir el espacio de iteraciones de alguno de los bucles entre los dos tipos de núcleos
-que conforman un VC; siguiendo las directivas de paralelización descritas en~\cite{BLIS3}, se distinguen a continuación dos escenarios de reparto posibles:
+Por último, cabe destacar que son necesarios ciertos requisitos adicionales
+en la implementación multihebra de BLIS que opera sobre el modelo
+propuesto. Considérese el kernel \gemm y la descripción de alto nivel
+proporcionada en el Listado~\ref{lst:gemm}. Como se ha descrito
+anteriormente, resulta necesario distribuir el espacio de iteraciones de
+alguno de los bucles entre los dos tipos de núcleos que conforman un VC;
+siguiendo las directivas de paralelización descritas en~\cite{BLIS3}, se
+distinguen a continuación dos escenarios de reparto posibles:
 
 \begin{itemize}
 	\item En arquitecturas donde cada VC está compuesto por igual número de núcleos de cada tipo (por ejemplo, \odroid) realizar un reparto
@@ -168,25 +181,36 @@ que conforman un VC; siguiendo las directivas de paralelización descritas en~\c
 
 \subsection{Estudio experimental del tamaño de bloque óptimo}
 
-En tiempo de ejecución, OmpSs descompone la rutina para la implementación de la factorización de Cholesky en una colección de tareas
-que operan en submatrices (bloques) con una granularidad que viene definida por el tamaño de bloque {\tt b}, véase el código en la 
-Figura~\ref{lst:chol}. Estas tareas típicamente se reducen a invocaciones a kernels elementales a nivel de BLAS (en nuestro caso,
-BLIS) o LAPACK, véase el código proporcionado en la Figura~\ref{lst:chol_tasks}.  
+En tiempo de ejecución, OmpSs descompone la rutina para la implementación
+de la factorización de Cholesky en una colección de tareas que operan en
+submatrices (bloques) con una granularidad que viene definida por el tamaño
+de bloque {\tt b}, véase el código del Listado~\ref{lst:chol}. Estas
+tareas típicamente se reducen a invocaciones a kernels elementales a nivel
+de BLAS (en nuestro caso, BLIS) o LAPACK, véase el código proporcionado en
+el Listado~\ref{lst:chol_tasks}.
 
 \newcommand{\bopt}{b^{\mbox{\rm \scriptsize opt}}\xspace}
 
-El primer paso en nuestra evaluación radica en proporcionar una estimación realista de la ganancia de rendimiento
-potencial proporcionada por la solución propuesta (en caso de haberla). Un factor crítico desde este punto de vista es
-el rango de tamaños de bloque que resultan óptimos para el runtime convencional de OmpSs ante una determinada operación
-(en adelante $\bopt$). En particular, la eficiencia de la solución propuesta vendrá determinada por el rendimiento obtenido
-por las implementaciones BLIS de cada una de las tareas que componen la operación, comparada con su implementación secuencial
-equivalente para dimensiones del problema {\tt n} en el orden de dimensión $bopt$.
+El primer paso en nuestra evaluación radica en proporcionar una estimación
+realista de la ganancia de rendimiento potencial proporcionada por la
+solución propuesta (en caso de haberla). Un factor crítico desde este punto
+de vista es el rango de tamaños de bloque que resultan óptimos para el
+runtime convencional de OmpSs ante una determinada operación (en adelante
+$\bopt$). En particular, la eficiencia de la solución propuesta vendrá
+determinada por el rendimiento obtenido por las implementaciones BLIS de
+cada una de las tareas que componen la operación, comparada con su
+implementación secuencial equivalente para dimensiones del problema {\tt n}
+en el orden de dimensión $bopt$.
 
-La Tabla~\ref{tab:optimal_bs_sym} muestra los tamaños de bloque óptimos $\bopt$ para la factorización de Cholesky y tamaños
-de problema crecientes, utilizando el planificador OmpSs convencional enlazado con una versión secuencial de BLIS y un número
-creciente de \wts entre~1 y~4. Obsérvese como, excepto para los menores tamaños de problema, los tamaños de bloque óptimos están
-en el rango entre 192 y 448. Estos tamaños de bloque resultan óptimos al ofrecer un equilibrio entre el paralelismo a nivel de tareas
-potencial y la eficiencia interna de las ejecuciones secuenciales de cada tarea individual.
+La Tabla~\ref{tab:optimal_bs_sym} muestra los tamaños de bloque óptimos
+$\bopt$ para la factorización de Cholesky y tamaños de problema crecientes,
+utilizando el planificador OmpSs convencional enlazado con una versión
+secuencial de BLIS y un número creciente de \wts entre~1 y~4. Obsérvese
+como, excepto para los menores tamaños de problema, los tamaños de bloque
+óptimos están en el rango entre 192 y 448. Estos tamaños de bloque resultan
+óptimos al ofrecer un equilibrio entre el paralelismo a nivel de tareas
+potencial y la eficiencia interna de las ejecuciones secuenciales de cada
+tarea individual.
 
 \newcommand{\ra}[1]{\renewcommand{\arraystretch}{#1}}
 \newcommand{\ca}[1]{\renewcommand{\tabcolsep}{#1}}
@@ -214,10 +238,13 @@ potencial y la eficiencia interna de las ejecuciones secuenciales de cada tarea 
 }
 \end{table}
 
-La principal conclusión extraída tras el análisis de los resultados es la siguiente: para elevar el rendimiento de un planificador
-de tareas combinado con una versión asimétrica de BLIS, cada uno de los kernels que componen la operación implementados en dicha
-versión asimétrica debe exhibir mayor rendimiento que las respectivas implementaciones secuenciales, para dimensiones de matrices 
-que estén en el orden de los tamaños de bloque mostrados en la Tabla~\ref{tab:optimal_bs_sym}.  
+La principal conclusión extraída tras el análisis de los resultados es la
+siguiente: para elevar el rendimiento de un planificador de tareas
+combinado con una versión asimétrica de BLIS, cada uno de los kernels que
+componen la operación implementados en dicha versión asimétrica debe
+exhibir mayor rendimiento que las respectivas implementaciones
+secuenciales, para dimensiones de matrices que estén en el orden de los
+tamaños de bloque mostrados en la Tabla~\ref{tab:optimal_bs_sym}.
 
 La Figura~\ref{fig:cross_blis} muestra el rendimiento alcanzado para las tres rutinas básicas BLAS que componen la factorización
 de Cholesky (\gemm, \syrk y \trsm) para el rango de dimensiones de interés sobre la plataforma \odroid.  
@@ -225,18 +252,26 @@ El experimento compara la versión secuencial de BLIS sobre un único núcleo Co
 que combina un Cortex-A15 y un Cortex-A7. Es decir, compara la ejecución de las tareas que componen la factorización sobre un
 único núcleo físico (rápido) y sobre un VC (combinando un núcleo rápido y otro lento).
 
-En general, las tres rutinas BLAS muestran una tendencia similar: los kernels de la versión secuencial de BLIS
-consiguen mejor rendimiento que sus respectivas implementaciones asimétricas para tamaños de problema pequeños (hasta
-aproximadamente {\tt m}, {\tt n}, {\tt k } = 128); sin embargo, 
-a partir de dicha dimensión, el uso de un núcleo lento comienza a hacer que el rendimiento mejore. 
-El aspecto más importante radica en el hecho de que el punto de corte entre ambas curvas está en el rango (e incluso 
-es típicamente menor) de $\bopt$, véase Tabla~\ref{tab:optimal_bs_sym}. 
-Esto implica que la versión asimétrica de BLIS puede, potencialmente, mejorar el rendimiento general de la factorización, 
-incluso usando un planificador de tareas convencional.
-Además, la mejora en rendimiento aumenta con el tamaño de problema, estabilizándose para dimensiones alrededor de 
-{\tt m}, {\tt n}, {\tt k } $\approx~400$. Dado que este valor está en el rango del tamaño de bloque óptimo para
-la factorización de Cholesky, sobre esta arquitectura es esperable una mejora en el orden de 0.3--0.5 GFLOPS por núcleo lento
-añadido.
+En general, las tres rutinas BLAS muestran una tendencia similar: los
+kernels de la versión secuencial de BLIS consiguen mejor rendimiento que
+sus respectivas implementaciones asimétricas para tamaños de problema
+pequeños (hasta aproximadamente {\tt m}, {\tt n}, {\tt k } = 128); sin
+embargo, a partir de dicha dimensión, el uso de un núcleo lento comienza a
+hacer que el rendimiento mejore.  El aspecto más importante radica en el
+hecho de que el punto de corte entre ambas curvas está en el rango (e
+incluso es típicamente menor) de $\bopt$, véase
+Tabla~\ref{tab:optimal_bs_sym}.  Esto implica que la versión asimétrica de
+BLIS puede, potencialmente, mejorar el rendimiento general de la
+factorización, incluso usando un planificador de tareas convencional.
+Además, la mejora en rendimiento aumenta con el tamaño de problema,
+estabilizándose para dimensiones alrededor de {\tt m}, {\tt n}, {\tt k }
+$\approx~400$. Dado que este valor está en el rango del tamaño de bloque
+óptimo para la factorización de Cholesky, sobre esta arquitectura es
+esperable una mejora en el orden de 0.3--0.5 GFLOPS por núcleo lento
+añadido.  \comentario{La comparación no es del todo justa: estamos
+  comparando un núcleo contra dos. Habría que aclara que el objetivo de la
+  comparación es mostrar que se puede mejorar el rendimiento con los
+  núcleos lentos?}
 %mimicking the behavior of the underlying BLIS.
 
 \begin{figure}[t]
@@ -252,10 +287,13 @@ añadido.
 
 \subsection{Integración de BLIS asimétrico con un planificador convencional}
 
-Con el fin de analizar los beneficios reales de la solución propuesta en términos de rendimiento, comparamos a continuación
-el rendimiento del planificador OmpSs enlazado con {\em (a)} una versión secuencial de BLIS, y {\em (b)} con la versión asimétrica de BLIS. 
-En todos los experimentos, los kernels BLIS en la primera configuración utilizaran exclusivamente un núcleo Cortex-A15, mientras
-que en el segundo caso se utilizara un núcleo Cortex-A15 más un núcleo Cortex-A7 para la ejecución de las tareas.
+Con el fin de analizar los beneficios reales de la solución propuesta en
+términos de rendimiento, comparamos a continuación el rendimiento del
+planificador OmpSs enlazado con {\em (a)} una versión secuencial de BLIS, y
+{\em (b)} con la versión asimétrica de BLIS.  En todos los experimentos,
+los kernels BLIS en la primera configuración utilizarán exclusivamente un
+núcleo Cortex-A15, mientras que en el segundo caso se utilizara un núcleo
+Cortex-A15 más un núcleo Cortex-A7 para la ejecución de las tareas.
 %
 La Figura~\ref{fig:ompss_blis} muestra los resultados obtenidos para ambas configuraciones, utilizando un número creciente
 de \wts, entre~1 y~4. Por simplicidad, únicamente se reportan los resultados obtenidos considerando el tamaño de bloque óptimo
