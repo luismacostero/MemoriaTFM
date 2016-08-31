@@ -246,11 +246,15 @@ exhibir mayor rendimiento que las respectivas implementaciones
 secuenciales, para dimensiones de matrices que estén en el orden de los
 tamaños de bloque mostrados en la Tabla~\ref{tab:optimal_bs_sym}.
 
-La Figura~\ref{fig:cross_blis} muestra el rendimiento alcanzado para las tres rutinas básicas BLAS que componen la factorización
-de Cholesky (\gemm, \syrk y \trsm) para el rango de dimensiones de interés sobre la plataforma \odroid.  
-El experimento compara la versión secuencial de BLIS sobre un único núcleo Cortex-A15 con la versión asimétrica de BLIS
-que combina un Cortex-A15 y un Cortex-A7. Es decir, compara la ejecución de las tareas que componen la factorización sobre un
-único núcleo físico (rápido) y sobre un VC (combinando un núcleo rápido y otro lento).
+La Figura~\ref{fig:cross_blis} muestra el rendimiento alcanzado para las
+tres rutinas básicas BLAS que componen la factorización de Cholesky (\gemm,
+\syrk y \trsm) para el rango de dimensiones de interés sobre la plataforma
+\odroid y que operan sobre los distintos bloques de la matriz. El
+experimento compara la versión secuencial de BLIS sobre un único núcleo
+Cortex-A15 con la versión asimétrica de BLIS que combina un Cortex-A15 y un
+Cortex-A7. Es decir, compara la ejecución de las tareas que componen la
+factorización sobre un único núcleo físico (rápido) y sobre un VC
+(combinando un núcleo rápido y otro lento).
 
 En general, las tres rutinas BLAS muestran una tendencia similar: los
 kernels de la versión secuencial de BLIS consiguen mejor rendimiento que
@@ -279,8 +283,11 @@ añadido.  \comentario{La comparación no es del todo justa: estamos
 \includegraphics[width=0.49\textwidth]{Plots/BLIS_small/blis_dgemm_sym_asym}
 \includegraphics[width=0.49\textwidth]{Plots/BLIS_small/blis_dsyrk_sym_asym}
 \includegraphics[width=0.49\textwidth]{Plots/BLIS_small/blis_dtrsm_sym_asym}
-	\caption[Rendimiento de los kernels BLAS-3 en las implementaciones secuencial y asimétrica de BLIS.]{Rendimiento de los kernels BLAS-3 en las implementaciones secuencial y asimétrica de BLIS, utilizando, respectivamente
-         un núcleo Cortex-A15 y un núcleo Cortex-A15 más un núcleo Cortex-A7 sobre \odroid.}
+\caption[Rendimiento de los kernels BLAS-3 en las implementaciones
+secuencial y asimétrica de BLIS.]{Rendimiento de los kernels BLAS-3 en las
+  implementaciones secuencial y asimétrica de BLIS, utilizando,
+  respectivamente un núcleo Cortex-A15 y un núcleo Cortex-A15 más un núcleo
+  Cortex-A7 sobre \odroid.}
 \label{fig:cross_blis}
 \end{figure}
 
@@ -295,14 +302,20 @@ los kernels BLIS en la primera configuración utilizarán exclusivamente un
 núcleo Cortex-A15, mientras que en el segundo caso se utilizara un núcleo
 Cortex-A15 más un núcleo Cortex-A7 para la ejecución de las tareas.
 %
-La Figura~\ref{fig:ompss_blis} muestra los resultados obtenidos para ambas configuraciones, utilizando un número creciente
-de \wts, entre~1 y~4. Por simplicidad, únicamente se reportan los resultados obtenidos considerando el tamaño de bloque óptimo
-para cada tamaño de problema. En todos los casos, la solución basada en la utilización de una biblioteca asimétrica mejora
-el rendimiento de la implementación secuencial para matrices relativamente grandes (típicamente con dimensiones {\tt n}~$>$~2,048)
-mientras que, para tamaños de problema menores, el ratio de GFLOPS obtenido en ambos casos es similar. 
-La razón de este comportamiento viene marcada por el tamaño de bloque óptimo reportado en la Tabla~\ref{tab:optimal_bs_sym}
-y el rendimiento de BLIS mostrado en la Figura~\ref{fig:cross_blis}: para dicho rango de dimensiones de problema,
-el tamaño óptimo de bloque es significativamente menor, y ambas implementaciones BLIS obtienen resultados de rendimiento similares.
+La Figura~\ref{fig:ompss_blis} muestra los resultados obtenidos para ambas
+configuraciones, utilizando un número creciente de \wts, entre~1 y~4. Por
+simplicidad, únicamente se reportan los resultados obtenidos considerando
+el tamaño de bloque óptimo para cada tamaño de problema. En todos los
+casos, la solución basada en la utilización de una biblioteca asimétrica
+mejora el rendimiento de la implementación secuencial para matrices
+relativamente grandes (típicamente con dimensiones {\tt n}~$>$~2,048)
+mientras que, para tamaños de problema menores, el ratio de GFLOPS obtenido
+en ambos casos es similar.  La razón de este comportamiento viene marcada
+por el tamaño de bloque óptimo reportado en la
+Tabla~\ref{tab:optimal_bs_sym} y el rendimiento de BLIS mostrado en la
+Figura~\ref{fig:cross_blis}: para dicho rango de dimensiones de problema,
+el tamaño óptimo de bloque es significativamente menor, y ambas
+implementaciones BLIS obtienen resultados de rendimiento similares.
 
 \begin{figure}%[t]
 \centering
@@ -333,18 +346,24 @@ el tamaño óptimo de bloque es significativamente menor, y ambas implementacion
 %
 %\end{table}
 
-La diferencia cuantitativa en términos de rendimiento entre ambos enfoques se muestra
-en las Tablas~\ref{tab:improvement_absolute} y~\ref{tab:improvement_percore}. 
-La primera tabla muestra la diferencia absoluta en rendimiento, mientras que la segunda 
-muestra la diferencia en rendimiento por cada núcleo lento (Cortex-A7) introducido en
-el experimento. Consideremos, por ejemplo, el tamaño de problema {\tt n}~=~6,144. 
-En este caso, el rendimiento mejora en 0.975 GFLOPS cuando se añaden los 4~núcleos lentos para 
-dar soporte a los 4~núcleos Cortex-A15. Este hecho se traduce en una ganancia de rendimiento de
-0.243 GFLOPS por core lento, ligeramente por debajo de la mejora que podría esperarse a partir de
-los resultados experimentales observados en la anterior sección. Nótese, sin embargo, cómo el 
-rendimiento por Cortex-A7 añadido se reduce desde 0.340~GFLOPS al añadir únicamente un núcleo,
-hasta 0.243~GFLOPS, al utilizar los cuatro núcleos lentos.
+La diferencia cuantitativa en términos de rendimiento entre ambos enfoques
+se muestra en las Tablas~\ref{tab:improvement_absolute}
+y~\ref{tab:improvement_percore}.  La primera tabla muestra la diferencia
+absoluta en rendimiento, mientras que la segunda muestra la diferencia en
+rendimiento por cada núcleo lento (Cortex-A7) introducido en el
+experimento. Consideremos, por ejemplo, el tamaño de problema {\tt
+  n}~=~6,144.  En este caso, el rendimiento mejora en 0.975 GFLOPS cuando
+se añaden los 4~núcleos lentos para dar soporte a los 4~núcleos
+Cortex-A15. Este hecho se traduce en una ganancia de rendimiento de 0.243
+GFLOPS por core lento, ligeramente por debajo de la mejora que podría
+esperarse a partir de los resultados experimentales observados en la
+anterior sección. Nótese, sin embargo, cómo el rendimiento por Cortex-A7
+añadido se reduce desde 0.340~GFLOPS al añadir únicamente un núcleo, hasta
+0.243~GFLOPS, al utilizar los cuatro núcleos lentos.  
 
+\comentario{Quizás podrías poner algo como el rendimiento por core lento
+  añadido siempre decrece al aumentar el número de worker
+  threads. Esperamos averiguar las causas en el futuro.}
 \newcommand{\fg}[1]{\textcolor{ForestGreen}{#1}} % Verde
 \newcommand{\br}[1]{\textcolor{BrickRed}{#1}} % Rojo
 
@@ -403,10 +422,10 @@ hasta 0.243~GFLOPS, al utilizar los cuatro núcleos lentos.
 
 \begin{table}
 \centering
-	\caption[Mejora de rendimiento por núcleo lento (en GFLOPS) para la factorización de Cholesky utilizando el planificador OmpSs convencional enlazado con una versión asimétrica de BLIS.]
-	{Mejora de rendimiento por núcleo lento (en GFLOPS) para la factorización de Cholesky utilizando
-         el planificador OmpSs convencional enlazado con una versión asimétrica de BLIS, con respecto
-	 al mismo planificador enlazado con la versión secuencial de BLIS sobre \odroid.}
+\caption[Mejora de rendimiento por núcleo lento (en GFLOPS) para la factorización de Cholesky utilizando el planificador OmpSs convencional enlazado con una versión asimétrica de BLIS.]
+{Mejora de rendimiento por núcleo lento (en GFLOPS) para la factorización de Cholesky utilizando
+  el planificador OmpSs convencional enlazado con una versión asimétrica de BLIS, con respecto
+  al mismo planificador enlazado con la versión secuencial de BLIS sobre \odroid.}
 \label{tab:improvement_percore}
 
 \ra{1.2}
@@ -467,10 +486,14 @@ Cholesky utilizando el planificador de OmpSs. Más concretamente, se consideran 
 alternativas:
 
 \begin{enumerate}
-
-	\item El planificador convencional OmpSs enlazado con una implementación secuencial de BLIS (``OmpSs - Seq. BLIS'').
-	\item El planificador convencional OmpSs enlazado con la versión asimétrica de BLIS que considera el SoC como cuatro {\em núcleos virtuales (VC)} (``OmpSs - Asym. BLIS'').
-	\item La versión consciente de la asimetría ({\em criticality-aware, o botlev}) de OmpSs, enlazada con la versión secuencial de BLIS (``Botlev-OmpS - Seq. BLIS''). 
+\item El planificador convencional OmpSs enlazado con una implementación
+  secuencial de BLIS (``OmpSs - Seq. BLIS'').
+\item El planificador convencional OmpSs enlazado con la versión asimétrica
+  de BLIS que considera el SoC como cuatro {\em núcleos virtuales (VC)}
+  (``OmpSs - Asym. BLIS'').
+\item La versión consciente de la asimetría ({\em criticality-aware, o
+    botlev}) de OmpSs, enlazada con la versión secuencial de BLIS
+  (``Botlev-OmpS - Seq. BLIS'').
 
 \end{enumerate}
 
@@ -483,21 +506,32 @@ anteriormente descritas sobre la plataforma \odroid. Los resultados pueden ser a
 en tres grandes grupos, atendiendo a la dimensión del problema:
 
 \begin{itemize}
-	\item Para matrices pequeñas ({\tt n}~=~512, 1,024), el planificador convencional utilizando exclusivamente cuatro núcleos rápidos (esto es,
-		enlazado con la versión secuencial de BLIS para la ejecución de tareas) obtiene los mejores resultados en términos de rendimiento.
-		Esta es una observación esperada y ya fue observada en la Figura~\ref{fig:ompss_blis}; la principal causa radica en el pequeño tamaño óptimo
-		de bloque para este rango de dimensiones de problema, necesario para exponer el suficiente paralelismo a nivel de tareas. Esta necesidad invalida
-		el uso de la implementación asimétrica de BLIS dado su bajo rendimiento sobre matrices de muy reducidas dimensiones; véase Figura~\ref{fig:cross_blis}. 
-		Además, cabe destacar que el planificador OmpSs adaptado a la asimetría (Botlev) no obtiene ratios de rendimiento elevados para este rango de 
-		dimensiones, independientemente del número de núcleos Cortex-A7 introducidos en el experimento.
+\item Para matrices pequeñas ({\tt n}~=~512, 1,024), el planificador
+  convencional utilizando exclusivamente cuatro núcleos rápidos (esto es,
+  enlazado con la versión secuencial de BLIS para la ejecución de tareas)
+  obtiene los mejores resultados en términos de rendimiento.  Esta es una
+  observación esperada y ya fue observada en la
+  Figura~\ref{fig:ompss_blis}; la principal causa radica en el pequeño
+  tamaño óptimo de bloque para este rango de dimensiones de problema,
+  necesario para exponer el suficiente paralelismo a nivel de tareas. Esta
+  necesidad invalida el uso de la implementación asimétrica de BLIS dado su
+  bajo rendimiento sobre matrices de muy reducidas dimensiones; véase
+  Figura~\ref{fig:cross_blis}.  Además, cabe destacar que el planificador
+  OmpSs adaptado a la asimetría (Botlev) no obtiene ratios de rendimiento
+  elevados para este rango de dimensiones, independientemente del número de
+  núcleos Cortex-A7 introducidos en el experimento.
 
- \item Para matrices de tamaño intermedio ({\tt n}~=~2,048, 4,096), la diferencia de rendimiento entre los diferentes enfoques se reduce.
-	 La variante que utiliza la versión asimétrica de BLIS comienza a obtener mejores rendimientos que las implementaciones alternativas para
-{\tt n}=4,096. Para este rango de dimensiones, Botlev-OmpSs es competitivo, y también obtiene mejores rendimientos que la configuración convencional.
+\item Para matrices de tamaño intermedio ({\tt n}~=~2,048), la diferencia
+  de rendimiento entre los diferentes enfoques se reduce. Para este rango
+  de dimensiones, Botlev-OmpSs es competitivo, y también obtiene mejores
+  rendimientos que la configuración convencional.
 
- \item Para matrices de grandes dimensiones ({\tt n}~=~6,144, 7,680) la anterior tendencia se consolida, y ambos enfoques conscientes de la arquitectura muestran
-	 ganancias de rendimiento considerables. Comparando ambos enfoques conscientes de la arquitectura, nuestra solución
-obtiene mejor rendimiento, incluso considerando la utilización de todos los núcleos lentos para el planificador Botlev-OmpSs.
+\item Para matrices de grandes dimensiones ({\tt n}~=~4,096, 6,144, 7,680)
+  la anterior tendencia se consolida, y ambos enfoques conscientes de la
+  arquitectura muestran ganancias de rendimiento considerables. Comparando
+  ambos enfoques conscientes de la arquitectura, nuestra solución obtiene
+  mejor rendimiento, incluso considerando la utilización de todos los
+  núcleos lentos para el planificador Botlev-OmpSs.
 
 \end{itemize}
 

@@ -45,14 +45,14 @@ consumida. En la actualidad, esta técnica ha cobrado especial relevancia en
 los dispositivos móviles, donde la duración de la batería es un factor muy
 importante a tener en cuenta. Sin embargo, esta técnica no se limita
 solamente a este tipo de dispositivos, sino a cualquier tipo de procesador
-que lo soporte. Como ejemplo del uso de esta técnica, destacar las
-implementaciones comerciales de Intel para sus CPUs denominada \emph{Intel
+que lo soporte. Como ejemplo del uso de esta técnica, destacar la
+implementación comercial de Intel para sus CPUs denominada \emph{Intel
   SpeedStep}, o las de AMD denominadas \emph{AMD Cool'n'Quiet} para
 procesadores destinados a servidores y equipos de sobremesa, y \emph{AMD
   PowerNow!}  para procesadores orientados a dispositivos móviles. Además,
-destacar que este tipo de técnicas no sólo se puede realizar sobre
-procesadores de propósito general, como puede ser la implementación de AMD
-denominada \emph{AMD PowerTune} para GPUs y APUs.
+destacar que este tipo de técnicas también se pueden aplicar a procesadores
+de propósito específico, como puede ser la implementación de AMD denominada
+\emph{AMD PowerTune} para GPUs y APUs (\emph{Accelerated Processing Unit}).
 
 La familia de procesadores big.LITTLE de ARM también poseen soporte para
 realizar escalado de frecuencia, aunque únicamente se permite realizar el
@@ -62,7 +62,7 @@ frecuencia. Además, las frecuencias a las que puede operar el cluster se
 encuentran limitadas a un conjunto cerrado impuesto por el diseño
 interno. Para las dos plataformas sobre las que se han desarrollado los
 experimentos, la tabla~\ref{tab:cjto-freqs} muestra el conjunto de
-frecuencias a las que cada cluster puede ejecutarse.
+frecuencias en las que cada cluster puede trabajar.
 
 \begin{table}
   \centering
@@ -82,11 +82,11 @@ frecuencias a las que cada cluster puede ejecutarse.
     \label{tab:cjto-freqs}
 \end{table}
 
-El acceso de a esta característica de los procesadores en el kernel Linux
-se realiza a través del subsistema \emph{cpufreq}, el cuál proporciona la
+El acceso a esta característica de los procesadores en el kernel Linux se
+realiza a través del subsistema \emph{cpufreq}, el cuál proporciona la
 librería \texttt{libcpufreq} y los ejecutables \texttt{cpufreq-set} y
 \texttt{cpufreq-info} que permiten obtener y modificar la frecuencia de
-cada núcleo en tiempo de ejecución. 
+cada núcleo en tiempo de ejecución.
 
 \subsection{Evaluación de rendimiento/eficiencia energética de las tareas}
 
@@ -98,7 +98,8 @@ matrices (una llamada por cada núcleo activo), se ha comprobado
 experimentalmente que todas las tareas que forman parte de la factorización
 de Cholesky utilizan el 100\% de la capacidad del núcleo correspondiente,
 independientemente de a qué cluster o plataforma pertenezca, haciendo que
-los resultados mostrados sean válidos para cualquier tarea.
+los resultados mostrados sean válidos para cualquier tarea de las que
+componen la factorización de Cholesky.
 
 \begin{figure}
   \centering
@@ -132,6 +133,7 @@ los resultados mostrados sean válidos para cualquier tarea.
 \todo{Pequeña descripción de rendimiento/eficiencia basada en los resultados que se muestran,
 para motivar el trabajo.}
 
+\todo{Aquí habría que decir que hay 3 variables que afectan al rendimiento y al consumo: tipo de núcleo, número de núcleos activos y frecuencia de los núcleos. Por lo tanto hay muchas formas de adaptar el rendimiento y el consumo a lo que necesite la aplicación y que vamos a explorar las principales.}
 
 
 \section{Políticas de reducción de consumo}
@@ -147,21 +149,23 @@ componen la arquitectura).
 
 
 \subsubsection{Política P1}
+\comentario{tareas limitadas por el camino crítico / fase dominada por
+  tareas críticas}
+
 
 Durante la ejecución de un programa paralelo mediante un paradigma basado
-en tareas, es común que, en cierto punto de la ejecución paralela,
-la mayor parte de tareas listas para ser ejecutadas
-sean tareas pertenecientes al {\em camino crítico}, provocando que nuevas tareas no puedan 
-pasar a considerarte listas para ejecución hasta que las tareas críticas finalicen. 
+en tareas, es común que, en cierto punto de la ejecución paralela, la mayor
+parte de tareas listas para ser ejecutadas sean tareas pertenecientes al
+{\em camino crítico}, provocando que nuevas tareas no puedan pasar a
+considerarte listas para ejecución hasta que las tareas críticas finalicen.
 
 Este comportamiento puede observarse en una aplicación cuyo grafo de
-dependencias se encogiera muy rápidamente en algún punto intermedio de la
+dependencias se encaja muy rápidamente en algún punto intermedio de la
 ejecución, para luego volverse a expandir rápidamente (un árbol con forma
-de diábolo). En este tipo de árbol, las tareas ``centrales''
-serían críticas, ya que son prioritarias para que la ejecución paralela
-prosiga, y además, en el momento que esto ocurra, un gran
-número de tareas serán liberadas para ser ejecutadas y
-poder continuar la ejecución del problema.
+de diábolo). En este tipo de árbol, las tareas ``centrales'' serán
+críticas, ya que son prioritarias para que la ejecución paralela prosiga, y
+además, en el momento que esto ocurra, un gran número de tareas serán
+liberadas para ser ejecutadas y poder continuar la ejecución del problema.
 
 Este problema, aplicado al planificador \botlev, (descrito en la
 sección~\ref{s3:botlev}) supondría que en el momento en el que el árbol se
@@ -172,29 +176,32 @@ finalizan la ejecución de sus tareas críticas y se liberan más tareas para
 ejecutar en los cores \LITTLE.
 
 Una forma de intentar paliar este problema consiste en forzar a que los
-núcleos lentos también ejecuten tareas críticas; este decisión, sin embargo, puede provocar 
-un retraso en la finalización de las tareas críticas, ya que aunque su ejecución
-puede comenzar antes (pues se disponen de más núcleos para distribuir
-el mismo número de tareas), el rendimiento de los núcleos \LITTLE es muy
-inferior que el de los cores \BIG, provocando retrasos en la ejecución e
-incluso llegando a agravar el cuello de botella anteriormente mencionado.
+núcleos lentos también ejecuten tareas críticas; esta decisión, sin
+embargo, puede provocar un retraso en la finalización de las tareas
+críticas, ya que aunque su ejecución puede comenzar antes (pues se disponen
+de más núcleos para distribuir el mismo número de tareas), el rendimiento
+de los núcleos \LITTLE es muy inferior que el de los cores \BIG, provocando
+retrasos en la ejecución e incluso llegando a agravar el cuello de botella
+anteriormente mencionado.
 
-La política P1 intenta solventar este problema desde un enfoque distinto. La
-idea principal consiste en aprovechar los períodos de tiempo en los que la carga 
-de trabajo sobre los núcleos lentos es menor para disminuir el consumo energético, 
-{\em forzando una reducción de frecuencia} sobre el cluster \LITTLE. 
-Como se podía ver en la Figura~\ref{fig:modelo_consumo}, reducir la frecuencia al cluster \LITTLE
-implica que la potencia instantánea disipada disminuye. Aunque es cierto que al
-reducir la frecuencia de los núcleos el tiempo empleado en ejecutar una tarea
-aumenta, esta técnica únicamente se aplica en aquellas fases de la ejecución paralela en las que
-la ejecución está limitada por el gran número de tareas críticas y el
-bajo número de tareas no críticas; por tanto, es esperable que el impacto final en el
-rendimiento no sea elevado, y sí lo sea la reducción de consumo energético.
+La política P1 intenta solventar este problema desde un enfoque
+distinto. La idea principal consiste en aprovechar los períodos de tiempo
+en los que la carga de trabajo sobre los núcleos lentos es menor para
+disminuir el consumo energético, {\em forzando una reducción de frecuencia}
+sobre el cluster \LITTLE.  Como se podía ver en la
+Figura~\ref{fig:modelo_consumo}, reducir la frecuencia al cluster \LITTLE
+implica que la potencia instantánea disipada disminuye. Aunque es cierto
+que al reducir la frecuencia de los núcleos el tiempo empleado en ejecutar
+una tarea aumenta, esta técnica únicamente se aplica en aquellas fases de
+la ejecución paralela en las que la ejecución está limitada por el gran
+número de tareas críticas y el bajo número de tareas no críticas; por
+tanto, es esperable que el impacto final en el rendimiento no sea elevado,
+y sí lo sea la reducción de consumo energético.
 
 La forma en la que se ha aplicado esta política sobre \botlev consiste en
 monitorizar constantemente el número de tareas, tanto críticas como no
 críticas, listas para ser ejecutadas (reflejado en el tamaño de las colas
-internas del planificador), y actuar en función a la relación entre el
+internas del planificador), y actuar en función de la relación entre el
 tamaño de ambas colas. El Listado~\ref{s5:fig:listing-p1} muestra un
 fragmento esquemático del código encargado de realizar esta tarea. El
 método es invocado cada vez que el tamaño de una cola es modificado (ya sea
@@ -265,6 +272,7 @@ frecuencia vuelve a disminuirse.
 \end{figure}
 
 \subsubsection{Políticas P2 y P2'}
+\comentario{ajuste a la carga de trabajo para LITTLE}
 
 A la hora de aplicar técnicas de escalado de frecuencia (DVFS) sobre un problema, la técnica
 presenta de manera simplificada dos grandes dimensiones en las que tomar
@@ -274,78 +282,82 @@ frecuencias utilizar} durante los diferentes cambios, y {\em (b)}~una segunda
 dimensión que determina {\em en qué momentos de la ejecución se debe modificar
 la frecuencia.}
 
-La primera dimensión normalmente viene determinada por la propia arquitectura
-sobre la que se ejecuta el problema, ya que es común que el procesador o el sistema operativo no
-puedan seleccionar cualquier frecuencia de funcionamiento, sino solamente a una serie de
-frecuencias predeterminadas. Esto hace que tomar la decisión de a
-qué frecuencia se desea que el procesador trabaje se reduzca a 
-una elección sobre un conjunto cerrado y finito de frecuencias. Cabe destacar que,
-en ocasiones, puede resultar conveniente descartar algunas de estas frecuencias y
-no tenerlas en consideración, ya sea porque impactan de manera muy negativa
-en el rendimiento, o no tienen un impacto significativo en la mejora de
-consumo.
+La primera dimensión normalmente viene determinada por la propia
+arquitectura sobre la que se ejecuta el problema, ya que es común que el
+procesador o el sistema operativo no puedan seleccionar cualquier
+frecuencia de funcionamiento, sino solamente una serie de frecuencias
+predeterminadas. Esto hace que tomar la decisión de a qué frecuencia se
+desea que el procesador trabaje se reduzca a una elección sobre un conjunto
+cerrado y finito de frecuencias. Cabe destacar que, en ocasiones, puede
+resultar conveniente descartar algunas de estas frecuencias y no tenerlas
+en consideración, ya sea porque impactan de manera muy negativa en el
+rendimiento, o no tienen un impacto significativo en la mejora de consumo.
 
 La segunda dimensión está estrechamente relacionada con el problema a
 ejecutar y el conocimiento que se tenga de él. Las decisiones que se pueden
-tomar varían desde decisiones de grano grueso, como por ejemplo considerar 
+tomar varían desde decisiones de grano grueso, como por ejemplo considerar
 el nivel de carga de trabajo de cada procesador y variar la frecuencia en
-función de dicho parámetro, hasta decisiones de grano más fino, por ejemplo 
+función de dicho parámetro, hasta decisiones de grano más fino, por ejemplo
 conocer el comportamiento de cada una de las tareas a ejecutar y el árbol
 de dependencias de antemano, y así tomar decisiones en función de estos
 parámetros. Por ejemplo, si una tarea es crítica, es posible aumentar la
-frecuencia del núcleo asociado para así liberar nuevas tareas cuanto antes; o si se
-sabe que la ejecución va a estar bloqueada hasta que no finalice una tarea
-en concreto, es posible disminuir la frecuencia del resto de núcleos hasta que
-esta tarea finalice, y así disminuir el consumo energético. Hay que
-destacar que aunque disminuir la frecuencia del procesador implique conseguir
-una potencia instantánea menor, esto no siempre implica que la energía final
-consumida sea también menor: al bajar la frecuencia, el tiempo
-empleado para finalizar la ejecución de una tarea puede aumentar lo
-suficiente para provocar un consumo de energía mayor global. Por tanto,
-cualquier decisión que afecte a la variación de frecuencia se debe considerar
-como un compromiso entre rendimiento y consumo energético; la clave aquí radica
-en optimizar dicho compromiso.
+frecuencia del núcleo asociado para así liberar nuevas tareas cuanto antes;
+o si se sabe que la ejecución va a estar bloqueada hasta que finalice una
+tarea en concreto, es posible disminuir la frecuencia del resto de núcleos
+hasta que esta tarea finalice, y así disminuir el consumo energético. Hay
+que destacar que aunque disminuir la frecuencia del procesador implique
+conseguir una potencia instantánea menor, esto no siempre implica que la
+energía final consumida sea también menor: al bajar la frecuencia, el
+tiempo empleado para finalizar la ejecución de una tarea puede aumentar lo
+suficiente para provocar un consumo de energía global mayor. Por tanto,
+cualquier decisión que afecte a la variación de frecuencia se debe
+considerar como un compromiso entre rendimiento y consumo energético; la
+clave aquí radica en optimizar dicho compromiso.
 
-Adicionalmente a estas dos dimensiones, los sistemas heterogéneos en general, y
-las arquitecturas asimétricas en particular, presentan una dimensión extra sobre
-la que tomar decisiones: {\em (c)}~decidir {\em sobre qué elementos de cálculo} aplicar
-el escalado de frecuencia. En el caso de las arquitecturas asimétricas,
-esta decisión se reduce a decidir si aplicar el escalado de frecuencias
-al cluster de núcleos \BIG, o al cluster de núcleos \LITTLE, dadas las limitaciones
-en la selección de frecuencias mencionadas en la Sección~\ref{sec:DVFS_BIGLITTLE}.
+Adicionalmente a estas dos dimensiones, los sistemas heterogéneos en
+general, y las arquitecturas asimétricas en particular, presentan una
+dimensión extra sobre la que tomar decisiones: {\em (c)}~decidir {\em sobre
+  qué elementos de cálculo} aplicar el escalado de frecuencia. En el caso
+de las arquitecturas asimétricas, esta decisión se reduce a decidir si
+aplicar el escalado de frecuencias al cluster de núcleos \BIG, o al cluster
+de núcleos \LITTLE, dadas las limitaciones en la selección de frecuencias
+mencionadas en la Sección~\ref{sec:DVFS_BIGLITTLE}.
+\comentario{Desde el principio del punto (donde dice política 2) hasta aquí debería ser la introducción a las políticas de escalado de frecuencia, es decir, justo antes de la política 1.}
+
 
 La primera intuición que surge al intentar aplicar un escalado de
 frecuencia sobre una arquitectura asimétrica es la de pensar que debido a
-la gran diferencia de rendimiento entre los cores \BIG y \LITTLE (como 
-muestra la Figura~\ref{fig:modelo_consumo}), aplicar una reducción de frecuencia a
-los núcleos \BIG puede suponer una pérdida significativa de rendimiento, lo
-cuál puede provocar incluso un aumento en el consumo energético al acarrear
-un mayor tiempo global de ejecución; es decir, esta técnica podría llegar a
-empeorar tanto el rendimiento como el consumo energético. Para evitar que
-suceda este hecho, las políticas P2 y P2' han sido diseñadas para modificar
-la frecuencia exclusivamente sobre el cluster de núcleos \LITTLE, con el fin de no causar
-gran impacto sobre el rendimiento global. Además, las políticas han sido
-desarrolladas sobre el planificador \botlev descrito en la
-sección~\ref{s3:botlev}, con el objetivo de asegurar que las
-tareas críticas se ejecutan en los núcleos \BIG y así evitar que estas
-retrasen su ejecución si se ejecutaran en un núcleo \LITTLE con la frecuencia
-disminuida.
+la gran diferencia de rendimiento entre los cores \BIG y \LITTLE (como
+muestra la Figura~\ref{fig:modelo_consumo}), aplicar una reducción de
+frecuencia a los núcleos \BIG puede suponer una pérdida significativa de
+rendimiento, lo cuál puede provocar incluso un aumento en el consumo
+energético al acarrear un mayor tiempo global de ejecución; es decir, esta
+técnica podría llegar a empeorar tanto el rendimiento como el consumo
+energético. Para evitar que suceda este hecho, las políticas P2 y P2' han
+sido diseñadas para modificar la frecuencia exclusivamente sobre el cluster
+de núcleos \LITTLE, con el fin de no causar gran impacto sobre el
+rendimiento global. Además, las políticas han sido desarrolladas sobre el
+planificador \botlev descrito en la sección~\ref{s3:botlev}, con el
+objetivo de asegurar que las tareas críticas se ejecutan en los núcleos
+\BIG y así evitar que estas retrasen su ejecución si se ejecutaran en un
+núcleo \LITTLE con la frecuencia disminuida.
 
-Para determinar cuándo variar la frecuencia del cluster, las políticas P2 y P2' tiene en cuenta
-el número de tareas listas para ser ejecutadas; así, si existen suficientes
-tareas listas para ser ejecutadas, la frecuencia será alta para 
-finalizar la ejecución cuanto antes, mientras que si existen pocas tareas
-listas para ser ejecutadas, la frecuencia será menor, intentando favorecer
-el ahorro energético. Este planteamiento es similar a tener en cuenta la
-carga de trabajo del sistema, pero medida en número de tareas pendientes en
-vez de ciclos ociosos/ocupados del procesador. Más concretamente, las
-políticas monitorizan el tamaño de la cola de tareas listas para ser
-ejecutadas, y determinan cuál es el tamaño máximo de la cola hasta el
-momento de manera dinámica. Si la cola posee un tamaño igual o superior al
-tamaño máximo conocido, significa que el número de tareas es elevado y por
-tanto la frecuencia debe ser elevada. Si el tamaño es menor, entonces se
-determina en que porcentaje es menor, y en función de las frecuencias
-consideradas se toma la decisión de modificar la frecuencia actual o no. 
+Para determinar cuándo variar la frecuencia del cluster, las políticas P2 y
+P2' tienen en cuenta el número de tareas listas para ser ejecutadas; así, si
+existen suficientes tareas listas para ser ejecutadas, la frecuencia será
+alta para finalizar la ejecución cuanto antes, mientras que si existen
+pocas tareas listas para ser ejecutadas, la frecuencia será menor,
+intentando favorecer el ahorro energético. Este planteamiento es similar a
+tener en cuenta la carga de trabajo del sistema, pero medida en número de
+tareas pendientes en vez de ciclos ociosos/ocupados del procesador. Más
+concretamente, las políticas monitorizan el tamaño de la cola de tareas
+listas para ser ejecutadas, y determinan cuál es el tamaño máximo de la
+cola hasta el momento de manera dinámica. Si la cola posee un tamaño igual
+o superior al tamaño máximo conocido, significa que el número de tareas es
+elevado y por tanto la frecuencia debe ser elevada. Si el tamaño es menor,
+entonces se determina en que porcentaje es menor, y en función de las
+frecuencias consideradas se toma la decisión de modificar la frecuencia
+actual o no.
 
 En el Listado~\ref{s5:fig:listing-p2} se muestra el pseudocódigo
 asociado a estas políticas. El bloque \texttt{if} de la
@@ -392,6 +404,7 @@ cluster, la política P2' solamente considera la frecuencia máxima y mínima
 del mismo.
 
 \subsubsection{Política P3}
+\comentario{Ajuste de carga de trabajo para big}
 
 La política P3 es similar a la política anterior P2, pero realizando el
 escalado de frecuencias sobre el cluster de núcleos \BIG en lugar de sobre los núcleos
@@ -428,7 +441,7 @@ de dimensión 512 en precisión simple.
 
 
 Como se puede observar en la gráfica, la ejecución se puede dividir en dos
-partes bien diferenciadas: una primera parte hasta que alcanza la cola el
+partes bien diferenciadas: una primera parte hasta que la cola alcanza el
 tamaño máximo, y una segunda parte en la que el número de tareas listas
 desciende constantemente. Estas dos partes están totalmente relacionadas
 con el grafo de dependencias de una factorización de Cholesky, donde existe
@@ -454,6 +467,7 @@ número de tareas produce que la frecuencia oscile entre 800MHz y 950MHz.
 \subsection[Basadas en planificación de tareas (P4, P5 y P6)]{Basadas en planificación de tareas}
 
 \subsubsection{Políticas P4 y P5}
+\comentario{Inhabilitación del cluster según la carga de trabajo}
 
 Las políticas descritas hasta el momento intentan obtener una mejora en el
 rendimiento energético a partir de un escalado de frecuencia en los
@@ -464,29 +478,31 @@ desarrollado prestando atención a la Figura~\ref{fig:modelo_consumo}, en la
 que se puede observar la disminución del consumo energético en función de
 la frecuencia. La siguiente idea que surge prestando atención a la misma
 figura consiste en disminuir el consumo al no utilizar algún cluster
-durante parte de la ejecución. Como se puede observar, el consumo energético
-es menor si el cluster presenta carga, independientemente de la frecuencia
-utilizada. Las siguientes políticas han sido diseñadas con el objetivo de
-que, en ciertos momentos de la ejecución, se evite asignar tareas a cierto
-cluster del sistema, modificando el planificador de tareas.
-Es decir, estas políticas no están orientadas a realizar técnicas de escalado
-de frecuencia, sino que tratan con el
-problema de planificación de tareas a los distintos \wts disponibles.
+durante parte de la ejecución. Como se puede observar, el consumo
+energético es menor si el cluster no presenta carga, independientemente de
+la frecuencia utilizada. Las siguientes políticas han sido diseñadas con el
+objetivo de que, en ciertos momentos de la ejecución, se evite asignar
+tareas a cierto cluster del sistema, modificando el planificador de tareas.
+Es decir, estas políticas no están orientadas a realizar técnicas de
+escalado de frecuencia, sino que tratan con el problema de planificación de
+tareas a los distintos \wts disponibles.
+\comentario{Este párrafo sería la introducción al 5.2.2}
 
 La política P4 monitoriza el tamaño de las colas de tareas listas y, en
-función del tamaño de la cola respecto al tamaño máximo (similar a la
-política P2 o P3), decide si asignar tareas listas al cluster de cores
-\LITTLE o por el contrario no hacerlo. En caso de que el tamaño de la cola 
-sea lo suficientemente pequeño, la política no asigna ninguna tarea lista al cluster, provocando
-que este se encuentre ocioso. Cabe destacar que, aunque el planificador
-no asigne tareas al cluster, esto no implica que el sistema operativo no
-ejecute procesos sobre él; aún así, según se ha observado, el impacto final 
-sobre el consumo energético es mínimo comparado con el de ejecutar una tarea.
+función del tamaño de la cola respecto al tamaño máximo (similar a las
+políticas P2 o P3), decide si asignar tareas listas al cluster de cores
+\LITTLE o por el contrario no hacerlo. En caso de que el tamaño de la cola
+sea lo suficientemente pequeño, la política no asigna ninguna tarea lista
+al cluster, provocando que éste se encuentre ocioso. Cabe destacar que,
+aunque el planificador no asigne tareas al cluster, esto no implica que el
+sistema operativo no ejecute procesos sobre él; aún así, según se ha
+observado, el impacto final sobre el consumo energético es mínimo comparado
+con el de ejecutar una tarea.
 
 Para realizar este proceso, cada vez que una tarea se inserta en la cola de
 tareas listas o es extraída de ésta, se compara el tamaño actual de la cola
 con el tamaño máximo conocido hasta el momento, y se decide si se debe
-utilizar el cluster o no para ejecutar tareas. Una vez que un \wt
+o no utilizar el cluster para ejecutar tareas. Una vez que un \wt
 finaliza la ejecución de una tarea, éste solicita una nueva tarea a
 ejecutar al planificador. Si el \wt se ejecuta sobre un núcleo del cluster
 \LITTLE, y se ha decidido que el cluster no ejecute ninguna acción, al \wt
@@ -495,17 +511,18 @@ en ese core asociado al \wt y perteneciente al cluster inhabilitado. En
 caso de que el cluster no se encuentre desactivado se asigna la siguiente
 tarea de la cola de tareas listas para que la ejecute el \wt.
 
-Para que esta política funcione correctamente, es necesario que se verifiquen algunas
-condiciones cuando se ejecute el problema:
+Para que esta política funcione correctamente, es necesario que se
+verifiquen algunas condiciones cuando se ejecute la aplicación sobre el
+\emph{runtime}:
 
 \begin{itemize}
-\item El número de \wts lanzados debe coincidir con el número de núcleos del
-  SoC. En caso de que el número de \wts sea superior, varios \wts
-  competirían por ejecutarse simultáneamente en el mismo núcleo. De manera
+\item El número de \wts lanzados debe coincidir con el número de núcleos
+  del SoC. En el caso en el que el número de \wts es superior, varios \wts
+  compiten por ejecutarse simultáneamente en el mismo núcleo. De manera
   contraria, si el número de \wts es menor que el número de núcleos, se
-  estarían desaprovechando recursos ya que no se utilizarían todos los
-  núcleos de manera simultánea. En \nanos esto se consigue mediante el
-  argumento \texttt{--smp-workers=<n>}.
+  está desaprovechando recursos ya que no se utilizan todos los núcleos de
+  manera simultánea. En \nanos esto se consigue mediante el argumento
+  \texttt{--smp-workers=<n>}.
 \item Cada \wt debe estar asignado a un núcleo único de la placa,
   provocando que un \wt siempre ejecute tareas en el mismo núcleo durante
   todo el problema. Esta condición unida a la anterior implica que existe
@@ -513,19 +530,20 @@ condiciones cuando se ejecute el problema:
   \emph{runtime}.
 \item Aunque se tenga control sobre qué tarea se ejecuta en qué \wt (y por
   tanto en qué núcleo), existen ciertas tareas pertenecientes al propio
-  \emph{runtime} o al código no paralelo del programa sobre el que no se
+  \emph{runtime} o al código no paralelo del programa sobre las que no se
   puede tomar decisiones desde el planificador, siendo normal que este
   código se ejecute sobre el \wt principal, normalmente ejecutado sobre el
   núcleo 0 de la máquina.
 \end{itemize}
 
 
-En las políticas anteriores, donde se disponía un número limitado de
-frecuencias, el punto en el que cambiar la frecuencia venía determinado a
-la hora de repartir por igual el tamaño máximo de la cola entre todas las
-frecuencias disponibles. Para dar mayor flexibilidad a esta política, el
-punto en el que tomar la decisión de apagar el cluster viene determinado
-por una variable de entorno elegida por el usuario a la hora de lanzar el
+En las políticas anteriores, donde se disponía de un número limitado de
+frecuencias, el momento en el que aplicar el cambio de frecuencia viene
+determinado por el número de frecuencias posibles para el cluster,
+repartiendo el número máximo de tareas listas de manera equitativa entre
+todas ellas. Para dar mayor flexibilidad a esta política, el punto en el
+que tomar la decisión de apagar el cluster viene determinado por una
+variable de entorno elegida por el usuario a la hora de lanzar el
 experimento. Esto permite observar el comportamiento variando el momento en
 el que se desactiva el cluster, como se describe en la siguiente
 sección. Además, para evitar efectos rebote, en los que el cluster se esté
@@ -569,36 +587,38 @@ bool CoresCfg::puedoEjecutar(int coreId){
 
 
 La política P5 realiza el mismo procedimiento, pero para el cluster de
-núcleos \BIG. Ambas políticas están implementadas sobre el planificador \botlev
-para así asegurar que la ejecución de tareas críticas siguen siendo en
-núcleos \BIG. Sin embargo, al desactivar los núcleos \BIG, hay que tener en cuenta
-que es necesario que las tareas críticas se ejecuten ahora en núcleos \LITTLE si los
-\BIG no están disponibles para que la ejecución no se quede bloqueada por
-las tareas críticas (la opción \texttt{--steal=1} en \botlev activa el {\em work-stealing}
-en \nanos).
+núcleos \BIG. Ambas políticas están implementadas sobre el planificador
+\botlev para así asegurar que la ejecución de tareas críticas sigue siendo
+en núcleos \BIG. Sin embargo, al desactivar los núcleos \BIG, hay que tener
+en cuenta que es necesario que las tareas críticas se ejecuten ahora en
+núcleos \LITTLE si los \BIG no están disponibles para que la ejecución no
+se quede bloqueada por las tareas críticas (la opción \texttt{--steal=1} en
+\botlev activa el {\em work-stealing} en \nanos).
 
-La Figura~\ref{fig:P4-evo} muestra un ejemplo de esta política para la
-ejecución de una factorización de Cholesky. La gráfica superior muestra la
-ejecución de las diferentes tareas por los distintos \wts, cada uno
-asignado a un núcleo distinto en orden de aparición. La ejecución ha sido
-realizada sobre la plataforma \juno, por lo que los 4 primeros núcleos
-corresponden a núcleos \LITTLE, mientras que los dos siguientes a núcleos
-\big. La segunda gráfica muestra la evolución del tamaño de las colas en
-función del tiempo. Como se puede observar, la ejecución de las tareas se
-realiza de manera convencional hasta que el tamaño de la cola decrece por debajo
-del 25\% del tamaño máximo (en este caso, el experimento se configuró con este valor
-con fines meramente ilustrativos). En ese momento, los núcleos \LITTLE dejan de recibir tareas mientras que los \BIG
-continúan su ejecución habitual. Una vez que el número de tareas vuelve a
-incrementarse, los cores lentos vuelven a activarse y a ejecutar tareas,
-hasta que al final de la ejecución el tamaño de la cola vuelve a decrecer
-y el cluster se desactiva hasta finalizar la ejecución. Aunque el primer
-\wt está asociado a un núcleo \LITTLE, también es considerado como el \wt
-principal del planificador, por lo que es el encargado de ejecutar la parte
-del código no paralela (en color verde). La mayor parte del tiempo que se
-encuentra ejecutando este código corresponde a tareas del propio
-planificador, o a la espera de que finalice la ejecución paralela (marcada
-por una etiqueta \texttt{\#pragma omp taskwait} en el código secuencial),
-por lo que el impacto final sobre el consumo energético no es significativo.
+La Figura~\ref{fig:P4-evo} muestra un ejemplo de esta política aplicada
+sobre el cluster de núcleos LITTLE sobre una factorización de Cholesky. La
+gráfica superior muestra la ejecución de las diferentes tareas por los
+distintos \wts, cada uno asignado a un núcleo distinto en orden de
+aparición. La ejecución ha sido realizada sobre la plataforma \juno, por lo
+que los 4 primeros núcleos corresponden a núcleos \LITTLE, mientras que los
+dos siguientes a núcleos \BIG. La segunda gráfica muestra la evolución del
+tamaño de las colas en función del tiempo. Como se puede observar, la
+ejecución de las tareas se realiza de manera convencional hasta que el
+tamaño de la cola decrece por debajo del 25\% del tamaño máximo (en este
+caso, el experimento se configuró con este valor con fines meramente
+ilustrativos). En ese momento, los núcleos \LITTLE dejan de recibir tareas
+mientras que los \BIG continúan su ejecución habitual. Una vez que el
+número de tareas vuelve a incrementarse, los cores lentos vuelven a
+activarse y a ejecutar tareas, hasta que al final de la ejecución el tamaño
+de la cola vuelve a decrecer y el cluster se desactiva hasta finalizar la
+ejecución. Aunque el primer \wt está asociado a un núcleo \LITTLE, también
+es considerado como el \wt principal del planificador, por lo que es el
+encargado de ejecutar la parte del código no paralela (en color verde). La
+mayor parte del tiempo que se encuentra ejecutando este código corresponde
+a tareas del propio planificador, o a la espera de que finalice la
+ejecución paralela (marcada por una etiqueta \texttt{\#pragma omp taskwait}
+en el código secuencial), por lo que el impacto final sobre el consumo
+energético no es significativo.
 
 \begin{figure}
   \centering
@@ -644,35 +664,38 @@ por lo que el impacto final sobre el consumo energético no es significativo.
 
 \subsubsection{Política P6}
 \label{sec:p6}
+\comentario{desactivación de núcleos}
 
 Una de las muchas funcionalidades que ofrece el kernel Linux es la de poder
-activar y desactivar núcleos bajo demanda y de manera dinámica. En cualquier
-momento de la ejecución, un núcleo puede ser desactivado, y este desaparece
-del sistema, siendo totalmente transparente para cualquier aplicación en
-ejecución. Esto implica que si se decide apagar un núcleo, todos los procesos
-asociados a ese núcleo son migrados a otro de manera totalmente
-transparente al proceso en ejecución, el número total de cores disminuye y
-cualquier llamada a una función del kernel considerará la nueva
+activar y desactivar núcleos bajo demanda y de manera dinámica. En
+cualquier momento de la ejecución, un núcleo puede ser desactivado, y este
+desaparece del sistema, siendo totalmente transparente para cualquier
+aplicación en ejecución. Esto implica que si se decide apagar un núcleo,
+todos los procesos asociados a ese núcleo son migrados a otro de manera
+totalmente transparente al proceso en ejecución, el número total de cores
+disminuye y cualquier llamada a una función del kernel considerará la nueva
 configuración hardware creada como la configuración real de la
 máquina. Esta funcionalidad permite, por ejemplo, generar dinámicamente
 arquitecturas diferentes utilizando el mismo hardware.
 
 Esta funcionalidad aplicada a una arquitectura big.LITTLE teóricamente
-conlleva que en cualquier momento de la ejecución se pueda desactivar
-uno de los dos cluster de la máquina, convirtiendo la arquitectura en una
-plataforma totalmente simétrica \footnote{En la práctica, no todas las versiones
-del kernel permiten apagar el núcleo 0, por lo que en estos casos, no es posible apagar el
-completametne el cluster que contiene a este núcleo}.
+conlleva que en cualquier momento de la ejecución se pueda desactivar uno
+de los dos cluster de la máquina, convirtiendo la arquitectura en una
+plataforma totalmente simétrica \footnote{En la práctica, no todas las
+  versiones del kernel permiten apagar el núcleo 0, por lo que en estos
+  casos, no es posible apagar el completametne el cluster que contiene a
+  este núcleo}.
 
-Para realizar un estudio del efecto del apagado selectivo de núcleos sobre el
-consumo energético, se ha realizado el experimento de desactivar, uno a uno,
-los núcleos de un mismo cluster mientras se monitoriza el consumo. Además, para
-evitar errores en las medidas, se ha establecido un tiempo de espera entre
-apagado de dos núcleos, y adicionalmente se ha ejecutado el test de carga asociado a
-un núcleo que no se fuera a apagar, evitando así problemas al migrar el
-proceso de un núcleo a otro. La Figura~\ref{s5:fig:apagadoCores} muestra las
-mediciones del consumo energético en las dos plataformas: 
-\juno (gráfica superior) y \odroid (gráfica inferior).
+Para realizar un estudio del efecto del apagado selectivo de núcleos sobre
+el consumo energético, se ha realizado el experimento de desactivar, uno a
+uno, los núcleos de un mismo cluster mientras se monitoriza el
+consumo. Además, para evitar errores en las medidas, se ha establecido un
+tiempo de espera entre apagado de dos núcleos, y adicionalmente se ha
+ejecutado el test asociado a un núcleo que no se fuera a apagar, evitando
+así problemas al migrar el proceso de un núcleo a otro. La
+Figura~\ref{s5:fig:apagadoCores} muestra las mediciones del consumo
+energético en las dos plataformas: \juno (gráfica superior) y \odroid
+(gráfica inferior).
 
 \begin{figure}
   \centering
@@ -696,26 +719,26 @@ mediciones del consumo energético en las dos plataformas:
   \caption[Consumo energético en función del número de cores activos en
   cada cluster]{Consumo energético en reposo en función del número de núcleos
     activos del sistema y de la plataforma. La versión del kernel Linux
-    instalada en la plataforma \odroid no permite apagar los el cluster
+    instalada en la plataforma \odroid no permite apagar el cluster
     \LITTLE de manera completa.}
   \label{s5:fig:apagadoCores}
 \end{figure}
 
-Las gráficas muestran la potencia instantánea observada (en Watios) durante todo el
-experimento en el eje vertical, mientras que el eje horizontal corresponde
-a las distintas fases por las que ha ido pasando el experimento. Por cada
-plataforma, la gráfica superior muestra el experimento apagando los cores
-del cluster \BIG, indicándose en el eje x el número de núcleos activos del
-cluster en cada momento; la gráfica inferior muestra el mismo
-experimento para el cluster \LITTLE. La diferencia de aspecto entre las
-gráficas de ambas plataformas se produce por la forma en la que se han
-realizado las medidas: mientras que en la plataforma \odroid los medidores
-poseen una frecuencia de muestreo máxima de 4 muestras por segundo (y por
-eso el aspecto \emph{lineal} de la gráfica), el entorno de medición de la
-plataforma \juno permite una mayor frecuencia de muestreo, por lo que la
-gráfica presenta un mayor ruido (esta es la causa de que la gráfica no
-presente una forma de línea, sino que los valores oscilan por encima y
-debajo del valor medio real).
+Las gráficas muestran la potencia instantánea observada (en Watios) durante
+todo el experimento en el eje vertical, mientras que el eje horizontal
+corresponde a las distintas fases por las que ha ido pasando el
+experimento. Por cada plataforma, la gráfica superior muestra el
+experimento apagando los cores del cluster \BIG, indicándose en el eje x el
+número de núcleos activos del cluster en cada momento; la gráfica inferior
+muestra el mismo experimento para el cluster \LITTLE. La diferencia de
+aspecto entre las gráficas de ambas plataformas se produce por la forma en
+la que se han realizado las medidas: mientras que en la plataforma \odroid
+los medidores poseen una frecuencia de muestreo máxima de 4 muestras por
+segundo (y por eso el aspecto \emph{lineal} de la gráfica), el entorno de
+medición de la plataforma \juno permite una mayor frecuencia de muestreo,
+por lo que la gráfica presenta un mayor ruido (esta es la causa de que la
+gráfica no presente una forma de línea, sino que los valores oscilan por
+encima y debajo del valor medio real).
 
 Observando los resultados de las gráficas se pueden extraer las siguientes
 conclusiones:
