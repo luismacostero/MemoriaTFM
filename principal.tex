@@ -41,8 +41,8 @@
 % |                                                                    |
 % +--------------------------------------------------------------------+
 
-\documentclass[final, 12pt, oneside, a4paper]{class_diss}
-%\documentclass[final, 12pt, twoside, openright]{class_diss}
+%\documentclass[final, 12pt, oneside, a4paper]{class_diss}
+\documentclass[final, 12pt, twoside]{class_diss}
 
 % +--------------------------------------------------------------------+
 % | The following command sets the bibliography style to American
@@ -92,7 +92,7 @@
 \usepackage{listings}
 \usepackage{tikz}
 \usepackage{collcell}
-
+\usepackage{emptypage}
 
 \lstset{language=C++,
   basicstyle=\footnotesize\ttfamily,
@@ -168,10 +168,13 @@
 % | Page margins are set on 1 inch on all sides.                       |
 % +--------------------------------------------------------------------+
 
+
 \topmargin      = -0.56in
 \textheight     =  8.60in
 \textwidth      =  6.46in
 \oddsidemargin  =  0.02in
+\evensidemargin  =  0.02in
+
 
 
 
@@ -229,7 +232,7 @@
 \begin{document}
 
 
-  \setcounter{page}{-1}
+  \setcounter{page}{-5}
 
 
 % +--------------------------------------------------------------------+
@@ -254,8 +257,8 @@
 % | or delete the following 3 lines.
 % +--------------------------------------------------------------------+
 
-\input{dedicatoria.tex}
-\phantomsection
+%\input{dedicatoria.tex}
+%\phantomsection
 %\addcontentsline{toc}{chapter}{Dedicatoria}
 
    % +--------------------------------------------------------------------+
@@ -275,7 +278,7 @@
 % +--------------------------------------------------------------------+
 
 %\thispagestyle{empty} Looks like it's ok to remove this line
-\newpage
+\cleardoublepage
 \pagenumbering{roman}
 
 % +--------------------------------------------------------------------+
@@ -319,14 +322,14 @@
 %\hfill  Are these lines necessary?
 %\hfill
 
-   \input{resumen.tex}
-   \addcontentsline{toc}{chapter}{Resumen}
-   \pdfbookmark[0]{Resumen}{PDFResumenPage}
+\input{resumen.tex}
+\addcontentsline{toc}{chapter}{Resumen}
+\pdfbookmark[0]{Resumen}{PDFResumenPage}
 
-    \input{abstract.tex}
-       \addcontentsline{toc}{chapter}{Abstract}
-       \pdfbookmark[0]{Abstract}{PDFAbstractPage}
-    \vfill
+\input{abstract.tex}
+\addcontentsline{toc}{chapter}{Abstract}
+\pdfbookmark[0]{Abstract}{PDFAbstractPage}
+\vfill
     
     
 
@@ -402,7 +405,7 @@
 % | file appendixX.tex for each appendix.                                 |
 % +--------------------------------------------------------------------+
 
-\appendix
-\input{appendixA.tex}
+%\appendix
+%\input{appendixA.tex}
 
 \end{document}
