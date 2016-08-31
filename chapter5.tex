@@ -5,21 +5,34 @@
 
 \section{Descripción de la estrategia de optimización}
 
-Este capítulo presenta, a partir de un planificador consciente de la
-asimetría (\botlev), distintas técnicas que buscan una mejora de la
-eficiencia energética sobre este tipo arquitecturas. Para ello, se
-presentan dos grandes conjuntos de técnicas, un primer conjunto basado en
-técnicas de escalado de frecuencia (DVFS), y un segundo grupo formado
-por técnicas basadas en la planificación de tareas.
+Las arquitecturas asimétricas permiten optimizar la eficiencia energética
+asignando las tareas a núcleos de distintas características en función de
+los requisitos de rendimiento y consumo de cada tarea. Pero además, la
+arquitectura permite ajustar el rendimiento y consumo de cada núcleo
+utilizando las técnicas de escalado de frecuencia que se encuentran
+disponibles en los procesadores modernos.
 
-\comentario{revisar este párrafo} Para ello, en primer lugar se describen
-los mecanismos disponibles para realizar el escalado de frecuencia en este
-tipo de arquitecturas, y un breve estudio del rendimiento y eficiencia
-energética de las soluciones actuales. A continuación se describen con
-detalle las distintas políticas que se han desarrollado y las
-modificaciones introducidas en el planificador, y finalmente los
-experimentos realizados y sus resultados comparados con un planificador
-consciente de la asimetría.
+Los planificadores de tareas utilizados en la actualidad no realizan este
+tipo de optimizaciones energéticas. Por eso, en este capítulo se presentan
+las modificaciones realizadas al planificador consciente de la asimetría
+\botlev, ya presentado en capítulos anteriores, para incluir en el mismo
+diversas técnicas de mejora de eficiencia energética.
+
+% Este capítulo presenta, a partir de un planificador consciente de la
+% asimetría (\botlev), distintas técnicas que buscan una mejora de la
+% eficiencia energética sobre este tipo arquitecturas. Para ello, se
+% presentan dos grandes conjuntos de técnicas, un primer conjunto basado en
+% técnicas de escalado de frecuencia (DVFS), y un segundo grupo formado
+% por técnicas basadas en la planificación de tareas.
+
+% \comentario{revisar este párrafo} Para ello, en primer lugar se describen
+% los mecanismos disponibles para realizar el escalado de frecuencia en este
+% tipo de arquitecturas, y un breve estudio del rendimiento y eficiencia
+% energética de las soluciones actuales. A continuación se describen con
+% detalle las distintas políticas que se han desarrollado y las
+% modificaciones introducidas en el planificador, y finalmente los
+% experimentos realizados y sus resultados comparados con un planificador
+% consciente de la asimetría.
 
 
 \subsection{DVFS sobre la arquitectura big.LITTLE}
@@ -1245,7 +1258,7 @@ desactivar el cluster \BIG supone un consumo cercano a cero, las medidas
 para la potencia instantánea son muy inferiores a las obtenidas provocando
 que los cores estuvieran \emph{idle} pero sin llegar a
 desactivarlos. Combinando estos dos resultados se obtiene el rendimiento
-energético mostrado en la tabla~\ref{tab:mejora-gflops-p6}. Como se puede
+energético mostrado en la tabla~\ref{tab:mejora-gflopsw-p6}. Como se puede
 apreciar, la mejora en el consumo de potencia es superior a la pérdida de
 rendimiento, consiguiendo ganancias en el rendimiento energético, haciendo
 a esta política una solución válida para obtener una mejora de rendimiento
