@@ -5,3 +5,63 @@
 
 \section{Conclusiones y trabajo futuro}
 
+En este trabajo se han desarrollado un conjunto de técnicas sobre
+arquitecturas asimétricas, y en especial para los procesadores big.LITTLE
+diseñados por ARM, que buscan obtener una mejora en el rendimiento de la
+aplicación o en la eficiencia energética de la plataforma.
+
+
+A través de la librería BLIS diseñada para arquitecturas asimétricas, se ha
+demostrado como se puede obtener un mejor rendimiento sin necesidad de
+adaptar el código del problema a la arquitectura, o introducir cambios
+específicos en el planificador. Esta propuesta permite reutilizar los
+\emph{runtimes} convencionales (y todas las técnicas desarrolladas durante
+los últimos años) sobre las nuevas arquitecturas asimétricas con el único
+coste de tener que implementar librerías asimétricas para la ejecución del
+problema. Los experimentos realizados han demostrado que esta solución es
+totalmente comparable con un planificador consciente de la asimetría de la
+plataforma, incluso llegando a obtener mejores resultados en el rendimiento
+de la aplicación. Esta técnica ha sido presentada en \emph{``The Sixth
+  International Workshop on Accelerators and Hybrid Exascale Systems
+  (AsHES)''}, a través del artículo~\cite{ashes} mostrado en la
+bibliografía.
+
+
+Buscando la mejora de la eficiencia energética, se han desarrollado una
+serie de políticas integradas sobre un planificador consciente de la
+asimetría, basadas tanto en técnicas de escalado de frecuencia (DVFS) como
+en técnicas de planificación, tomando las decisiones de forma dinámica en
+función del número de tareas listas para ser ejecutadas en cada momento. El
+primer conjunto de experimentos realizados muestran como,
+independientemente de las dos plataformas sobre las que se han ejecutado
+los experimentos, aplicar técnicas de escalado de frecuencia sobre el
+cluster de núcleos big obtiene una mejora en el rendimiento energético
+significativa frente a un planificador normal consciente de la
+asimetría.\\
+De igual manera, el segundo conjunto de experimentos revela como en
+aquellos procesadores que permiten desactivar un cluster a nivel
+\emph{hardware}, apagarlo en ciertos momentos de la ejecución cuando el
+nivel de tareas listas es lo suficientemente bajo permite obtener una
+mejora de rendimiento energético reduciendo la potencia instantánea media
+consumida drásticamente. También se ha puesto de manifiesto como, en los
+procesadores que no soportan un apagado del cluster a nivel físico, una
+política de planificación de tareas que no asigne tareas a ese cluster
+obtiene los mismos resultados de eficiencia energética que el planificador
+normal consciente de la asimetría.
+
+
+Como trabajo futuro, se considera realizar los experimentos sobre un
+conjunto de problemas de interés científico mayor, así como sobre otras
+arquitecturas donde el número de núcleos big y LITTLE se encuentre más
+desequilibrado. Adicionalmente, se considera desarrollar políticas que
+tomen decisiones de manera dinámica en base al problema ejecutado y su DAG
+correspondiente, así como a resultados parciales tomados durante la
+ejecución de las distintas tareas previas del problema.
+
+
+
+%-- Configuraciones para emacs --
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "./principal.tex"
+%%% End:
