@@ -10,23 +10,22 @@ arquitecturas asimétricas, y en especial para los procesadores big.LITTLE
 diseñados por ARM, que buscan obtener mejoras tanto en el rendimiento de las
 aplicaciones como en la eficiencia energética de la plataforma.
 
-En base a un paradigma basado en la extracción de paralelismo a nivel de tareas
-en tiempo de ejecución, y 
-a través de una versión de la biblioteca BLIS adaptada a arquitecturas asimétricas, 
-y basándose en un planificador de tareas convencional, se ha
-demostrado como es posible obtener un mejor rendimiento sin necesidad de
-adaptar el código del problema a la arquitectura, o introducir cambios
-específicos en el planificador. Esta propuesta permite reutilizar los
-\emph{runtimes} convencionales (y todas las técnicas desarrolladas durante
-los últimos años) sobre las nuevas arquitecturas asimétricas con el único
-coste de la implementación de versiones asimétricas de cada tarea.
-Los experimentos realizados han demostrado que esta solución es
-totalmente comparable con un planificador consciente de la asimetría de la
-plataforma, incluso llegando a obtener mejores resultados en el rendimiento
-de la aplicación. Esta técnica ha sido presentada en \emph{``The Sixth
-  International Workshop on Accelerators and Hybrid Exascale Systems
-  (AsHES)''}, a través del artículo~\cite{ashes} mostrado en la
-bibliografía.
+En base a un paradigma basado en la extracción de paralelismo a nivel de
+tareas en tiempo de ejecución, y a través de una versión de la biblioteca
+BLIS adaptada a arquitecturas asimétricas, y basándose en un planificador
+de tareas convencional, se ha demostrado como es posible obtener un mejor
+rendimiento sin necesidad de adaptar el código del problema a la
+arquitectura, o introducir cambios específicos en el planificador. Esta
+propuesta permite reutilizar los \emph{runtimes} convencionales (y todas
+las técnicas desarrolladas durante los últimos años) sobre las nuevas
+arquitecturas asimétricas con el único coste de la implementación de
+versiones asimétricas de cada rutina de la librería.  Los experimentos
+realizados han demostrado que esta solución es totalmente comparable con un
+planificador consciente de la asimetría de la plataforma, incluso llegando
+a obtener mejores resultados en el rendimiento de la aplicación. Esta
+técnica ha sido presentada en \emph{``The Sixth International Workshop on
+  Accelerators and Hybrid Exascale Systems (AsHES)''}, a través del
+artículo~\cite{ashes} mostrado en la bibliografía.
 
 Buscando la mejora de la eficiencia energética, se han desarrollado una
 serie de políticas integradas sobre un planificador consciente de la
@@ -53,7 +52,7 @@ normal consciente de la asimetría.
 
 
 Como trabajo futuro, se considera realizar los experimentos sobre un
-conjunto de problemas de interés científico mayor, así como sobre otras
+conjunto mayor de problemas de interés científico, así como sobre otras
 arquitecturas donde el número de núcleos big y LITTLE se encuentre más
 desequilibrado. Adicionalmente, se considera desarrollar políticas que
 tomen decisiones de manera dinámica en base al problema ejecutado y su DAG

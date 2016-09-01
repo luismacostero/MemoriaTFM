@@ -66,15 +66,15 @@ existentes pueden ser aplicadas directamente en este tipo de arquitecturas,
 éstas exponen nuevos retos y problemáticas que hay que abordar. Este
 trabajo se centra en dos de estos retos:
 \begin{itemize}
-\item Integración y combinación de bibliotecas específicas conscientes de la asimetría en
-  con \emph{runtimes} convencionales (no conscientes de la
+\item Integración y combinación de bibliotecas específicas conscientes de
+  la asimetría con \emph{runtimes} convencionales (no conscientes de la
   asimetría), y comparativa de este enfoque con un diseño de \emph{runtime}
   sí consciente con la asimetría de la arquitectura.
 
 \item Diseño de técnicas de reducción de consumo energético. Aplicación de
   técnicas de escalado dinámico de frecuencia (DVFS) o desactivación de
   núcleos en distintas fases de la ejecución de una determinada aplicación,
-  en función de la demandas de cómputo y grado de paralelismo disponible, y
+  en función de las demandas de cómputo y grado de paralelismo disponible, y
   evaluación del impacto de este tipo de técnicas en el tiempo de ejecución
   y consumo energético global.
 \end{itemize}
@@ -90,24 +90,24 @@ abordado las siguientes tareas específicas:
   aplicación.
 \item Estudio, análisis y evaluación del rendimiento de familias de
   bibliotecas y planificadores de tareas en tiempo de ejecución no
-  conscientes con la asimetría de la arquitectura, así como soluciones ya
-  adaptadas a esta familia de arquitecturas. En el ámbito del álgebra lineal,
-		utilizado como hilo conductor del trabajo, se ha utilizado la
-		biblioteca BLIS~\cite{BLIS1}.
-\item Integración de las anteriores bibliotecas sobre
-  \emph{runtimes} no conscientes de la asimetría ya existentes, para explotar de forma transparente la asimetría de las 
-		arquitecturas sin modificaciones en los planificadores, para un
-		conjunto de operaciones matemáticas de interés.
+  conscientes de la asimetría de la arquitectura, así como soluciones ya
+  adaptadas a esta familia de arquitecturas. En el ámbito del álgebra
+  lineal, utilizado como hilo conductor del trabajo, se ha utilizado la
+  biblioteca BLIS~\cite{BLIS1}.
+\item Integración de las anteriores bibliotecas sobre \emph{runtimes} no
+  conscientes de la asimetría ya existentes, para explotar de forma
+  transparente la asimetría de las arquitecturas sin modificaciones en los
+  planificadores, para un conjunto de operaciones matemáticas de interés.
 \item Diseño de heurísticas, políticas de asignación de recursos y
   explotación de los modos de bajo consumo proporcionados por las
   arquitecturas, que permitan un aprovechamiento óptimo de los recursos a
   nivel del planificador de tareas en \emph{runtimes} existentes, con el
-  objetivo de explotar de manera energéticamente eficiente todos los todos
-  los recursos computacionales existentes.
+  objetivo de explotar de manera energéticamente eficiente todos los
+  recursos computacionales existentes.
 \item Evaluación del rendimiento y eficiencia energética de las nuevas
-  librerías y políticas desarrolladas. Comparación de los resultados con
-  soluciones actuales, tanto conscientes como no conscientes de la
-  asimetría de la arquitectura.
+  políticas desarrolladas. Comparación de los resultados con soluciones
+  actuales, tanto conscientes como no conscientes de la asimetría de la
+  arquitectura.
 \end{enumerate}
 
 \section{Estructura del documento}

@@ -230,7 +230,7 @@
 % +--------------------------------------------------------------------+
 
 \begin{document}
-
+\renewcommand{\listtablename}{Índice de tablas}
 
   \setcounter{page}{-5}
 
@@ -310,14 +310,37 @@
 % +--------------------------------------------------------------------+
 
 
+\newcommand*{\BeginNoToc}{%
+  \addtocontents{toc}{%
+    \edef\protect\SavedTocDepth{\protect\the\protect\value{tocdepth}}%
+  }%
+  \addtocontents{toc}{%
+    \protect\setcounter{tocdepth}{-10}%
+  }%
+}
+\newcommand*{\EndNoToc}{%
+  \addtocontents{toc}{%
+    \protect\setcounter{tocdepth}{\protect\SavedTocDepth}%
+  }%
+}
+
+
 
 \phantomsection
 \addcontentsline{toc}{chapter}{Índice}
 
 \tableofcontents
+\cleardoublepage
 \listoffigures
+\BeginNoToc
+\cleardoublepage
 \listoftables
+\EndNoToc
+\addcontentsline{toc}{chapter}{Índice de tablas}
+
+\cleardoublepage
 \lstlistoflistings
+\addcontentsline{toc}{chapter}{Índice de listados}
 
 %\hfill  Are these lines necessary?
 %\hfill
@@ -344,7 +367,6 @@
 % | and other general style issues that we've defined globally.        |
 % +--------------------------------------------------------------------+
 
-\newpage
 \pagenumbering{arabic}
 \setcounter{page}{1}
 
