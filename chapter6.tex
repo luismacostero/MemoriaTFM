@@ -7,25 +7,26 @@
 
 En este trabajo se han desarrollado un conjunto de técnicas sobre
 arquitecturas asimétricas, y en especial para los procesadores big.LITTLE
-diseñados por ARM, que buscan obtener una mejora en el rendimiento de la
-aplicación o en la eficiencia energética de la plataforma.
+diseñados por ARM, que buscan obtener mejoras tanto en el rendimiento de las
+aplicaciones como en la eficiencia energética de la plataforma.
 
-
-A través de la librería BLIS diseñada para arquitecturas asimétricas, se ha
-demostrado como se puede obtener un mejor rendimiento sin necesidad de
+En base a un paradigma basado en la extracción de paralelismo a nivel de tareas
+en tiempo de ejecución, y 
+a través de una versión de la biblioteca BLIS adaptada a arquitecturas asimétricas, 
+y basándose en un planificador de tareas convencional, se ha
+demostrado como es posible obtener un mejor rendimiento sin necesidad de
 adaptar el código del problema a la arquitectura, o introducir cambios
 específicos en el planificador. Esta propuesta permite reutilizar los
 \emph{runtimes} convencionales (y todas las técnicas desarrolladas durante
 los últimos años) sobre las nuevas arquitecturas asimétricas con el único
-coste de tener que implementar librerías asimétricas para la ejecución del
-problema. Los experimentos realizados han demostrado que esta solución es
+coste de la implementación de versiones asimétricas de cada tarea.
+Los experimentos realizados han demostrado que esta solución es
 totalmente comparable con un planificador consciente de la asimetría de la
 plataforma, incluso llegando a obtener mejores resultados en el rendimiento
 de la aplicación. Esta técnica ha sido presentada en \emph{``The Sixth
   International Workshop on Accelerators and Hybrid Exascale Systems
   (AsHES)''}, a través del artículo~\cite{ashes} mostrado en la
 bibliografía.
-
 
 Buscando la mejora de la eficiencia energética, se han desarrollado una
 serie de políticas integradas sobre un planificador consciente de la
@@ -35,11 +36,12 @@ función del número de tareas listas para ser ejecutadas en cada momento. El
 primer conjunto de experimentos realizados muestran como,
 independientemente de las dos plataformas sobre las que se han ejecutado
 los experimentos, aplicar técnicas de escalado de frecuencia sobre el
-cluster de núcleos big obtiene una mejora en el rendimiento energético
-significativa frente a un planificador normal consciente de la
-asimetría.\\
+cluster de núcleos \BIG obtiene una mejora en el rendimiento energético
+significativa frente a un planificador convencional consciente de la
+asimetría sin ninguna política de ahorro energético integrada.
+
 De igual manera, el segundo conjunto de experimentos revela como en
-aquellos procesadores que permiten desactivar un cluster a nivel
+aquellos procesadores que permiten desactivar un cluster completo a nivel
 \emph{hardware}, apagarlo en ciertos momentos de la ejecución cuando el
 nivel de tareas listas es lo suficientemente bajo permite obtener una
 mejora de rendimiento energético reduciendo la potencia instantánea media
