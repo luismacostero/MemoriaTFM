@@ -137,21 +137,71 @@ para motivar el trabajo.}
 
 
 \section{Políticas de reducción de consumo}
-En esta sección se detallan las diversas políticas desarrolladas para 
+En esta sección se detallan las diversas políticas desarrolladas para
 reducir el consumo energético en una arquitectura asimétrica. Las políticas
 se encuentran divididas en dos grandes grupos: un primer grupo formado por
-politicas basadas en {\em escalado de frecuencia}, y un segundo grupo formado por
-políticas encargadas de modificar la {\em asignación de las tareas} a los
-diferentes \wts generados por el \emph{runtime} (y por tanto, a los diferentes núcleos que
-componen la arquitectura).
+politicas basadas en {\em escalado de frecuencia}, y un segundo grupo
+formado por políticas encargadas de modificar la {\em asignación de las
+  tareas} a los diferentes \wts generados por el \emph{runtime} (y por
+tanto, a los diferentes núcleos que componen la arquitectura).
 
 \subsection[{Políticas basadas en escalado de frecuencia (P1, P2, P2' y P3)}]{Políticas basadas en escalado de frecuencia}
 
+A la hora de aplicar técnicas de escalado de frecuencia (DVFS) sobre un
+problema, la técnica presenta de manera simplificada dos grandes
+dimensiones en las que tomar decisiones sobre los parámetros de
+configuración para conseguir el objetivo de reducir el consumo total: {\em
+  (a)}~una primera dimensión que determina {\em qué frecuencias utilizar}
+durante los diferentes cambios, y {\em (b)}~una segunda dimensión que
+determina \emph{en qué momentos de la ejecución se debe modificar la
+  frecuencia.}
 
-\subsubsection{Política P1}
-\comentario{tareas limitadas por el camino crítico / fase dominada por
-  tareas críticas}
+La primera dimensión normalmente viene determinada por la propia
+arquitectura sobre la que se ejecuta el problema, ya que es común que el
+procesador o el sistema operativo no puedan seleccionar cualquier
+frecuencia de funcionamiento, sino solamente una serie de frecuencias
+predeterminadas. Esto hace que tomar la decisión de a qué frecuencia se
+desea que el procesador trabaje se reduzca a una elección sobre un conjunto
+cerrado y finito de frecuencias. Cabe destacar que, en ocasiones, puede
+resultar conveniente descartar algunas de estas frecuencias y no tenerlas
+en consideración, ya sea porque impactan de manera muy negativa en el
+rendimiento, o no tienen un impacto significativo en la mejora de
+consumo.
 
+La segunda dimensión está estrechamente relacionada con el problema a
+ejecutar y el conocimiento que se tenga de él. Las decisiones que se pueden
+tomar varían desde decisiones de grano grueso, como por ejemplo considerar
+el nivel de carga de trabajo de cada procesador y variar la frecuencia en
+función de dicho parámetro, hasta decisiones de grano más fino, por ejemplo
+conocer el comportamiento de cada una de las tareas a ejecutar y el árbol
+de dependencias de antemano, y así tomar decisiones en función de estos
+parámetros. Por ejemplo, si una tarea es crítica, es posible aumentar la
+frecuencia del núcleo asociado para así liberar nuevas tareas cuanto antes;
+o si se sabe que la ejecución va a estar bloqueada hasta que finalice una
+tarea en concreto, es posible disminuir la frecuencia del resto de núcleos
+hasta que esta tarea finalice, y así disminuir el consumo energético. Hay
+que destacar que aunque disminuir la frecuencia del procesador implique
+conseguir una potencia instantánea menor, esto no siempre implica que la
+energía final consumida sea también menor: al bajar la frecuencia, el
+tiempo empleado para finalizar la ejecución de una tarea puede aumentar lo
+suficiente para provocar un consumo de energía global mayor. Por tanto,
+cualquier decisión que afecte a la variación de frecuencia se debe
+considerar como un compromiso entre rendimiento y consumo energético; la
+clave aquí radica en optimizar dicho compromiso.
+
+Adicionalmente a estas dos dimensiones, los sistemas heterogéneos en
+general, y las arquitecturas asimétricas en particular, presentan una
+dimensión extra sobre la que tomar decisiones: {\em (c)}~decidir {\em sobre
+  qué elementos de cálculo} aplicar el escalado de frecuencia. En el caso
+de las arquitecturas asimétricas, esta decisión se reduce a decidir si
+aplicar el escalado de frecuencias al cluster de núcleos \BIG, o al cluster
+de núcleos \LITTLE, dadas las limitaciones en la selección de frecuencias
+mencionadas en la Sección~\ref{sec:DVFS_BIGLITTLE}.\\
+Las siguientes políticas desarrolladas contemplan estos aspectos,
+adaptándolos para la ejecución sobre una arquitectura big.LITTLE y un
+modelo de paralelismo basado en tareas.
+
+\subsubsection{Política P1: Tareas limitadas por el camino crítico}
 
 Durante la ejecución de un programa paralelo mediante un paradigma basado
 en tareas, es común que, en cierto punto de la ejecución paralela, la mayor
@@ -271,59 +321,8 @@ frecuencia vuelve a disminuirse.
   \label{s5:fig:P1-evo}
 \end{figure}
 
-\subsubsection{Políticas P2 y P2'}
-\comentario{ajuste a la carga de trabajo para LITTLE}
-
-A la hora de aplicar técnicas de escalado de frecuencia (DVFS) sobre un problema, la técnica
-presenta de manera simplificada dos grandes dimensiones en las que tomar
-decisiones sobre los parámetros de configuración para conseguir el objetivo
-de reducir el consumo total: {\em (a)}~una primera dimensión que determina {\em qué
-frecuencias utilizar} durante los diferentes cambios, y {\em (b)}~una segunda
-dimensión que determina {\em en qué momentos de la ejecución se debe modificar
-la frecuencia.}
-
-La primera dimensión normalmente viene determinada por la propia
-arquitectura sobre la que se ejecuta el problema, ya que es común que el
-procesador o el sistema operativo no puedan seleccionar cualquier
-frecuencia de funcionamiento, sino solamente una serie de frecuencias
-predeterminadas. Esto hace que tomar la decisión de a qué frecuencia se
-desea que el procesador trabaje se reduzca a una elección sobre un conjunto
-cerrado y finito de frecuencias. Cabe destacar que, en ocasiones, puede
-resultar conveniente descartar algunas de estas frecuencias y no tenerlas
-en consideración, ya sea porque impactan de manera muy negativa en el
-rendimiento, o no tienen un impacto significativo en la mejora de consumo.
-
-La segunda dimensión está estrechamente relacionada con el problema a
-ejecutar y el conocimiento que se tenga de él. Las decisiones que se pueden
-tomar varían desde decisiones de grano grueso, como por ejemplo considerar
-el nivel de carga de trabajo de cada procesador y variar la frecuencia en
-función de dicho parámetro, hasta decisiones de grano más fino, por ejemplo
-conocer el comportamiento de cada una de las tareas a ejecutar y el árbol
-de dependencias de antemano, y así tomar decisiones en función de estos
-parámetros. Por ejemplo, si una tarea es crítica, es posible aumentar la
-frecuencia del núcleo asociado para así liberar nuevas tareas cuanto antes;
-o si se sabe que la ejecución va a estar bloqueada hasta que finalice una
-tarea en concreto, es posible disminuir la frecuencia del resto de núcleos
-hasta que esta tarea finalice, y así disminuir el consumo energético. Hay
-que destacar que aunque disminuir la frecuencia del procesador implique
-conseguir una potencia instantánea menor, esto no siempre implica que la
-energía final consumida sea también menor: al bajar la frecuencia, el
-tiempo empleado para finalizar la ejecución de una tarea puede aumentar lo
-suficiente para provocar un consumo de energía global mayor. Por tanto,
-cualquier decisión que afecte a la variación de frecuencia se debe
-considerar como un compromiso entre rendimiento y consumo energético; la
-clave aquí radica en optimizar dicho compromiso.
-
-Adicionalmente a estas dos dimensiones, los sistemas heterogéneos en
-general, y las arquitecturas asimétricas en particular, presentan una
-dimensión extra sobre la que tomar decisiones: {\em (c)}~decidir {\em sobre
-  qué elementos de cálculo} aplicar el escalado de frecuencia. En el caso
-de las arquitecturas asimétricas, esta decisión se reduce a decidir si
-aplicar el escalado de frecuencias al cluster de núcleos \BIG, o al cluster
-de núcleos \LITTLE, dadas las limitaciones en la selección de frecuencias
-mencionadas en la Sección~\ref{sec:DVFS_BIGLITTLE}.
-\comentario{Desde el principio del punto (donde dice política 2) hasta aquí debería ser la introducción a las políticas de escalado de frecuencia, es decir, justo antes de la política 1.}
-
+\subsubsection{Políticas P2 y P2': Escalado sobre el cluster LITTLE en
+  función de la carga de trabajo}
 
 La primera intuición que surge al intentar aplicar un escalado de
 frecuencia sobre una arquitectura asimétrica es la de pensar que debido a
@@ -403,8 +402,8 @@ divide el tamaño de la cola entre todas las frecuencias posibles para el
 cluster, la política P2' solamente considera la frecuencia máxima y mínima
 del mismo.
 
-\subsubsection{Política P3}
-\comentario{Ajuste de carga de trabajo para big}
+\subsubsection{Políticas P3: Escalado sobre el cluster big en
+  función de la carga de trabajo}
 
 La política P3 es similar a la política anterior P2, pero realizando el
 escalado de frecuencias sobre el cluster de núcleos \BIG en lugar de sobre los núcleos
@@ -464,11 +463,8 @@ del escalón asociado a 950MHz, donde se aprecia como un ligero descenso del
 número de tareas produce que la frecuencia oscile entre 800MHz y 950MHz.
 
 
-\subsection[Basadas en planificación de tareas (P4, P5 y P6)]{Basadas en planificación de tareas}
-
-\subsubsection{Políticas P4 y P5}
-\comentario{Inhabilitación del cluster según la carga de trabajo}
-
+\subsection[Políticas basadas en planificación de tareas (P4, P5 y
+P6)]{Políticas basadas en planificación de tareas}
 Las políticas descritas hasta el momento intentan obtener una mejora en el
 rendimiento energético a partir de un escalado de frecuencia en los
 distintos clusters de la arquitectura, prestando atención al número de
@@ -486,7 +482,9 @@ tareas a cierto cluster del sistema, modificando el planificador de tareas.
 Es decir, estas políticas no están orientadas a realizar técnicas de
 escalado de frecuencia, sino que tratan con el problema de planificación de
 tareas a los distintos \wts disponibles.
-\comentario{Este párrafo sería la introducción al 5.2.2}
+
+\subsubsection{Políticas P4 y P5: Inhabilitación del cluster según la
+  carga de trabajo}
 
 La política P4 monitoriza el tamaño de las colas de tareas listas y, en
 función del tamaño de la cola respecto al tamaño máximo (similar a las
@@ -662,9 +660,9 @@ energético no es significativo.
 
 
 
-\subsubsection{Política P6}
+\subsubsection{Política P6: Desactivación de núcleos en función de la carga
+de trabajo}
 \label{sec:p6}
-\comentario{desactivación de núcleos}
 
 Una de las muchas funcionalidades que ofrece el kernel Linux es la de poder
 activar y desactivar núcleos bajo demanda y de manera dinámica. En
@@ -921,7 +919,7 @@ sobre la plataforma \juno.
 %%% WATIOS %%%%
 \begin{table}
   \centering
-  \caption{Mejora de la potencia instantánea media para las políticas P1-P3.}
+  \caption{Mejora de la potencia instantánea media (en watios) para las políticas P1-P3.}
   \label{tab:mejora-potencia}
   {\scriptsize
     \begin{tabular}{lccccccccccccccc}
