@@ -103,29 +103,30 @@ componen la factorización de Cholesky.
 
 \begin{figure}
   \centering
-    \begin{subfigure}{0.45\textwidth}
+    \begin{subfigure}{0.49\textwidth}
       \centering
+      \includegraphics[width=1\linewidth]{Plots/Modelos_consumo/odroid_big.eps}
 
-      \begin{framed}
-        \includegraphics[width=1\linewidth]{Plots/Modelos_consumo/odroid_big.eps}
-        \includegraphics[width=1\linewidth]{Plots/Modelos_consumo/odroid_little.eps}
-      \end{framed}
+      \vspace{1cm}
+
+      \includegraphics[width=1\linewidth]{Plots/Modelos_consumo/odroid_little.eps}
       \caption{\odroid}
       \label{fig:modelo_consumo-odroid}
 
     \end{subfigure}
-%
-    \begin{subfigure}{0.45\textwidth}
+\hspace{0.2cm}%
+    \begin{subfigure}{0.49\textwidth}
       \centering
-      \begin{framed}
-        \includegraphics[width=1\linewidth]{Plots/Modelos_consumo/juno_big.eps}
-        \includegraphics[width=1\linewidth]{Plots/Modelos_consumo/juno_little.eps}
-      \end{framed}
+      \includegraphics[width=1\linewidth]{Plots/Modelos_consumo/juno_big.eps}
+
+      \vspace{1cm}
+
+      \includegraphics[width=1\linewidth]{Plots/Modelos_consumo/juno_little.eps}
       \caption{\juno}
       \label{fig:modelo_consumo-juno}
     \end{subfigure}  
 
-	\caption{Medidas de consumo energético por núcleo y plataforma. \todo{Hay algunas etiquetas en inglés (eje X) y otras en castellano (eje Y)}}
+	\caption{Medidas de consumo energético por núcleo y plataforma}
   \label{fig:modelo_consumo}
 \end{figure}
 
@@ -697,21 +698,19 @@ energético en las dos plataformas: \juno (gráfica superior) y \odroid
 
 \begin{figure}
   \centering
-  \begin{subfigure}{0.9\textwidth}
+%  \setlength{\fboxsep}{0pt}
+  \begin{subfigure}{1.0\textwidth}
     \centering
-    \fbox{\includegraphics[width=0.75\linewidth]{Plots/Modelos_consumo/apagadoJuno.eps}}
-    \caption{Plataforma \juno: 2 núcleos \BIG A57 y 4 núcleos \LITTLE A53.}
-      \label{}
+    \includegraphics[width=0.75\linewidth]{Plots/Modelos_consumo/apagadoJuno.eps}
+    \caption{Plataforma \juno: dos núcleos \BIG A57 y cuatro núcleos \LITTLE A53.}
     \end{subfigure}
 
     \vspace{0.5cm}
 
-    \begin{subfigure}{0.9\textwidth}
+    \begin{subfigure}{1.0\textwidth}
       \centering
-      \setlength{\fboxsep}{20pt} %No tienen el mismo margen :(
-      \fbox{\includegraphics[width=0.66\linewidth]{Plots/Modelos_consumo/apagadoOdroid.eps}}
-      \caption{Plataforma \odroid: 4 núcleos \BIG A15 y 4 núcleos \LITTLE A7.}
-      \label{}
+      \includegraphics[width=0.8\linewidth]{Plots/Modelos_consumo/apagadoOdroid.eps}
+      \caption{Plataforma \odroid: cuatro núcleos \BIG A15 y cuatro núcleos \LITTLE A7.}
     \end{subfigure}  
     
   \caption[Consumo energético en función del número de cores activos en
@@ -867,7 +866,8 @@ A grandes rasgos, es posible extraer un conjunto de observaciones generales:
 \comentario{Rehacer gráfica para aprovechar el espacio}
 \begin{figure}
   \centering
-  \fbox{\includegraphics[width=1.0\textwidth]{Plots/dvfs_results/0-4_all_juno.eps}}
+  \setlength{\fboxsep}{-20pt}
+  \includegraphics[width=1.0\textwidth]{Plots/dvfs_results/0-4_all_juno.eps}
   
   \caption[Medidas experimentales para las políticas desde P1 a P3 en \juno]{Medidas
     experimentales para las políticas desde P1 a P3 para la plataforma \juno. La política P0
@@ -878,7 +878,7 @@ A grandes rasgos, es posible extraer un conjunto de observaciones generales:
 
 \begin{figure}
   \centering
-  \fbox{\includegraphics[width=1.0\textwidth]{Plots/dvfs_results/0-4_all_odroid.eps}}
+  \includegraphics[width=1.0\textwidth]{Plots/dvfs_results/0-4_all_odroid.eps}
   \caption[Medidas experimentales para las políticas desde P1 a P3 en \odroid]{Medidas
     experimentales para las políticas desde P1 a P3 en la plataforma \odroid. La política P0
     representa a una ejecución normal con \botlev. Las etiquetas del eje x
@@ -1046,17 +1046,17 @@ a una ejecución normal.
 
 \begin{figure}
   \centering
-    \begin{subfigure}{0.75\textwidth}
+    \begin{subfigure}{1.0\textwidth}
       \centering
-      \fbox{\includegraphics[width=0.9\textwidth]{Plots/dvfs_results/8192-124_0-4_juno.eps}}
+      \fbox{\includegraphics[width=0.8\textwidth]{Plots/dvfs_results/8192-124_0-4_juno.eps}}
       \caption{\juno}
     \end{subfigure}
 
     \vspace{0.5cm}
 
-    \begin{subfigure}{0.75\textwidth}
+    \begin{subfigure}{1.0\textwidth}
       \centering
-      \fbox{\includegraphics[width=0.9\textwidth]{Plots/dvfs_results/8192-124_0-4_odroid.eps}}
+      \fbox{\includegraphics[width=0.8\textwidth]{Plots/dvfs_results/8192-124_0-4_odroid.eps}}
       \caption{\odroid}
     \end{subfigure}  
   \caption{Detalle de las políticas P1-P3 para la configuración
@@ -1185,18 +1185,19 @@ cuatro cores \LITTLE obtiene un rendimiento mayor que realizarla sobre
 
 \begin{figure}
   \centering
-    \begin{subfigure}{0.75\textwidth}
+    \begin{subfigure}{0.82\textwidth}
       \centering
-      \fbox{\includegraphics[width=0.9\textwidth]{Plots/sched_results/P4_juno.eps}}
-      \caption{P4}
+      \caption*{Política P4:}
+      \includegraphics[width=0.95\textwidth]{Plots/sched_results/P4_juno.eps}
     \end{subfigure}
 
-    \vspace{0.5cm}
+    \vspace{1cm}
 
-    \begin{subfigure}{0.75\textwidth}
+    \begin{subfigure}{0.82\textwidth}
       \centering
-      \fbox{\includegraphics[width=0.9\textwidth]{Plots/sched_results/P5_juno.eps}}
-      \caption{P5}
+      \caption*{Política P5:}
+      \includegraphics[width=0.95\textwidth]{Plots/sched_results/P5_juno.eps}
+
     \end{subfigure}  
   \caption{Resultados para los experimentos P4 y P5 sobre la plataforma
     \juno.}
@@ -1288,17 +1289,19 @@ durante la ejecución.
 
 \begin{figure}
   \centering
-
-  \begin{subfigure}{0.9\textwidth}
+  \setlength{\fboxsep}{0.1cm}
+  \begin{subfigure}{0.82\textwidth}
     \centering
-    \fbox{\includegraphics[width=0.9\textwidth]{Plots/sched_results/P5_odroid.eps}}
-    \caption*{Política P5}
+    \caption*{Política P5:}
+    \includegraphics[width=0.95\textwidth]{Plots/sched_results/P5_odroid.eps}
   \end{subfigure}
+
+  \vspace{1cm}
   
-  \begin{subfigure}{0.9\textwidth}
+  \begin{subfigure}{0.82\textwidth}
     \centering
-    \fbox{\includegraphics[width=0.9\textwidth]{Plots/sched_results/P6_odroid.eps}}
-    \caption*{Política P6}
+    \caption*{Política P6:}
+    \includegraphics[width=0.95\textwidth]{Plots/sched_results/P6_odroid.eps}
   \end{subfigure}
 
   \caption{Resultados de los experimentos realizados para las políticas P5
