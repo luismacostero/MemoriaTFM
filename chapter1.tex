@@ -8,6 +8,7 @@
 \label{ch:chapter1}
 
 \section{Motivación}
+
 En los últimos años, el consumo energético ha emergido como una de las
 principales barreras que ha frenado la mejora de rendimiento en los
 sistemas de cómputo, desde dispositivos móviles hasta grandes centros de
@@ -65,10 +66,11 @@ existentes pueden ser aplicadas directamente en este tipo de arquitecturas,
 éstas exponen nuevos retos y problemáticas que hay que abordar. Este
 trabajo se centra en dos de estos retos:
 \begin{itemize}
-\item Diseño de bibliotecas específicas conscientes de la asimetría en
-  combinación con \emph{runtimes} convencionales (no conscientes de la
+\item Integración y combinación de bibliotecas específicas conscientes de la asimetría en
+  con \emph{runtimes} convencionales (no conscientes de la
   asimetría), y comparativa de este enfoque con un diseño de \emph{runtime}
   sí consciente con la asimetría de la arquitectura.
+
 \item Diseño de técnicas de reducción de consumo energético. Aplicación de
   técnicas de escalado dinámico de frecuencia (DVFS) o desactivación de
   núcleos en distintas fases de la ejecución de una determinada aplicación,
@@ -89,10 +91,13 @@ abordado las siguientes tareas específicas:
 \item Estudio, análisis y evaluación del rendimiento de familias de
   bibliotecas y planificadores de tareas en tiempo de ejecución no
   conscientes con la asimetría de la arquitectura, así como soluciones ya
-  adaptadas a esta familia de arquitecturas.
-\item Desarrollo e implementación de códigos que exploten, sin utilizar un
-  \emph{runtime}, la asimetría de las arquitecturas para bibliotecas
-  matemáticas de interés.
+  adaptadas a esta familia de arquitecturas. En el ámbito del álgebra lineal,
+		utilizado como hilo conductor del trabajo, se ha utilizado la
+		biblioteca BLIS~\cite{BLIS1}.
+\item Integración de las anteriores bibliotecas sobre
+  \emph{runtimes} no conscientes de la asimetría ya existentes, para explotar de forma transparente la asimetría de las 
+		arquitecturas sin modificaciones en los planificadores, para un
+		conjunto de operaciones matemáticas de interés.
 \item Diseño de heurísticas, políticas de asignación de recursos y
   explotación de los modos de bajo consumo proporcionados por las
   arquitecturas, que permitan un aprovechamiento óptimo de los recursos a
