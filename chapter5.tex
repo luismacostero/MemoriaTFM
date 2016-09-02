@@ -38,10 +38,10 @@ destacar que este tipo de técnicas también se pueden aplicar a procesadores
 de propósito específico, como puede ser la implementación de AMD denominada
 \emph{AMD PowerTune} para GPUs y APUs (\emph{Accelerated Processing Unit}).
 
-La familia de procesadores big.LITTLE de ARM también poseen soporte para
+Los procesadores de la familia big.LITTLE de ARM poseen soporte para
 realizar escalado de frecuencia, aunque únicamente se permite realizar el
 escalado a nivel de cluster y no de núcleo, lo que implica que todos los
-núcleos del cluster siempre van a estar ejecutándose a la misma
+núcleos del cluster siempre van a estar ejecutando tareas a la misma
 frecuencia. Además, las frecuencias a las que puede operar el cluster se
 encuentran limitadas a un conjunto cerrado impuesto por el diseño
 interno. Para las dos plataformas sobre las que se han desarrollado los
@@ -88,7 +88,7 @@ al rendimiento y al consumo energético de una aplicación:
   energético del procesador.
 \item La frecuencia a la que trabajan los distintos clusters. Frecuencias
   bajas pueden afectar al rendimiento de la aplicación al aumentar el
-  tiempo de ejecución, pero pueden suponer un descanso de la potencia
+  tiempo de ejecución, pero pueden suponer un descenso de la potencia
   instantánea.
 \end{itemize}
 
@@ -137,7 +137,7 @@ varias llamadas en paralelo para realizar una multiplicación de matrices
 experimentalmente que todas las tareas que forman parte de la factorización
 de Cholesky utilizan el 100\% de la capacidad del núcleo correspondiente,
 independientemente de a qué cluster o plataforma pertenezca, haciendo que
-los resultados mostrados sean cálidos para cualquier tareas de las que
+los resultados mostrados sean válidos para cualquier tarea de las que
 componen la factorización.  
 
 

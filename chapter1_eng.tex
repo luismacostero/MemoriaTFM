@@ -1,0 +1,139 @@
+\cleardoublepage
+% \newpage
+% \thispagestyle{empty}
+% \mbox{}
+
+
+\chapter{Introduction}
+\label{ch:chapter1}
+
+\section{Motivation}
+
+En los últimos años, el consumo energético ha emergido como una de las
+principales barreras que ha frenado la mejora de rendimiento en los
+sistemas de cómputo, desde dispositivos móviles hasta grandes centros de
+procesamiento de datos (CPDs). Con el fin de mejorar la eficiencia
+energética, resulta necesario explotar mayores grados de especialización en
+el hardware. Las arquitecturas actuales proporcionan diversos tipos de
+heterogeneidad, que van desde configuraciones heterogéneas en CPDs, hasta
+procesadores con aceleradores hardware integrados en el propio chip,
+plataformas híbridas formadas por procesadores de propósito general (CPUs)
+y aceleradores de propósito específico (como pueden ser GPUs, Intel Xeon
+Phi, etc.), multicores asimétricos (AMPSs) con repertorio común de
+instrucciones o multicores heterogéneos con múltiples repertorios de
+instrucciones~\cite{NRC2011,KoSh13}.
+
+
+
+La correcta explotación del rendimiento y la eficiencia energética
+ofrecidos por estas arquitecturas conlleva, de forma necesaria, un
+incremento en la complejidad del software que permita, de forma lo más
+transparente posible para el usuario final, la adaptación de aplicaciones
+ya existentes o de nuevo desarrollo para aumentar el rendimiento y reducir
+su consumo energético~\cite{OsTo10,SKC+15}. Uno de los principales retos en
+este sentido es la correcta asignación de trabajo a los recursos
+computacionales existentes, de modo que, de forma simultánea, se optimice
+su grado de ocupación y la adaptación del recurso escogido a la tarea
+específica a desarrollar. En respuesta a estas necesidades, una de las
+soluciones propuestas por la comunidad científica es el desarrollo de
+modelos de programación que expongan el paralelismo a nivel de tareas,
+explotado en tiempo de ejecución por planificadores de tareas (comúnmente
+conocidos como runtimes~\cite{VMC+14}). Esta capa de software es capaz de
+gestionar de forma transparente al usuario los procesos de gestión de
+dependencias de datos entre tareas, las transferencias de datos en entornos
+heterogéneos, y el mapeado eficiente entre tipos de tareas y de procesador,
+entre otros aspectos.
+
+Atendiendo a las arquitecturas subyacentes, el trabajo se centra en una de
+las familias de arquitecturas con más perspectiva de futuro de entre las
+anteriormente mencionadas: procesadores multinúcleo asimétricos (AMPs) de
+bajo consumo, y en concreto, procesadores de la familia big.LITTLE de ARM.
+Este tipo de configuraciones ha suscitado gran interés en el mercado de las
+aplicaciones y ecosistemas móviles, debido a la especialización de cada
+tipo de procesador ante tareas concretas. Esta especialización se suele
+traducir en la activación/desactivación de cada tipo de núcleo en función
+de la demanda computacional o prioridad de las aplicaciones en ejecución, o
+de las limitaciones energéticas ligadas a cada escenario concreto de
+ejecución.
+
+
+\section{Objectives}
+Desde el punto de vista de la computación de altas prestaciones (HPC), el
+uso conjunto de todos los recursos computacionales desde una misma
+aplicación multihebra resulta de especial interés. Aunque algunas de las
+técnicas ya desarrolladas en bibliotecas o planificadores de tareas
+existentes pueden ser aplicadas directamente en este tipo de arquitecturas,
+éstas exponen nuevos retos y problemáticas que hay que abordar. Este
+trabajo se centra en dos de estos retos:
+\begin{itemize}
+\item Integración y combinación de bibliotecas específicas conscientes de
+  la asimetría con \emph{runtimes} convencionales (no conscientes de la
+  asimetría), y comparativa de este enfoque con un diseño de \emph{runtime}
+  sí consciente con la asimetría de la arquitectura.
+
+\item Diseño de técnicas de reducción de consumo energético. Aplicación de
+  técnicas de escalado dinámico de frecuencia (DVFS) o desactivación de
+  núcleos en distintas fases de la ejecución de una determinada aplicación,
+  en función de las demandas de cómputo y grado de paralelismo disponible, y
+  evaluación del impacto de este tipo de técnicas en el tiempo de ejecución
+  y consumo energético global.
+\end{itemize}
+
+
+\section{Methodology and work plan}
+Para alcanzar los objetivos descritos en el apartado anterior, se han
+abordado las siguientes tareas específicas:
+\begin{enumerate}[T1.]
+\item Estudio del estado del arte en sistemas asimétricos desde el punto de
+  vista arquitectural, y del soporte software disponible para explotar sus
+  características, a nivel de sistema operativo, \emph{runtime} o
+  aplicación.
+\item Estudio, análisis y evaluación del rendimiento de familias de
+  bibliotecas y planificadores de tareas en tiempo de ejecución no
+  conscientes de la asimetría de la arquitectura, así como soluciones ya
+  adaptadas a esta familia de arquitecturas. En el ámbito del álgebra
+  lineal, utilizado como hilo conductor del trabajo, se ha utilizado la
+  biblioteca BLIS~\cite{BLIS1}.
+\item Integración de las anteriores bibliotecas sobre \emph{runtimes} no
+  conscientes de la asimetría ya existentes, para explotar de forma
+  transparente la asimetría de las arquitecturas sin modificaciones en los
+  planificadores, para un conjunto de operaciones matemáticas de interés.
+\item Diseño de heurísticas, políticas de asignación de recursos y
+  explotación de los modos de bajo consumo proporcionados por las
+  arquitecturas, que permitan un aprovechamiento óptimo de los recursos a
+  nivel del planificador de tareas en \emph{runtimes} existentes, con el
+  objetivo de explotar de manera energéticamente eficiente todos los
+  recursos computacionales existentes.
+\item Evaluación del rendimiento y eficiencia energética de las nuevas
+  políticas desarrolladas. Comparación de los resultados con soluciones
+  actuales, tanto conscientes como no conscientes de la asimetría de la
+  arquitectura.
+\end{enumerate}
+
+\section{Document structure}
+La presente memoria se estructura como sigue. 
+El Capítulo~\ref{ch:chapter2} ofrece una descripción general de las
+arquitecturas heterogéneas y asimétricas actualmente más utilizadas en el
+ámbito de la computación de altas prestaciones, haciendo especial hincapié
+en el paradigma big.LITTLE de ARM utilizado en el trabajo
+realizado. Además, detalla las características específicas del entorno
+experimental empleado a nivel hardware y software.
+El Capítulo~\ref{ch:chapter3} introduce dos de las estrategias de
+paralelización utilizadas en el desarrollo del trabajo: extracción de
+paralelismo a nivel de tareas, y extracción de paralelismo a nivel de
+datos, centrándose en las características de cada uno, así como en sus
+ventajas e inconvenientes.
+Los Capítulos~\ref{ch:chapter4} y~\ref{ch:chapter5} describen en detalle el
+trabajo realizado, dividido en la propuesta y evaluación de técnicas para
+la mejora de rendimiento en planificadores a nivel de tareas, y en el
+desarrollo de soluciones para la mejora de la eficiencia energética,
+respectivamente.
+Finalmente, el Capítulo~\ref{ch:chapter6} incluye una serie de conclusiones
+generales y líneas de trabajo futuras.
+
+
+%-- Configuraciones para emacs --
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "./principal.tex"
+%%% End:
