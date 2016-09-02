@@ -18,22 +18,6 @@ las modificaciones realizadas al planificador consciente de la asimetría
 \botlev, ya presentado en capítulos anteriores, para incluir en el mismo
 diversas técnicas de mejora de eficiencia energética.
 
-% Este capítulo presenta, a partir de un planificador consciente de la
-% asimetría (\botlev), distintas técnicas que buscan una mejora de la
-% eficiencia energética sobre este tipo arquitecturas. Para ello, se
-% presentan dos grandes conjuntos de técnicas, un primer conjunto basado en
-% técnicas de escalado de frecuencia (DVFS), y un segundo grupo formado
-% por técnicas basadas en la planificación de tareas.
-
-% \comentario{revisar este párrafo} Para ello, en primer lugar se describen
-% los mecanismos disponibles para realizar el escalado de frecuencia en este
-% tipo de arquitecturas, y un breve estudio del rendimiento y eficiencia
-% energética de las soluciones actuales. A continuación se describen con
-% detalle las distintas políticas que se han desarrollado y las
-% modificaciones introducidas en el planificador, y finalmente los
-% experimentos realizados y sus resultados comparados con un planificador
-% consciente de la asimetría.
-
 
 \subsection{DVFS sobre la arquitectura big.LITTLE}
 \label{sec:DVFS_BIGLITTLE}
@@ -90,16 +74,29 @@ cada núcleo en tiempo de ejecución.
 
 \subsection{Evaluación de rendimiento/eficiencia energética de las tareas}
 
-La Figura~\ref{fig:modelo_consumo} muestra la potencia instantánea
-consumida por cada cluster en función del número de núcleos activos y la
-frecuencia de ejecución del mismo. Aunque el experimento se ha realizado
-ejecutando varias llamadas en paralelo para realizar una multiplicación de
-matrices (una llamada por cada núcleo activo), se ha comprobado
-experimentalmente que todas las tareas que forman parte de la factorización
-de Cholesky utilizan el 100\% de la capacidad del núcleo correspondiente,
-independientemente de a qué cluster o plataforma pertenezca, haciendo que
-los resultados mostrados sean válidos para cualquier tarea de las que
-componen la factorización de Cholesky.
+En un sistema asimétrico, se pueden identificar tres variables que afectan
+al rendimiento y al consumo energético de una aplicación: 
+
+\begin{itemize}
+\item El tipo de núcleo usado para ejecutar las distintas tareas que
+  componen el problema. Ejecutar una tarea sobre un núcleo del cluster \BIG
+  va a generar un mayor rendimiento que si se ejecuta sobre un núcleo del
+  cluster \LITTLE.
+\item El número de núcleos activos durante la ejecución del problema. Un
+  número bajo de núcleos activos puede suponer una pérdida del rendimiento
+  global considerable, sin embargo también supone un ahorro en el consumo
+  energético del procesador.
+\item La frecuencia a la que trabajan los distintos clusters. Frecuencias
+  bajas pueden afectar al rendimiento de la aplicación al aumentar el
+  tiempo de ejecución, pero pueden suponer un descanso de la potencia
+  instantánea.
+\end{itemize}
+
+A partir de estas tres dimensiones, existen muchas formas de combinar los
+distintos factores para conseguir adaptar el rendimiento y el consumo
+energético de acuerdo a la aplicación a ejecutar. En las siguientes
+secciones se exploran las técnicas principales para obtener la mejora en
+rendimiento y energía, adaptadas para este tipo de plataformas.
 
 \begin{figure}
   \centering
@@ -131,10 +128,24 @@ componen la factorización de Cholesky.
 \end{figure}
 
 
-\todo{Pequeña descripción de rendimiento/eficiencia basada en los resultados que se muestran,
-para motivar el trabajo.}
+La Figura~\ref{fig:modelo_consumo} relaciona dos de los puntos anteriores,
+mostrando la potencia instantánea consumida por cada cluster que compone la
+arquitectura en función del número de núcleos activos y la frecuencia de
+ejecución del mismo. Aunque el experimento se ha realizado ejecutando
+varias llamadas en paralelo para realizar una multiplicación de matrices
+\texttt{gemm} (una por cada núcleo activo), se ha comprobado
+experimentalmente que todas las tareas que forman parte de la factorización
+de Cholesky utilizan el 100\% de la capacidad del núcleo correspondiente,
+independientemente de a qué cluster o plataforma pertenezca, haciendo que
+los resultados mostrados sean cálidos para cualquier tareas de las que
+componen la factorización.  
 
-\todo{Aquí habría que decir que hay 3 variables que afectan al rendimiento y al consumo: tipo de núcleo, número de núcleos activos y frecuencia de los núcleos. Por lo tanto hay muchas formas de adaptar el rendimiento y el consumo a lo que necesite la aplicación y que vamos a explorar las principales.}
+
+
+
+
+
+
 
 
 \section{Políticas de reducción de consumo}
@@ -802,7 +813,6 @@ int d, a;
 \section{Resultados experimentales}
 
 \subsection{Análisis de la mejora energética para las políticas P1-P3}
-
 El primer conjunto de experimentos que se muestran a continuación tiene
 como objetivo principal comprobar el nivel de eficiencia energética desde
 la política P1 hasta la política P3, las cuales corresponden a políticas
@@ -810,25 +820,28 @@ que siguen una estrategia puramente DVFS como se ha descrito
 anteriormente\footnote{En este capítulo todos los experimentos han sido
   realizados utilizando precisión simple.}. Los experimentos corresponden a
 distintas ejecuciones de una factorización de Cholesky para distintas
-configuraciones de tamaño de matriz y bloque. Para comprobar si estas
-políticas presentan una mejora energética real, los resultados son
-comparados con una ejecución convencional utilizando el planificador \botlev sobre
-el \emph{runtime} \ompss (esta ejecución se denomina P0 en los experimentos
-realizados). Para poder observar el comportamiento con detalle y poder
-extraer mejores conclusiones, de todos los experimentos se extraen las tres
-siguientes medidas:
+configuraciones de tamaño de matriz y bloque. Cada configuración del
+problema ha sido lanzada 10 veces, y obtenido la media de los resultados
+para intentar disminuir los posibles errores que hubiera en las
+mediciones. Para comprobar si estas políticas presentan una mejora
+energética real, los resultados son comparados con una ejecución
+convencional utilizando el planificador \botlev sobre el \emph{runtime}
+\ompss (esta ejecución se denomina P0 en los experimentos realizados). Para
+poder observar el comportamiento con detalle y poder extraer mejores
+conclusiones, de todos los experimentos se extraen las tres siguientes
+medidas:
 \begin{enumerate}
-\item Rendimiento computacional medido en GFLOPS\footnote{1 GFLOP equivale a $1e9$ operaciones en 
-		punto flotante por segundo.}. Distintos rendimientos
-  sobre la misma configuración del problema sirven para indicar
-  diferencias en el tiempo de ejecución.
+\item Rendimiento computacional medido en GFLOPS\footnote{1 GFLOP equivale
+    a $1e9$ operaciones en punto flotante por segundo.}. Distintos
+  rendimientos sobre la misma configuración del problema sirven para
+  indicar diferencias en el tiempo de ejecución.
 
-\item Muestreo de la potencia media (en Watios). Los medidores
-  permiten extraer el muestreo de potencia diferenciado por clusters, aunque
-		en este caso se muestra agregada para ambos cluster.
+\item Muestreo de la potencia media (en Watios). Los medidores permiten
+  extraer el muestreo de potencia diferenciado por clusters, aunque en este
+  caso se muestra agregada para ambos cluster.
 
-\item Eficiencia o rendimiento energético medido en GFLOPS/Watio, como resultado de
-  combinar las dos medidas anteriores.
+\item Eficiencia o rendimiento energético medido en GFLOPS/Watio, como
+  resultado de combinar las dos medidas anteriores.
 \end{enumerate}
 
 En las Figuras~\ref{fig:resultados:all-0-3:juno}~y~\ref{fig:resultados:all-0-3:odroid}
@@ -863,7 +876,6 @@ A grandes rasgos, es posible extraer un conjunto de observaciones generales:
   que la ejecución con \botlev sobre \ompss.
 \end{itemize}  
 
-\comentario{Rehacer gráfica para aprovechar el espacio}
 \begin{figure}
   \centering
   \setlength{\fboxsep}{-20pt}
