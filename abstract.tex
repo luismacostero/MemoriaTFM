@@ -13,39 +13,72 @@
   \end{center}
 \vspace{1cm}
 
-Las arquitecturas asimétricas, formadas por varios procesadores con el
-mismo repertorio de instrucciones pero distintas características de
-rendimiento y consumo, ofrecen muchas posibilidades de optimización del
-rendimiento y/o el consumo en la ejecución de aplicaciones paralelas. La
-planificación de tareas sobre dichas arquitecturas de manera que se
-aprovechen de manera eficiente los distintos recursos es muy compleja y se
-suele abordar utilizando modelos de programación paralelos, que permiten al
-programador especificar el paralelismo de las tareas, y entornos de
-ejecución que explotan dinámicamente dicho paralelismo.
+Asymmetric architectures, composed by multiple processors with the same
+instruction set but different performance and energy consumption
+characteristics, provide many optimisation possibilities in performance
+and/or energy consumption over the execution of parallel
+applications. Scheduling tasks in this kind of architectures in such a way
+that all the resources are used efficiently is a difficult task, and it is
+usually addressed using parallel programming models, allowing programmers
+to annotate the degree of parallelism for each of the different tasks of
+the program, and runtime environments which dinamically take advantage of
+this kind of parallelism.
 
-En este trabajo hemos modificado uno de los planificadores de tareas más
-utilizados en la actualidad para intentar aprovechar todos los recursos al
-máximo, cuando el rendimiento así lo necesite, o para conseguir la mejor
-eficiencia energética posible, cuando el consumo sea más
-prioritario. También se ha utilizado una biblioteca desarrollada
-específicamente para la arquitectura asimétrica objeto del estudio en la
-Universidad de Austin.
+% Las arquitecturas asimétricas, formadas por varios procesadores con el
+% mismo repertorio de instrucciones pero distintas características de
+% rendimiento y consumo, ofrecen muchas posibilidades de optimización del
+% rendimiento y/o el consumo en la ejecución de aplicaciones paralelas. La
+% planificación de tareas sobre dichas arquitecturas de forma que se
+% aprovechen de manera eficiente los distintos recursos, es muy compleja y se
+% suele abordar utilizando modelos de programación paralelos, que permiten al
+% programador especificar el paralelismo de las tareas, y entornos de
+% ejecución que explotan dinámicamente dicho paralelismo.
 
-Para obtener el máximo rendimiento se han agrupado los núcleos del sistema
-en dos niveles: hay un cluster simétrico de núcleos virtuales idénticos,
-cada uno de los cuales está compuesto por un conjunto de núcleos
-asimétricos. El planificador de tareas asigna trabajo a los núcleos
-virtuales, de manera idéntica a como lo haría en un sistema multinúcleo
-simétrico, y la biblioteca se encarga de repartir el trabajo entre los
-núcleos asimétricos. El trabajo ha consistido en integrar dicha biblioteca
-con el planificador de tareas.
 
-Para mejorar la eficiencia energética se han incluido en el planificador de
-tareas políticas de explotación de los modos de bajo consumo de la
-arquitectura y también de apagado o no asignación de carga de trabajo a
-algunos de los núcleos, que se activan en tiempo de ejecución cuando se
-detecta que la aplicación no necesita todos los recursos disponibles en la
-arquitectura.
+In this work we have modified one of the most used task schedulers nowadays
+to try to use all the resources efficiently if high performance is needed,
+or to achieve the best energy efficiency if consumption reduction is the
+priority. A math library developed specifically for this kind of asymmetric
+architectures in the University of Texas, Austin, has been used as well.
+
+% En este trabajo hemos modificado uno de los planificadores de tareas más
+% utilizados en la actualidad para intentar aprovechar todos los recursos al
+% máximo, cuando el rendimiento así lo necesite, o para conseguir la mejor
+% eficiencia energética posible, cuando el consumo sea más
+% prioritario. También se ha utilizado una biblioteca desarrollada
+% específicamente para la arquitectura asimétrica objeto del estudio en la
+% Universidad de Austin.
+
+
+To obtain maximum performance, cores have been grouped into two different
+levels: a symmetric cluster with identical virtual cores where each of them
+is composed by a set of asymmetric cores. With this approach, schedulers
+can allocate tasks to the virtual cores in the same way as they would do in
+a symmetric multicore system, and the library is responsible for the
+allocation of tasks to the asymmetric cores. The work carried out consisted
+of integrating this library with the task scheduler.
+
+% Para obtener el máximo rendimiento se han agrupado los núcleos del sistema
+% en dos niveles: hay un cluster simétrico de núcleos virtuales idénticos,
+% cada uno de los cuales está compuesto por un conjunto de núcleos
+% asimétricos. El planificador de tareas asigna trabajo a los núcleos
+% virtuales, de manera idéntica a como lo haría en un sistema multinúcleo
+% simétrico, y la biblioteca se encarga de repartir el trabajo entre los
+% núcleos asimétricos. El trabajo ha consistido en integrar dicha biblioteca
+% con el planificador de tareas.
+
+To improve energy efficiency, new policies have been included into the
+scheduler. These policies have been designed to take advantage of the low
+consumption modes of the architecture and to disable or not assign tasks to
+some of the cores, activating them at run-time if the execution does not
+need all the available resources in the architecture.
+
+% Para mejorar la eficiencia energética se han incluido en el
+% planificador de tareas políticas de explotación de los modos de bajo
+% consumo de la arquitectura y también de apagado o no asignación de carga de
+% trabajo a algunos de los núcleos, que se activan en tiempo de ejecución
+% cuando se detecta que la aplicación no necesita todos los recursos
+% disponibles en la arquitectura.
 
 \begin{center}
   {\bf \Large Keywords}

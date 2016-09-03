@@ -55,8 +55,7 @@
 
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
-\usepackage[spanish,es-tabla]{babel}
-\selectlanguage{spanish}
+\usepackage[english,spanish,es-tabla]{babel}
 \usepackage{eurosym}
 \usepackage{xspace}
 \usepackage[usenames,dvipsnames,svgnames,table]{xcolor}
@@ -230,10 +229,11 @@
 % +--------------------------------------------------------------------+
 
 \begin{document}
-\renewcommand{\listtablename}{Índice de tablas}
 
+\renewcommand{\listtablename}{Índice de tablas}
   \setcounter{page}{-5}
 
+\selectlanguage{spanish}
 
 % +--------------------------------------------------------------------+
 % | Title Page -- Required for both Doctoral and Masters Students
@@ -349,6 +349,8 @@
 \addcontentsline{toc}{chapter}{Resumen}
 \pdfbookmark[0]{Resumen}{PDFResumenPage}
 
+
+\selectlanguage{english}
 \input{abstract.tex}
 \addcontentsline{toc}{chapter}{Abstract}
 \pdfbookmark[0]{Abstract}{PDFAbstractPage}
@@ -379,15 +381,19 @@
 % | Chapters
 % +--------------------------------------------------------------------+
 
+\selectlanguage{spanish}
 \input{chapter1.tex}
+\selectlanguage{english}
 \input{chapter1_eng.tex}
+\selectlanguage{spanish}
 \input{chapter2.tex}
 \input{chapter3.tex}
 \input{chapter4.tex}
 \input{chapter5.tex}
 \input{chapter6.tex}
+\selectlanguage{english}
 \input{chapter6_eng.tex}
-
+\selectlanguage{spanish}
 
 % +-------------------------------------------------------------------------+
 % | References                                                              |
