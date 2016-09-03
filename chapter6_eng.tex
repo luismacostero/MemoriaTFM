@@ -5,59 +5,115 @@
 
 \section{Conclusions and future work}
 
-En este trabajo se han desarrollado un conjunto de técnicas sobre
-arquitecturas asimétricas, y en especial para los procesadores big.LITTLE
-diseñados por ARM, que buscan obtener mejoras tanto en el rendimiento de las
-aplicaciones como en la eficiencia energética de la plataforma.
 
-En base a un paradigma basado en la extracción de paralelismo a nivel de
-tareas en tiempo de ejecución, y a través de una versión de la biblioteca
-BLIS adaptada a arquitecturas asimétricas, y basándose en un planificador
-de tareas convencional, se ha demostrado como es posible obtener un mejor
-rendimiento sin necesidad de adaptar el código del problema a la
-arquitectura, o introducir cambios específicos en el planificador. Esta
-propuesta permite reutilizar los \emph{runtimes} convencionales (y todas
-las técnicas desarrolladas durante los últimos años) sobre las nuevas
-arquitecturas asimétricas con el único coste de la implementación de
-versiones asimétricas de cada rutina de la librería.  Los experimentos
-realizados han demostrado que esta solución es totalmente comparable con un
-planificador consciente de la asimetría de la plataforma, incluso llegando
-a obtener mejores resultados en el rendimiento de la aplicación. Esta
-técnica ha sido presentada en \emph{``The Sixth International Workshop on
-  Accelerators and Hybrid Exascale Systems (AsHES)''}, a través del
-artículo~\cite{ashes} mostrado en la bibliografía.
+Throughout this work, we have presented a set of newly developed techniques
+over asymmetric architectures, focusing on ARM designed big.LITTLE
+systems-on-chip, which are aimed at obtaining performance and energy
+efficiency improvements in parallel applications.
 
-Buscando la mejora de la eficiencia energética, se han desarrollado una
-serie de políticas integradas sobre un planificador consciente de la
-asimetría, basadas tanto en técnicas de escalado de frecuencia (DVFS) como
-en técnicas de planificación, tomando las decisiones de forma dinámica en
-función del número de tareas listas para ser ejecutadas en cada momento. El
-primer conjunto de experimentos realizados muestran como,
-independientemente de las dos plataformas sobre las que se han ejecutado
-los experimentos, aplicar técnicas de escalado de frecuencia sobre el
-cluster de núcleos \BIG obtiene una mejora en el rendimiento energético
-significativa frente a un planificador convencional consciente de la
-asimetría sin ninguna política de ahorro energético integrada.
-
-De igual manera, el segundo conjunto de experimentos revela como en
-aquellos procesadores que permiten desactivar un cluster completo a nivel
-\emph{hardware}, apagarlo en ciertos momentos de la ejecución cuando el
-nivel de tareas listas es lo suficientemente bajo permite obtener una
-mejora de rendimiento energético reduciendo la potencia instantánea media
-consumida drásticamente. También se ha puesto de manifiesto como, en los
-procesadores que no soportan un apagado del cluster a nivel físico, una
-política de planificación de tareas que no asigne tareas a ese cluster
-obtiene los mismos resultados de eficiencia energética que el planificador
-normal consciente de la asimetría.
+% En este trabajo se han desarrollado un conjunto de técnicas sobre
+% arquitecturas asimétricas, y en especial para los procesadores big.LITTLE
+% diseñados por ARM, que buscan obtener mejoras tanto en el rendimiento de las
+% aplicaciones como en la eficiencia energética de la plataforma.
 
 
-Como trabajo futuro, se considera realizar los experimentos sobre un
-conjunto mayor de problemas de interés científico, así como sobre otras
-arquitecturas donde el número de núcleos big y LITTLE se encuentre más
-desequilibrado. Adicionalmente, se considera desarrollar políticas que
-tomen decisiones de manera dinámica en base al problema ejecutado y su DAG
-correspondiente, así como a resultados parciales tomados durante la
-ejecución de las distintas tareas previas del problema.
+We have demonstrated that, for a task-level parallelism model, an approach
+that delegates the burden of dealing with asymmetry to the library (in our
+case, using an asymmetry-aware BLIS implementation), does not require any
+formulation of an existing task scheduler, and can deliver high
+performance. This proposal paves the road towards reusing conventional
+runtime schedulers for SMPs (and all the associated improvement techniques
+developed through the past few years), as the runtime only has a symmetric
+view of the hardware, at the cost of developing asymmetry-aware underlying
+libraries. Our experiments reveal that this solution is competitive and
+even improves the results obtained with an asymmetry-aware scheduler for
+DLA operations. This work has been presented in \emph{``The Sixth
+  International Workshop on Accelerators and Hybrid Exascale Systems
+  (AsHES)''}, with the paper~\cite{ashes} shown in the bibliography.
+
+
+% En base a un paradigma basado en la extracción de paralelismo a nivel de
+% tareas en tiempo de ejecución, y a través de una versión de la biblioteca
+% BLIS adaptada a arquitecturas asimétricas, y basándose en un planificador
+% de tareas convencional, se ha demostrado como es posible obtener un mejor
+% rendimiento sin necesidad de adaptar el código del problema a la
+% arquitectura, o introducir cambios específicos en el planificador.  Esta
+% propuesta permite reutilizar los \emph{runtimes} convencionales (y todas
+% las técnicas desarrolladas durante los últimos años) sobre las nuevas
+% arquitecturas asimétricas con el único coste de la implementación de
+% versiones asimétricas de cada rutina de la librería.  Los experimentos
+% realizados han demostrado que esta solución es totalmente comparable con un
+% planificador consciente de la asimetría de la plataforma, incluso llegando
+% a obtener mejores resultados en el rendimiento de la aplicación. Esta
+% técnica ha sido presentada en \emph{``The Sixth International Workshop on
+%   Accelerators and Hybrid Exascale Systems (AsHES)''}, a través del
+% artículo~\cite{ashes} mostrado en la bibliografía.
+
+
+
+Trying to improve energy efficiency, a set of new policies has been
+integrated into the asymmetry-aware scheduler, based both on dynamic
+voltage frequency scaling (DVFS) techniques and scheduling techniques,
+making decisions dynamically depending on the number of ready tasks to be
+executed every time. The first set of experiments shows how, independently
+of the platform used, applying techniques of frequency scaling over \BIG
+cores leads to better results than an asymmetry-aware scheduler.
+
+% Buscando la mejora de la eficiencia energética, se han desarrollado una
+% serie de políticas integradas sobre un planificador consciente de la
+% asimetría, basadas tanto en técnicas de escalado de frecuencia (DVFS) como
+% en técnicas de planificación, tomando las decisiones de forma dinámica en
+% función del número de tareas listas para ser ejecutadas en cada momento. El
+% primer conjunto de experimentos realizados muestran como,
+% independientemente de las dos plataformas sobre las que se han ejecutado
+% los experimentos, aplicar técnicas de escalado de frecuencia sobre el
+% cluster de núcleos \BIG obtiene una mejora en el rendimiento energético
+% significativa frente a un planificador convencional consciente de la
+% asimetría sin ninguna política de ahorro energético integrada.
+
+
+Similarly, the second set of experiments shows how, in processors which
+allow deactivating a full cluster at \emph{hardware} level, switching
+it off at certain times during the execution when the number of ready tasks
+is low enough allows to obtain an energy performance gain by drastically
+reducing the average instant power consumed. Also, these experiments reveal
+that, in architectures that do not support a \emph{hardware} switching off,
+a policy which does not assign tasks to a certain cluster has the same
+energy performance results that an asymmetric-aware scheduler has,
+decreasing the average power consumed.
+
+% De igual manera, el segundo conjunto de experimentos revela como en
+% aquellos procesadores que permiten desactivar un cluster completo a nivel
+% \emph{hardware}, apagarlo en ciertos momentos de la ejecución cuando el
+% nivel de tareas listas es lo suficientemente bajo permite obtener una
+% mejora de rendimiento energético reduciendo la potencia instantánea media
+% consumida drásticamente. También se ha puesto de manifiesto como, en los
+% procesadores que no soportan un apagado del cluster a nivel físico, una
+% política de planificación de tareas que no asigne tareas a ese cluster
+% obtiene los mismos resultados de eficiencia energética que el planificador
+% normal consciente de la asimetría.
+
+
+
+
+
+
+As future work, we are considering to carry out the experiments over a bigger
+set of problems of scientific interest, and to run them over other
+platforms where the number of \BIG and \LITTLE cores is less
+balanced. Additionally, we consider to develop new techniques that make
+decisions dynamically depending on the problem we are trying to solve and
+its associated DAG, as well as partial results taken during previous task
+executions.
+
+
+% Como trabajo futuro, se considera realizar los experimentos sobre un
+% conjunto mayor de problemas de interés científico, así como sobre otras
+% arquitecturas donde el número de núcleos big y LITTLE se encuentre más
+% desequilibrado. Adicionalmente, se considera desarrollar políticas que
+% tomen decisiones de manera dinámica en base al problema ejecutado y su DAG
+% correspondiente, así como a resultados parciales tomados durante la
+% ejecución de las distintas tareas previas del problema.
 
 
 
