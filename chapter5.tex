@@ -21,7 +21,7 @@ diversas técnicas de mejora de eficiencia energética.
 
 \subsection{DVFS sobre la arquitectura big.LITTLE}
 \label{sec:DVFS_BIGLITTLE}
-Las siglas DVFS (\emph{Dynamic voltage frecuency scaling}) representan a un
+Las siglas DVFS (\emph{Dynamic voltage frequency scaling}) representan a un
 conjunto de técnicas caracterizadas por variar la frecuencia o el voltaje
 del procesador de manera dinámica en tiempo de ejecución con el objetivo de
 obtener una mejora energética o disminuir la potencia instantánea
@@ -152,7 +152,7 @@ componen la factorización.
 En esta sección se detallan las diversas políticas desarrolladas para
 reducir el consumo energético en una arquitectura asimétrica. Las políticas
 se encuentran divididas en dos grandes grupos: un primer grupo formado por
-politicas basadas en {\em escalado de frecuencia}, y un segundo grupo
+políticas basadas en {\em escalado de frecuencia}, y un segundo grupo
 formado por políticas encargadas de modificar la {\em asignación de las
   tareas} a los diferentes \wts generados por el \emph{runtime} (y por
 tanto, a los diferentes núcleos que componen la arquitectura).
@@ -232,17 +232,17 @@ liberadas para ser ejecutadas y poder continuar la ejecución del problema.
 Este problema, aplicado al planificador \botlev, (descrito en la
 sección~\ref{s3:botlev}) supondría que en el momento en el que el árbol se
 estreche, la cola de tareas no críticas tendría un tamaño muy inferior a la
-de tareas críticas, y por tanto los cores \LITTLE tendrían mucha menor carga
-de trabajo que los cores \BIG. Este fenómeno se da mientras los cores big
+de tareas críticas, y por tanto los núcleos \LITTLE tendrían mucha menor carga
+de trabajo que los núcleos \BIG. Este fenómeno se da mientras los núcleos big
 finalizan la ejecución de sus tareas críticas y se liberan más tareas para
-ejecutar en los cores \LITTLE.
+ejecutar en los núcleos \LITTLE.
 
 Una forma de intentar paliar este problema consiste en forzar a que los
 núcleos lentos también ejecuten tareas críticas; esta decisión, sin
 embargo, puede provocar un retraso en la finalización de las tareas
 críticas, ya que aunque su ejecución puede comenzar antes (pues se disponen
 de más núcleos para distribuir el mismo número de tareas), el rendimiento
-de los núcleos \LITTLE es muy inferior que el de los cores \BIG, provocando
+de los núcleos \LITTLE es muy inferior que el de los núcleos \BIG, provocando
 retrasos en la ejecución e incluso llegando a agravar el cuello de botella
 anteriormente mencionado.
 
@@ -301,7 +301,7 @@ int P1(int bigQueueSize, int littleQueueSize){
 Adicionalmente al comportamiento general de esta política, hay que
 distinguir dos casos especiales que merecen ser mencionados: el caso en el
 que no exista ninguna tarea crítica lista para ser ejecutada, y el caso
-opuesto, en el que todas las tareas listas sean críticas y los cores lentos
+opuesto, en el que todas las tareas listas sean críticas y los núcleos lentos
 estén totalmente ociosos. En estos casos, las
 líneas~\ref{s5:lst:p1-casoEsp1}-\ref{s5:lst:p1-casoEsp2} se encargan de
 aumentar la frecuencia al máximo directamente en caso de que todas las
@@ -338,7 +338,7 @@ frecuencia vuelve a disminuirse.
 
 La primera intuición que surge al intentar aplicar un escalado de
 frecuencia sobre una arquitectura asimétrica es la de pensar que debido a
-la gran diferencia de rendimiento entre los cores \BIG y \LITTLE (como
+la gran diferencia de rendimiento entre los núcleos \BIG y \LITTLE (como
 muestra la Figura~\ref{fig:modelo_consumo}), aplicar una reducción de
 frecuencia a los núcleos \BIG puede suponer una pérdida significativa de
 rendimiento, lo cuál puede provocar incluso un aumento en el consumo
@@ -387,7 +387,7 @@ máximo de tareas preparadas para ser ejecutadas ha sido de 20 tareas, antes
 de cambiar de frecuencia se dispone de un margen de 4 tareas. Si el tamaño
 actual de la cola es de 3 tareas, la frecuencia del cluster será la mínima,
 mientras que si es de 5 tareas, la frecuencia será la frecuencia
-inmeditamente superior a la frecuencia mínima.
+inmediatamente superior a la frecuencia mínima.
 
 \begin{lstlisting}[float,language=C++,caption={Pseudocódigo para las políticas P2 y P2'.},label={s5:fig:listing-p2}]
 int P2(int littleQueueSize, int bigQueueSize){      
@@ -445,8 +445,8 @@ de dimensión 512 en precisión simple.
     tareas listas según la política P3. La ejecución corresponde a una
     factorización de Cholesky sobre una matriz de 4608 elementos en
     precisión simple, dividida en bloques de tamaño de 512 elementos,
-    ejecutada sobre la plataforma de desarrollo Juno (donde los cores big
-    corresponden a cores ARM-A57).}
+    ejecutada sobre la plataforma de desarrollo \juno (donde los núcleos big
+    corresponden a núcleos ARM-A57).}
   \label{s5:fig:P3-evo}
 \end{figure}
 
@@ -500,7 +500,7 @@ tareas a los distintos \wts disponibles.
 
 La política P4 monitoriza el tamaño de las colas de tareas listas y, en
 función del tamaño de la cola respecto al tamaño máximo (similar a las
-políticas P2 o P3), decide si asignar tareas listas al cluster de cores
+políticas P2 o P3), decide si asignar tareas listas al cluster de núcleos
 \LITTLE o por el contrario no hacerlo. En caso de que el tamaño de la cola
 sea lo suficientemente pequeño, la política no asigna ninguna tarea lista
 al cluster, provocando que éste se encuentre ocioso. Cabe destacar que,
@@ -576,7 +576,7 @@ desactivado, mediante las siguientes líneas se determina si el núcleo
 pertenece al cluster inactivo. En caso de pertenecer, se devuelve el
 valor de falso para indicar que el \wt no debe ejecutar tareas, y además
 se reduce la frecuencia de núcleo al mínimo para intentar minimizar el
-consumo energético mientras no se utilice el cluster de cores \LITTLE
+consumo energético mientras no se utilice el cluster de núcleos \LITTLE
 (línea~\ref{lst:p4-c}).
 
 
@@ -618,7 +618,7 @@ tamaño de la cola decrece por debajo del 25\% del tamaño máximo (en este
 caso, el experimento se configuró con este valor con fines meramente
 ilustrativos). En ese momento, los núcleos \LITTLE dejan de recibir tareas
 mientras que los \BIG continúan su ejecución habitual. Una vez que el
-número de tareas vuelve a incrementarse, los cores lentos vuelven a
+número de tareas vuelve a incrementarse, los núcleos lentos vuelven a
 activarse y a ejecutar tareas, hasta que al final de la ejecución el tamaño
 de la cola vuelve a decrecer y el cluster se desactiva hasta finalizar la
 ejecución. Aunque el primer \wt está asociado a un núcleo \LITTLE, también
@@ -664,8 +664,8 @@ energético no es significativo.
     verde={\sc main}. La ejecución corresponde a una factorización de
     Cholesky para una matriz de 4096 elementos dividido en bloques de
     tamaño 512 en precisión simple sobre una arquitectura \juno, donde los
-    4 primeros \wts corresponden a los cores lentos y los 2 últimos a los
-    cores rápidos. La política está configurada para desactivar cores a
+    4 primeros \wts corresponden a los núcleos lentos y los 2 últimos a los
+    núcleos rápidos. La política está configurada para desactivar núcleos a
     partir del 25\% del tamaño máximo de la cola.}
   \label{fig:P4-evo}
 \end{figure}
@@ -682,7 +682,7 @@ cualquier momento de la ejecución, un núcleo puede ser desactivado, y este
 desaparece del sistema, siendo totalmente transparente para cualquier
 aplicación en ejecución. Esto implica que si se decide apagar un núcleo,
 todos los procesos asociados a ese núcleo son migrados a otro de manera
-totalmente transparente al proceso en ejecución, el número total de cores
+totalmente transparente al proceso en ejecución, el número total de núcleos
 disminuye y cualquier llamada a una función del kernel considerará la nueva
 configuración hardware creada como la configuración real de la
 máquina. Esta funcionalidad permite, por ejemplo, generar dinámicamente
@@ -693,7 +693,7 @@ conlleva que en cualquier momento de la ejecución se pueda desactivar uno
 de los dos cluster de la máquina, convirtiendo la arquitectura en una
 plataforma totalmente simétrica \footnote{En la práctica, no todas las
   versiones del kernel permiten apagar el núcleo 0, por lo que en estos
-  casos, no es posible apagar el completametne el cluster que contiene a
+  casos, no es posible apagar el completamente el cluster que contiene a
   este núcleo}.
 
 Para realizar un estudio del efecto del apagado selectivo de núcleos sobre
@@ -724,7 +724,7 @@ energético en las dos plataformas: \juno (gráfica superior) y \odroid
       \caption{Plataforma \odroid: cuatro núcleos \BIG A15 y cuatro núcleos \LITTLE A7.}
     \end{subfigure}  
     
-  \caption[Consumo energético en función del número de cores activos en
+  \caption[Consumo energético en función del número de núcleos activos en
   cada cluster]{Consumo energético en reposo en función del número de núcleos
     activos del sistema y de la plataforma. La versión del kernel Linux
     instalada en la plataforma \odroid no permite apagar el cluster
@@ -736,7 +736,7 @@ Las gráficas muestran la potencia instantánea observada (en Watios) durante
 todo el experimento en el eje vertical, mientras que el eje horizontal
 corresponde a las distintas fases por las que ha ido pasando el
 experimento. Por cada plataforma, la gráfica superior muestra el
-experimento apagando los cores del cluster \BIG, indicándose en el eje x el
+experimento apagando los núcleos del cluster \BIG, indicándose en el eje x el
 número de núcleos activos del cluster en cada momento; la gráfica inferior
 muestra el mismo experimento para el cluster \LITTLE. La diferencia de
 aspecto entre las gráficas de ambas plataformas se produce por la forma en
@@ -752,10 +752,10 @@ Observando los resultados de las gráficas se pueden extraer las siguientes
 conclusiones:
 
 \begin{enumerate}
-\item En la plataforma \juno, desactivar cores es equivalente a no usarlos
+\item En la plataforma \juno, desactivar núcleos es equivalente a no usarlos
   en lo referente al consumo energético.
 \item Mientras que la versión del kernel Linux utilizada en la plataforma
-  \juno permite apagar todos los cores del sistema, la versión utilizada en
+  \juno permite apagar todos los núcleos del sistema, la versión utilizada en
   la plataforma \odroid no permite apagar el núcleo 0, por lo que no es
   posible desactivar el cluster \LITTLE completo.
 \item En la plataforma \odroid, desactivar un cierto número de núcleos sin
@@ -766,10 +766,10 @@ conclusiones:
 \end{enumerate}
 
 
-Aprovechando la caída de pontencia cuando el cluster de
+Aprovechando la caída de potencia cuando el cluster de
 núcleos \BIG se desactiva por completo en la plataforma \odroid, la política
 P6 ha sido desarrollada como una modificación de la política anterior, pero
-además de no asignar tareas a estos cores, realiza un apagado controlado de
+además de no asignar tareas a estos núcleos, realiza un apagado controlado de
 los mismos. Para realizar esta modificación, el cambio introducido sobre el
 código de la Figura~\ref{fig:P4-puedo-ejecutar} afecta a la
 línea~\ref{lst:p4-c}, en la que en vez de disminuir la frecuencia del
@@ -784,7 +784,7 @@ durante la ejecución.
 
 
 
-\begin{lstlisting}[float,language=C++,caption={Fragmento de código para el apagado de cores de manera
+\begin{lstlisting}[float,language=C++,caption={Fragmento de código para el apagado de núcleos de manera
     dinámica.},label={fig:lst:apagado-cores}]
 char path[50];
 sprintf(path, "/sys/devices/system/cpu/cpu%d/online", coreId);
@@ -1170,8 +1170,8 @@ el grado de paralelismo explotado es menor que si se desactiva el cluster
 \BIG. Como conclusión adicional, se puede observar cómo, a pesar de que el
 rendimiento de un core \BIG (Cortex-A57 en este caso) es más elevado que el
 rendimiento de un core \LITTLE (\mbox{Cortex-A53}), realizar la ejecución sobre
-cuatro cores \LITTLE obtiene un rendimiento mayor que realizarla sobre
-únicamente dos cores \BIG.
+cuatro núcleos \LITTLE obtiene un rendimiento mayor que realizarla sobre
+únicamente dos núcleos \BIG.
 
 
 \begin{table}
@@ -1290,7 +1290,7 @@ rendimiento obtenido en los experimentos para la política P6 sea menor al
 obtenido para la política P5. Sin embargo, como en la plataforma \odroid
 desactivar el cluster \BIG supone un consumo cercano a cero, las medidas
 para la potencia instantánea son muy inferiores a las obtenidas provocando
-que los cores estuvieran \emph{idle} pero sin llegar a
+que los núcleos estuvieran \emph{idle} pero sin llegar a
 desactivarlos. Combinando estos dos resultados se obtiene el rendimiento
 energético mostrado en la tabla~\ref{tab:mejora-gflopsw-p6}. Como se puede
 apreciar, la mejora en el consumo de potencia es superior a la pérdida de
