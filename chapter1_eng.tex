@@ -9,17 +9,17 @@
 \section*{Motivation}
 
 
-In the last days, energy consumption has reveal as one of the barriers that
-have stopped the performance improvement in all computer systems, from mobile
-devices to big data centres. In order to improve the energy efficiency, it
-is necessary to exploit greater specialisation levels in the
-hardware. Nowadays architectures provide different types of heterogeneity,
-from heterogeneous configurations for data centres, to processors with
-hardware accelerators inside the chip, hybrid platforms composed by general
-purpose processors (CPUs) and specific purpose accelerators (like GPUs,
-Intel Xeon Phi, etc.), asymmetric multicores (AMPSs) with similar
-instruction set, or heterogeneous multicores with different instruction
-sets~\cite{NRC2011,KoSh13}.
+In recent years, energy consumption has been revealed as one of the
+barriers that has stopped performance improvements in all computer
+systems, from mobile devices to big data centres. In order to improve the
+energy efficiency, it is necessary to exploit greater specialisation levels
+in the hardware. Nowadays, architectures provide different types of
+heterogeneity, from heterogeneous configurations for data centres, to
+processors with hardware accelerators inside the chip, hybrid platforms
+composed by general purpose processors (CPUs) and specific purpose
+accelerators (like GPUs, Intel Xeon Phi, etc.), asymmetric multicores
+(AMPSs) with a similar instruction set, or heterogeneous multicores with
+different instruction sets~\cite{NRC2011,KoSh13}.
 
 % En los últimos años, el consumo energético ha emergido como una de las
 % principales barreras que ha frenado la mejora de rendimiento en los
@@ -40,15 +40,15 @@ The correct exploitation of performance and energy efficiency offered by
 these architectures leads to an increase in complexity of the software that
 permits, in the most transparent way for the end user, the adaptation of
 already existing applications or newly developed applications to increase
-the performance and reduce the energy consumption~\cite{OsTo10,
-  SKC+15}. One of the main challenges in this topic is the right assignment
-of work to the existent computational resources, in such a way that,
+performance and reduce the energy consumption~\cite{OsTo10, SKC+15}. One of
+the main challenges in this topic is the right assignment of work to the
+existent computational resources, which should be done in such a way that,
 simultaneously, its activity degree and the adaptation between the task and
-the resources are optimised.In response of these needs, one of the
+the resources are optimised. In response to these needs, one of the
 scientific community solutions proposed is the development of programming
 models which expose the task parallelism degree, exploited in execution
-time by task schedulers (usually known as runtimes~\cite{VMC+14}).
-This software layer can manage, in a transparent user way, the process of
+time by task schedulers (usually known as runtimes~\cite{VMC+14}).  This
+software layer can manage, in a transparent user way, the process of
 managing the dependencies between tasks, data transfers between
 heterogeneous environments, and the efficient assignment between types of
 tasks and processors, as many others aspects.
@@ -72,11 +72,11 @@ tasks and processors, as many others aspects.
 % entornos heterogéneos, y el mapeado eficiente entre tipos de tareas y de
 % procesador, entre otros aspectos.
 
-Regarding underlying architectures, the work focus on one of the family
+Regarding underlying architectures, the work focuses on one of the family
 architectures with more future perspective between the previously cited:
-asymmetric multicore architectures (AMPs) with low energy consumption,
+asymmetric multicore architectures (AMPs) with low energy consumption and,
 specifically, processors of ARM's big.LITTLE family. This kind of
-configurations have cause a high interest in the application market and
+configurations has caused a high interest in the application market and
 mobile ecosystems, because of the specialisation of each kind of processor
 to specific tasks. This kind of specialisation is translated into the
 activation/deactivation of each kind of core depending of the computational
@@ -127,8 +127,7 @@ new challenges to face. This work focus on two of these challenges:
   dynamic frequency scaling (DVFS) techniques, or deactivating cores in
   different moments during the application execution depending on the
   computing demands and parallelism degree available, and evaluation of the
-  impact of this techniques over the execution time and global energy
-  consumption. 
+  impact of these techniques in run-time and global energy consumption.
 % \item Diseño de técnicas de reducción de consumo energético. Aplicación de
 %   técnicas de escalado dinámico de frecuencia (DVFS) o desactivación de
 %   núcleos en distintas fases de la ejecución de una determinada aplicación,
@@ -149,24 +148,25 @@ new challenges to face. This work focus on two of these challenges:
 \section*{Methodology and work plan}
 
 In order to achieve the objectives described in the previous section, the
-next specific task has been done:
+next specific tasks have been done:
 
 % Para alcanzar los objetivos descritos en el apartado anterior, se han
 % abordado las siguientes tareas específicas:
 \begin{enumerate}[T1.]
 
-\item Study of the state of asymmetric system from an architectural point
-  of view, and of the software support for exploiting its characteristics,
-  from the operative system level, \emph{runtime} level or application level.
+\item Study of the state of the art of asymmetric systems from an
+  architectural point of view, and of the software support for exploiting
+  its characteristics, from the operative system level, \emph{runtime}
+  level or application level.
 % \item Estudio del estado del arte en sistemas asimétricos desde el punto de
 %   vista arquitectural, y del soporte software disponible para explotar sus
 %   características, a nivel de sistema operativo, \emph{runtime} o
 %   aplicación.
 
-\item Study, analysis and evaluation of the performance of the library
-  family non conscious of the architect's asymmetry, also of solutions
-  adapted for this kind of architectures. In the lineal algebra scope,
-  using this as unifying thread, BLIS library~\cite{BLIS1} has been used.
+\item Study, analysis and evaluation of performance of family libraries non
+  conscious of the architect's asymmetry, and also of solutions adapted for
+  this kind of architectures. In the linear algebra scope, used as the main
+  thread of this work, the BLIS library~\cite{BLIS1} has been used.
 % \item Estudio, análisis y evaluación del rendimiento de familias de
 %   bibliotecas y planificadores de tareas en tiempo de ejecución no
 %   conscientes de la asimetría de la arquitectura, así como soluciones ya
@@ -174,21 +174,21 @@ next specific task has been done:
 %   lineal, utilizado como hilo conductor del trabajo, se ha utilizado la
 %   biblioteca BLIS~\cite{BLIS1}.
 
-\item Integration of the previous libraries over existing non
-  asymmetry-aware conscious schedulers, for exploiting in a transparent
-  way, the asymmetry of the architecture without modifying the actual
-  schedulers, specially over a set of mathematical interesting operations.
+\item Integration of the previous libraries over existing asymmetry-aware
+  non conscious schedulers, to exploit the asymmetry of the architecture
+  without modifying the actual schedulers in a transparent way, specially
+  over a set of mathematical interesting operations.
 % \item Integración de las anteriores bibliotecas sobre \emph{runtimes} no
 %   conscientes de la asimetría ya existentes, para explotar de forma
 %   transparente la asimetría de las arquitecturas sin modificaciones en los
 %   planificadores, para un conjunto de operaciones matemáticas de interés.
 
-\item Design of heuristics, resources scheduling politics and exploitation
-  of the low power modes provided by this kind of architectures (¿¿??),
-  allowing an optimal use of the resources in existing schedulers, with the
-  objective of exploiting in an energy efficiency way all the
-  available computational resources. (Perdón por esta frase. Borrala cuando
-  la leas :()
+\item Design of heuristics, resource scheduling policies and exploitation
+  of low power consuming modes provided by this kind of architectures,
+  which allow an optimal use of the resources in existing schedulers, with
+  the objective of exploiting every existing computational resource in an
+  energy efficient way.
+  
 % \item Diseño de heurísticas, políticas de asignación de recursos y
 %   explotación de los modos de bajo consumo proporcionados por las
 %   arquitecturas, que permitan un aprovechamiento óptimo de los recursos a
@@ -197,8 +197,8 @@ next specific task has been done:
 %   recursos computacionales existentes.
 
 
-\item Evaluation of performance and energy efficiency of the new politics
-  developed. Comparison between these results with  actual asymmetry-aware
+\item Evaluation of performance and energy efficiency of the new policies
+  developed. Comparison between these results with current asymmetry-aware
   solutions. 
 % \item Evaluación del rendimiento y eficiencia energética de las nuevas
 %   políticas desarrolladas. Comparación de los resultados con soluciones
@@ -207,20 +207,20 @@ next specific task has been done:
 
 
 \section*{Document structure}
-This document is organised as follow:
-Chapter~\ref{ch:chapter2} shows a general description of heterogeneous and
-asymmetric architectures more used nowadays, focusing on ARM's big.LITTLE
-architectures used in this work. Also, specific characteristic of the
-environment used for testing (hardware and software details) are described.
-Chapter~\ref{ch:chapter3} introduce the two parallel strategies used on
-this work: task-level parallelism and data-level parallelism, focusing on
-the characteristics of each one, also its advantages and disadvantages.
-Chapters~\ref{ch:chapter4}~and~\ref{ch:chapter5} shows a complete
-description of the work developed, split into the techniques developed and
-evaluated for obtaining a performance gain over task-level schedulers, and
-techniques developed for obtain energy efficiency gain, respectively.
-Finally, chapter~\ref{ch:chapter6} shows a set of general conclusions and
-future work.
+This document is organised as follow: Chapter~\ref{ch:chapter2} shows a
+general description of the heterogeneous and asymmetric architectures most
+used nowadays, focusing on ARM's big.LITTLE architectures used in this
+work. Also, specific characteristics of the environment used for testing
+(including hardware and software) are described. Chapter~\ref{ch:chapter3}
+introduces the two parallel strategies used in this work: task-level
+parallelism and data-level parallelism, focusing on the characteristics of
+each one of them and also on their advantages and disadvantages.
+Chapters~\ref{ch:chapter4}~and~\ref{ch:chapter5} show a complete
+description of the work developed, splitted into the proposed techniques
+and their evaluation for obtaining a performance gain over task-level
+schedulers, and techniques developed for obtain at least some energy
+efficiency gain, respectively. Finally, chapter~\ref{ch:chapter6} shows a
+set of general conclusions and future work.
 
 
 % La presente memoria se estructura como sigue. 
