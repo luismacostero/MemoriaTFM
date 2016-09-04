@@ -83,7 +83,7 @@ al rendimiento y al consumo energético de una aplicación:
   va a generar un mayor rendimiento que si se ejecuta sobre un núcleo del
   cluster \LITTLE.
 \item El número de núcleos activos durante la ejecución del problema. Un
-  número bajo de núcleos activos puede suponer una pérdida del rendimiento
+  número bajo de núcleos activos puede suponer una pérdida de rendimiento
   global considerable, sin embargo también supone un ahorro en el consumo
   energético del procesador.
 \item La frecuencia a la que trabajan los distintos clusters. Frecuencias
@@ -94,9 +94,9 @@ al rendimiento y al consumo energético de una aplicación:
 
 A partir de estas tres dimensiones, existen muchas formas de combinar los
 distintos factores para conseguir adaptar el rendimiento y el consumo
-energético de acuerdo a la aplicación a ejecutar. En las siguientes
-secciones se exploran las técnicas principales para obtener la mejora en
-rendimiento y energía, adaptadas para este tipo de plataformas.
+energético a la aplicación a ejecutar. En las siguientes secciones se
+exploran las técnicas principales para obtener la mejora en rendimiento y
+energía, adaptadas para este tipo de plataformas.
 
 \begin{figure}
   \centering
@@ -131,7 +131,7 @@ rendimiento y energía, adaptadas para este tipo de plataformas.
 La Figura~\ref{fig:modelo_consumo} relaciona dos de los puntos anteriores,
 mostrando la potencia instantánea consumida por cada cluster que compone la
 arquitectura en función del número de núcleos activos y la frecuencia de
-ejecución del mismo. Aunque el experimento se ha realizado ejecutando
+ejecución de los mismos. Aunque el experimento se ha realizado ejecutando
 varias llamadas en paralelo para realizar una multiplicación de matrices
 \texttt{gemm} (una por cada núcleo activo), se ha comprobado
 experimentalmente que todas las tareas que forman parte de la factorización
@@ -222,7 +222,7 @@ parte de tareas listas para ser ejecutadas sean tareas pertenecientes al
 considerarte listas para ejecución hasta que las tareas críticas finalicen.
 
 Este comportamiento puede observarse en una aplicación cuyo grafo de
-dependencias se encaja muy rápidamente en algún punto intermedio de la
+dependencias se encoja muy rápidamente en algún punto intermedio de la
 ejecución, para luego volverse a expandir rápidamente (un árbol con forma
 de diábolo). En este tipo de árbol, las tareas ``centrales'' serán
 críticas, ya que son prioritarias para que la ejecución paralela prosiga, y
@@ -319,7 +319,7 @@ ejecución del problema. Como se puede apreciar, al inicio de la ejecución
 de manera escalonada en función de la relación entre el tamaño de ambas
 colas. Una vez el número de tareas no críticas aumenta, el cluster se
 mantiene a máxima frecuencia durante la mayor parte de la ejecución hasta
-que esta se encuentra en las fases finales donde el número de tareas
+que ésta se encuentra en las fases finales donde el número de tareas
 críticas vuelve a ser elevado respecto al número de tareas no críticas y la
 frecuencia vuelve a disminuirse.
 
@@ -350,7 +350,7 @@ de núcleos \LITTLE, con el fin de no causar gran impacto sobre el
 rendimiento global. Además, las políticas han sido desarrolladas sobre el
 planificador \botlev descrito en la sección~\ref{s3:botlev}, con el
 objetivo de asegurar que las tareas críticas se ejecutan en los núcleos
-\BIG y así evitar que estas retrasen su ejecución si se ejecutaran en un
+\BIG y así evitar que éstas retrasen su ejecución si se ejecutan en un
 núcleo \LITTLE con la frecuencia disminuida.
 
 Para determinar cuándo variar la frecuencia del cluster, las políticas P2 y
@@ -366,7 +366,7 @@ listas para ser ejecutadas, y determinan cuál es el tamaño máximo de la
 cola hasta el momento de manera dinámica. Si la cola posee un tamaño igual
 o superior al tamaño máximo conocido, significa que el número de tareas es
 elevado y por tanto la frecuencia debe ser elevada. Si el tamaño es menor,
-entonces se determina en que porcentaje es menor, y en función de las
+entonces se determina en qué porcentaje es menor, y en función de las
 frecuencias consideradas se toma la decisión de modificar la frecuencia
 actual o no.
 
@@ -530,7 +530,7 @@ verifiquen algunas condiciones cuando se ejecute la aplicación sobre el
   del SoC. En el caso en el que el número de \wts es superior, varios \wts
   compiten por ejecutarse simultáneamente en el mismo núcleo. De manera
   contraria, si el número de \wts es menor que el número de núcleos, se
-  está desaprovechando recursos ya que no se utilizan todos los núcleos de
+  están desaprovechando recursos ya que no se utilizan todos los núcleos de
   manera simultánea. En \nanos esto se consigue mediante el argumento
   \texttt{--smp-workers=<n>}.
 \item Cada \wt debe estar asignado a un núcleo único de la placa,
@@ -541,14 +541,14 @@ verifiquen algunas condiciones cuando se ejecute la aplicación sobre el
 \item Aunque se tenga control sobre qué tarea se ejecuta en qué \wt (y por
   tanto en qué núcleo), existen ciertas tareas pertenecientes al propio
   \emph{runtime} o al código no paralelo del programa sobre las que no se
-  puede tomar decisiones desde el planificador, siendo normal que este
+  pueden tomar decisiones desde el planificador, siendo normal que este
   código se ejecute sobre el \wt principal, normalmente ejecutado sobre el
   núcleo 0 de la máquina.
 \end{itemize}
 
 
 En las políticas anteriores, donde se disponía de un número limitado de
-frecuencias, el momento en el que aplicar el cambio de frecuencia viene
+frecuencias, el momento en el que aplicar el cambio de frecuencia venía
 determinado por el número de frecuencias posibles para el cluster,
 repartiendo el número máximo de tareas listas de manera equitativa entre
 todas ellas. Para dar mayor flexibilidad a esta política, el punto en el
@@ -561,7 +561,7 @@ activando y desactivando de manera continuada, mediante experimentación se
 ha decidido insertar un margen del 10\% del tamaño de la cola antes de
 tomar la decisión de apagar o encender el cluster.
 
-La Figura~\ref{fig:P4-puedo-ejecutar} muestra un fragmento del código
+El Listado~\ref{fig:P4-puedo-ejecutar} muestra un fragmento del código
 encargado de determinar si un \wt debe ejecutar una tarea lista o no. La
 función recibe por parámetro el núcleo al que se encuentra asignado el \wt
 y devuelve un valor \emph{booleano} en función de si el cluster se
@@ -678,7 +678,7 @@ de trabajo}
 
 Una de las muchas funcionalidades que ofrece el kernel Linux es la de poder
 activar y desactivar núcleos bajo demanda y de manera dinámica. En
-cualquier momento de la ejecución, un núcleo puede ser desactivado, y este
+cualquier momento de la ejecución, un núcleo puede ser desactivado, y éste
 desaparece del sistema, siendo totalmente transparente para cualquier
 aplicación en ejecución. Esto implica que si se decide apagar un núcleo,
 todos los procesos asociados a ese núcleo son migrados a otro de manera
@@ -766,21 +766,20 @@ conclusiones:
 \end{enumerate}
 
 
-Aprovechando la caída de potencia cuando el cluster de
-núcleos \BIG se desactiva por completo en la plataforma \odroid, la política
-P6 ha sido desarrollada como una modificación de la política anterior, pero
-además de no asignar tareas a estos núcleos, realiza un apagado controlado de
-los mismos. Para realizar esta modificación, el cambio introducido sobre el
-código de la Figura~\ref{fig:P4-puedo-ejecutar} afecta a la
+Aprovechando la caída de potencia cuando el cluster de núcleos \BIG se
+desactiva por completo en la plataforma \odroid, la política P6 ha sido
+desarrollada como una modificación de la política anterior, pero además de
+no asignar tareas a estos núcleos, realiza un apagado controlado de los
+mismos. Para realizar esta modificación, el cambio introducido sobre el
+código del Listado~\ref{fig:P4-puedo-ejecutar} afecta a la
 línea~\ref{lst:p4-c}, en la que en vez de disminuir la frecuencia del
 cluster, se realiza una llamada al código encargado de realizar el apagado
-de los distintos núcleos, mostrado en la
-Figura~\ref{s5:fig:apagadoCores}. Como se puede observar, el apagado del
-núcleo se realiza escribiendo el valor 0 en el fichero del sistema ({\sc sysFS}) que se
-encuentra en la ruta
-\texttt{/sys/devices/system/cpu/cpu<cpuId>/online}. Esta operación se ha protegido
-mediante un cerrojo para evitar problemas de concurrencia
-durante la ejecución.
+de los distintos núcleos, mostrado en el Listado~\ref{fig:lst:apagado-cores}. Como se puede observar, el apagado del
+núcleo se realiza escribiendo el valor 0 en el fichero del sistema ({\sc
+  sysFS}) que se encuentra en la ruta
+\texttt{/sys/devices/system/cpu/cpu<cpuId>/online}. Esta operación se ha
+protegido mediante un cerrojo para evitar problemas de concurrencia durante
+la ejecución.
 
 
 
@@ -1038,7 +1037,7 @@ la cual muestra los datos obtenidos para una configuración concreta del
 problema (en este caso, para una matriz de $8192 \times 8192$ elementos divida en bloques
 de dimensión 1024). Como se puede observar en la figura, la
 disminución de la potencia media en las políticas P1, P2 y P2' sobre el
-cluster \LITTLE es ínfima frente a la perdida de rendimiento, seguramente
+cluster \LITTLE es ínfima frente a la pérdida de rendimiento, seguramente
 causada por el alto grado de eficiencia energética que posee un procesador
 \LITTLE, provocando que no exista mejora en el rendimiento energético. Sin
 embargo, la política P3 provoca una gran reducción de la potencia en el
@@ -1160,18 +1159,19 @@ P5). La Tabla~\ref{tab:p4-p5:gflops} muestra el rendimiento alcanzado por
 cada configuración del problema, política y plataforma según el momento
 elegido para desactivar el cluster correspondiente. Nótese que mientras que
 en la plataforma \juno es la política P4 la que obtiene peor rendimiento
-frente a la política P5, en la plataforma \odroid sucede al contrario. Una
-de las causas que provoca este hecho se encuentra en el tamaño de cada
-cluster en cada una de las plataformas. En \juno, el cluster \BIG se
-encuentra formado únicamente por dos núcleos, mientras que el cluster
-\LITTLE se encuentra formado por cuatro. Al desactivar el cluster \LITTLE,
-únicamente se disponen de dos núcleos donde ejecutar las tareas, por lo que
-el grado de paralelismo explotado es menor que si se desactiva el cluster
-\BIG. Como conclusión adicional, se puede observar cómo, a pesar de que el
-rendimiento de un core \BIG (Cortex-A57 en este caso) es más elevado que el
-rendimiento de un core \LITTLE (\mbox{Cortex-A53}), realizar la ejecución sobre
-cuatro núcleos \LITTLE obtiene un rendimiento mayor que realizarla sobre
-únicamente dos núcleos \BIG.
+frente a la política P5, en la plataforma \odroid sucede al contrario para
+las tres primeras columnas de la tabla. Una de las causas que provoca este
+hecho se encuentra en el tamaño de cada cluster en cada una de las
+plataformas. En \juno, el cluster \BIG se encuentra formado únicamente por
+dos núcleos, mientras que el cluster \LITTLE se encuentra formado por
+cuatro. Al desactivar el cluster \LITTLE, únicamente se dispone de dos
+núcleos donde ejecutar las tareas, por lo que el grado de paralelismo
+explotado es menor que si se desactiva el cluster \BIG. Como conclusión
+adicional, se puede observar cómo, a pesar de que el rendimiento de un core
+\BIG (Cortex-A57 en este caso) es más elevado que el rendimiento de un core
+\LITTLE (\mbox{Cortex-A53}), realizar la ejecución sobre cuatro núcleos
+\LITTLE obtiene un rendimiento mayor que realizarla sobre únicamente dos
+núcleos \BIG.
 
 
 \begin{table}
@@ -1183,7 +1183,7 @@ cuatro núcleos \LITTLE obtiene un rendimiento mayor que realizarla sobre
     \begin{tabular}{lcccccccccccc}
       \toprule
       \phantom{a} & \phantom{a} & \multicolumn{5}{c}{\juno} & \phantom{a} & \multicolumn{5}{c}{\odroid}\\
-      \phantom{a} & \phantom{a} & 10\% & 20\% & 30\% & 40\% & 50\% & \phantom{a} & 10\% & 20\% & 30\% & 40\% & 50\% \\\hline
+      \phantom{a} & \phantom{a} & 50\% & 40\% & 30\% & 20\% & 10\% & \phantom{a} & 50\% & 40\% & 30\% & 20\% & 10\% \\\hline
 
 {\sc P4} & \phantom{a} & 52.18\% & 59.56\% & 67.33\% & 78.29\% & 85.87\% & \phantom{a} & 70.477\% & 75.93\% & 82.19\% & 87.55\% & 91.43\%\\
 {\sc P5} & \phantom{a} & 58.2\% & 62.99\% & 69.85\% & 76.05\% & 84.77\% & \phantom{a} &61.96\% & 67.85\% & 74.59\% & 82.03\% & 90.27\%\\\bottomrule

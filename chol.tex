@@ -33,7 +33,7 @@ DAG.
 Los modelos de programación basados en la extracción de paralelismo a nivel
 de tareas han demostrado su utilidad, particularmente en el campo del
 álgebra lineal~\cite{Abalenkovs}. En general, estos modelos proporcionan al
-programador en primer lugar un mecanismos para expresar el paralelismo
+programador en primer lugar un mecanismo para expresar el paralelismo
 potencial a nivel de tareas existente en la aplicación, normalmente en
 forma de grafo de tareas, y en segundo lugar un planificador de tareas (o
 runtime) que realice una planificación dinámica de las mismas, respetando
@@ -43,13 +43,16 @@ aprovechamiento de las unidades de procesamiento disponibles.
 Entre las propuestas e implementaciones más extendidas para este tipo de modelo de programación cabe
 destacar, entre otros, Cilk Plus, StarPU, Superglue, QUARK, Kaapi y OmpSs. 
 
-Cilk Plus~\cite{cilkweb,Blumofe:Cilk,Frigo:Cilk,Leiserson:Cilk} es un lenguaje diseñado exclusivamente
-para programación paralela basado en C, con extensiones que permiten expresar tanto el paralelismo a nivel
-de tareas como a nivel de datos. Cilk incorpora un componente software para la planificación de tareas
-en tiempo de ejecución aprovechando el paralelismo expuesto por el programador. Fue desarrollado en los
-años 90 en el MIT, distribuido de forma comercial más tarde por Intel, y liberado e integrado en proyectos
-de software libre (por ejemplo, GCC) más tarde. En su versión actual, Cilk no incorpora ningún soporte 
-específico para arquitecturas heterogéneas ni asimétricas.
+Cilk Plus~\cite{cilkweb,Blumofe:Cilk,Frigo:Cilk,Leiserson:Cilk} es un
+lenguaje diseñado exclusivamente para programación paralela basado en C,
+con extensiones que permiten expresar tanto el paralelismo a nivel de
+tareas como a nivel de datos. Cilk incorpora un componente software para la
+planificación de tareas en tiempo de ejecución que aprovecha el paralelismo
+expuesto por el programador. Fue desarrollado en los años 90 en el MIT,
+distribuido de forma comercial más tarde por Intel, y liberado e integrado
+en proyectos de software libre (por ejemplo, GCC) más tarde. En su versión
+actual, Cilk no incorpora ningún soporte específico para arquitecturas
+heterogéneas ni asimétricas.
 
 StarPU~\cite{starpuweb,Augonnet:2011:SUP:1951453.1951454,agullo:hal-01223573,agullo:hal-01120507}
 implementa un planificador de tareas en tiempo de ejecución y da soporte de
@@ -91,7 +94,7 @@ gestionadas automáticamente por el planificador.
 
 \subsection{OmpSs. Modelo de programación y planificación de tareas}
 
-OmpSs es uno de los modelos de programación paralela a nivel de tareas más
+\ompss~\cite{ompssweb,ompss} es uno de los modelos de programación paralela a nivel de tareas más
 extendidos a día de hoy. A grandes rasgos, el diseño del modelo de
 programación se basa en la inclusión de directivas (o {\tt pragma}s)
 similares a las utilizadas en otros modelos de programación paralela, como
@@ -125,7 +128,7 @@ sincronización de las distintas tareas.
 \subsubsection{Planificación de tareas en OmpSs. El \emph{runtime} Nanox}
 
 Una vez que un código anotado ha sido compilado con el compilador de OmpSs
-Mercurium, este puede ser ejecutado a través del \emph{runtime} de OmpSs
+Mercurium, éste puede ser ejecutado a través del \emph{runtime} de OmpSs
 denominado Nanox, consistente en una serie de librerías encargadas de
 controlar la ejecución del programa e intentar finalizar la ejecución de la
 manera más eficiente posible. Para ello, Nanox está compuesto por un núcleo
@@ -148,10 +151,10 @@ resto de hilos pueden estar ociosos en el caso de no existir ninguna tarea
 lista para ejecución, este hilo siempre estará ocupado. Notar que al
 contrario que en el modelo de ejecución usado por OpenMP, Nanox no crea un
 nuevo hilo por cada tarea a ejecutar, sino que crea un conjunto de hilos al
-inicio de la aplicación, y son estos los encargados de ejecutar todas las
+inicio de la aplicación, y son éstos los encargados de ejecutar todas las
 tareas del programa, finalizando su vida al acabar la ejecución de la misma.
 
-Cuando un \wt finaliza la ejecución de una tarea, este realiza dos acciones
+Cuando un \wt finaliza la ejecución de una tarea, éste realiza dos acciones
 sobre el \emph{runtime}:
 \begin{enumerate}
 \item El \wt informa al \emph{runtime} de la finalización de la tarea. Al
@@ -166,14 +169,14 @@ sobre el \emph{runtime}:
   haya decidido usar, y del \wt que solicite la tarea, decidirá qué tarea
   debe ejecutar. En caso de no existir ninguna tarea lista para ejecutar, o
   de que el \wt no sea el idóneo para ejecutar ninguna de las tareas listas
-  existentes, este pasa a estado inactivo hasta la creación de nuevas
+  existentes, éste pasa a estado inactivo hasta la creación de nuevas
   tareas, evitando así consumir recursos de manera innecesaria.
 \end{enumerate}
 
-La forma en la que se crean nuevas tareas corresponde al momento en el que
-un \wt en ejecución se encuentra una anotación para la creación de una
-nueva tarea. En este momento, \wt informa al \emph{runtime} para que cree
-la tarea correspondiente y la inserte al DAG del problema, esperando a que
+La creación de nuevas tareas tiene lugar en el momento en el que un \wt en
+ejecución se encuentra una anotación para la creación de una nueva
+tarea. En este momento, el \wt informa al \emph{runtime} para que cree la
+tarea correspondiente y la inserte al DAG del problema, esperando a que
 todas sus dependencias sean satisfechas y la nueva tarea esté lista para su
 ejecución.
 
@@ -295,16 +298,17 @@ objetivo intentando calcular de manera dinámica qué tareas pertenecen al
 camino crítico del DAG asociado al problema, y ejecutar estas tareas sobre
 núcleos rápidos con el objetivo de finalizar su ejecución cuanto
 antes. Además, en caso de existir más tareas no críticas, las tareas
-críticas tendrán preferencia frente a las tareas críticas. El objetivo de
-garantizar que las tareas del camino crítico se ejecutan en los núcleos
+críticas tendrán preferencia frente a las tareas no críticas. El objetivo
+de garantizar que las tareas del camino crítico se ejecutan en los núcleos
 rápidos cuanto antes es asegurarse que al ejecutar las tareas críticas,
-estas liberarán dependencias con nuevas tareas que pasarán a estar listas
+éstas liberarán dependencias con nuevas tareas que pasarán a estar listas
 para ejecución, y así intentar conseguir que nunca haya \wts ociosos a
 causa de que no existan tareas listas para ejecutar, lo cual disminuiría el
-rendimiento global de la aplicación. La principal diferencia entre \botlev y
-los planificadores tradicionales para sistemas heterogéneos es que \botlev
-toma las decisiones en tiempo dinámico sin necesidad de conocer de antemano
-información sobre las tareas, o la forma del árbol de dependencias.
+rendimiento global de la aplicación. La principal diferencia entre \botlev
+y los planificadores tradicionales para sistemas heterogéneos es que
+\botlev toma las decisiones en tiempo dinámico sin necesidad de conocer de
+antemano información sobre las tareas, o la forma del árbol de
+dependencias.
 
 Para determinar si una tarea pertenece al camino crítico o no en tiempo de
 ejecución, \botlev asigna una prioridad a cada tarea en el momento de la
@@ -319,7 +323,7 @@ tarea hoja del grafo de dependencias. Cuando una tarea es introducida en el
 DAG asociado al problema, se le asigna una prioridad 0 ya que la longitud
 del camino más largo desde la tarea a un nodo hoja (ella misma) es
 0. Además, cuando una nueva tarea es insertada en el árbol, se actualizan
-todas las tareas predecesoras, ya que las prioridades de estas pueden haber
+todas las tareas predecesoras, ya que las prioridades de éstas pueden haber
 cambiado: por cada tarea predecesora, se intenta aumentar la prioridad en 1
 unidad (el camino es un nodo más largo), siempre que no tuviera una
 prioridad mayor antes (este es el caso de que la tarea pertenezca a un
@@ -380,12 +384,12 @@ críticas listas para ser ejecutadas en función del momento de la ejecución
 del problema, mientras que la línea roja muestra el número de tareas
 críticas. Como se puede apreciar, a mitad de ejecución el número de tareas
 listas para ejecución disminuye considerablemente, y hasta que un conjunto
-de tareas detectadas como críticas no son ejecutadas, el número de tareas
+de tareas detectadas como críticas son ejecutadas, el número de tareas
 listas no vuelve a aumentar. Este es un ejemplo de cómo retrasar la
 ejecución de una tarea crítica supone retrasar la creación de tareas, y por
 tanto, tener un impacto negativo en el rendimiento.
 
-Cuando un core big finaliza la ejecución de una tarea, este ejecutará la
+Cuando un core \BIG finaliza la ejecución de una tarea, éste ejecutará la
 siguiente tarea de la cola de tareas críticas, mientras que un core LITTLE
 ejecutará la primera tarea de la cola de tareas no críticas. De esta forma
 se consigue asignar las tareas críticas a núcleos big, mientras que las
@@ -444,7 +448,7 @@ donde las dependencias de datos internos a cada tarea son sencillas, o
 cuando el número de núcleos en el sistema es reducido, esta opción
 típicamente conlleva menos sobrecarga en tiempo de ejecución, y por tanto
 proporciona una solución más eficiente desde el punto de vista del
-rendimiento. A día de hoy, esta es la opción preferida y adoptada en
+rendimiento. A día de hoy, ésta es la opción preferida y adoptada en
 bibliotecas comerciales y de software libre, como por ejemplo AMD
 ACML~\cite{ACML}, IBM ESSL~\cite{ESSL}, Intel MKL~\cite{mkl},
 GotoBLAS~\cite{Goto:2008:AHP}, OpenBLAS~\cite{OpenBLAS} o
@@ -483,7 +487,7 @@ rendimiento pico de la arquitectura, tanto en sistemas multinúcleo como
 sistemas con aceleradores~\cite{BLIS2,BLIS3}.  Estos estudios han derivado en
 versiones de la implementación conscientes de la asimetría sobre
 arquitecturas ARM big.LITTLE bajo el modelo de ejecución
-GTS. Concretamente, versión multihebra consciente de la asimetría descrita
+GTS. Concretamente, la versión multihebra consciente de la asimetría descrita
 en~\cite{asymBLIS} integra las siguientes tres técnicas:
 \begin{itemize}
 \item Un particionado dinámico 1-D del espacio de iteraciones para distribuir la carga de los bucles~1 y~3 sobre los dos

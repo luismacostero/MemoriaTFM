@@ -10,16 +10,16 @@
 
 
 In recent years, energy consumption has been revealed as one of the
-barriers that has stopped performance improvements in all computer
-systems, from mobile devices to big data centres. In order to improve the
-energy efficiency, it is necessary to exploit greater specialisation levels
-in the hardware. Nowadays, architectures provide different types of
-heterogeneity, from heterogeneous configurations for data centres, to
-processors with hardware accelerators inside the chip, hybrid platforms
-composed by general purpose processors (CPUs) and specific purpose
-accelerators (like GPUs, Intel Xeon Phi, etc.), asymmetric multicores
-(AMPSs) with a similar instruction set, or heterogeneous multicores with
-different instruction sets~\cite{NRC2011,KoSh13}.
+barriers that has stopped performance improvements in all computer systems,
+from mobile devices to big data centres. In order to improve the energy
+efficiency, it is necessary to exploit greater specialisation levels in the
+hardware. Nowadays, architectures provide different types of heterogeneity,
+from heterogeneous configurations for data centres, to processors with
+hardware accelerators inside the chip, hybrid platforms composed by general
+purpose processors (CPUs) and specific purpose accelerators (like GPUs,
+Intel Xeon Phi, etc.), asymmetric multicores (AMPSs) with the same
+instruction set, or heterogeneous multicores with different instruction
+sets~\cite{NRC2011,KoSh13}.
 
 % En los últimos años, el consumo energético ha emergido como una de las
 % principales barreras que ha frenado la mejora de rendimiento en los
@@ -46,7 +46,7 @@ existent computational resources, which should be done in such a way that,
 simultaneously, its activity degree and the adaptation between the task and
 the resources are optimised. In response to these needs, one of the
 scientific community solutions proposed is the development of programming
-models which expose the task parallelism degree, exploited in execution
+models which expose the task parallelism, exploited in execution
 time by task schedulers (usually known as runtimes~\cite{VMC+14}).  This
 software layer can manage, in a transparent user way, the process of
 managing the dependencies between tasks, data transfers between
@@ -163,10 +163,11 @@ next specific tasks have been done:
 %   características, a nivel de sistema operativo, \emph{runtime} o
 %   aplicación.
 
-\item Study, analysis and evaluation of performance of family libraries non
-  conscious of the architect's asymmetry, and also of solutions adapted for
-  this kind of architectures. In the linear algebra scope, used as the main
-  thread of this work, the BLIS library~\cite{BLIS1} has been used.
+\item Study, analysis and evaluation of performance of families of
+  libraries and schedulers non conscious of the architecture's asymmetry, and
+  also of solutions adapted for this kind of architectures. In the linear
+  algebra scope, used as the main thread of this work, the BLIS
+  library~\cite{BLIS1} has been used.
 % \item Estudio, análisis y evaluación del rendimiento de familias de
 %   bibliotecas y planificadores de tareas en tiempo de ejecución no
 %   conscientes de la asimetría de la arquitectura, así como soluciones ya
@@ -231,7 +232,7 @@ set of general conclusions and future work.
 % realizado. Además, detalla las características específicas del entorno
 % experimental empleado a nivel hardware y software.
 % El Capítulo~\ref{ch:chapter3} introduce dos de las estrategias de
-p% paralelización utilizadas en el desarrollo del trabajo: extracción de
+% paralelización utilizadas en el desarrollo del trabajo: extracción de
 % paralelismo a nivel de tareas, y extracción de paralelismo a nivel de
 % datos, centrándose en las características de cada uno, así como en sus
 % ventajas e inconvenientes.
