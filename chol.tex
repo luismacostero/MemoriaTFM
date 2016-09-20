@@ -94,14 +94,14 @@ gestionadas automáticamente por el planificador.
 
 \subsection{OmpSs. Modelo de programación y planificación de tareas}
 
-\ompss~\cite{ompssweb,ompss} es uno de los modelos de programación paralela a nivel de tareas más
-extendidos a día de hoy. A grandes rasgos, el diseño del modelo de
-programación se basa en la inclusión de directivas (o {\tt pragma}s)
-similares a las utilizadas en otros modelos de programación paralela, como
-OpenMP. Sin embargo, dichas directivas se limitan en su mayoría, a la
-anotación de ciertos bloques de código (típicamente funciones) para
-informar de su carácter de {\em tareas}, es decir, unidades básicas de
-planificación a los recursos computacionales disponibles. Dicha
+\ompss~\cite{ompssweb,ompss} es uno de los modelos de programación paralela
+a nivel de tareas más extendidos a día de hoy. A grandes rasgos, el diseño
+del modelo de programación se basa en la inclusión de directivas (o {\tt
+  pragma}s) similares a las utilizadas en otros modelos de programación
+paralela, como OpenMP. Sin embargo, dichas directivas se limitan en su
+mayoría, a la anotación de ciertos bloques de código (típicamente
+funciones) para informar de su carácter de {\em tareas}, es decir, unidades
+básicas de planificación a los recursos computacionales disponibles. Dicha
 planificación se difiere hasta el momento de la ejecución del código, en el
 que un {\em planificador de tareas} o {\em runtime} (en el caso de OmpSs,
 llamado Nanox) se encarga de mapear, de forma eficiente, su ejecución al
@@ -219,7 +219,7 @@ proporcionadas por los estándares LAPACK~\cite{lapackweb} y BLAS~\cite{OpenBLAS
 	\caption[DAG con las tareas y dependencias de datos resultantes de la aplicación del código en la Figura~\ref{lst:chol}
          sobre una matriz compuesta por $4 \times 4$ bloques ({\tt s}=4).]
 	 {DAG con las tareas y dependencias de datos resultantes de la
-           aplicación del código en el Listado~\ref{lst:chol} sobre una
+           aplicación del código del Listado~\ref{lst:chol} sobre una
            matriz compuesta por $4 \times 4$ bloques ({\tt s}=4). Las
            etiquetas especifican el tipo de kernel/tarea con la siguiente
            correspondencia: ``{\sf C}'' para la Factorización de Cholesky,
@@ -238,25 +238,29 @@ genera un grafo acíclico dirigido (DAG) que refleja las dependencias entre
 tareas (esto es, entre instancias de los kernels) y, por tanto, el
 paralelismo de tareas potencial de la operación.  Por ejemplo, la Figura
 ~\ref{fig:dag} muestra el DAG con las tareas (nodos) y las dependencias de
-datos (arcos) intrínsecas a la ejecución del código del Listado~\ref{lst:chol}, cuando éste se ejecuta sobre una matriz compuesta
+datos (arcos) intrínsecas a la ejecución del código del
+Listado~\ref{lst:chol} cuando éste se ejecuta sobre una matriz compuesta
 por $4 \times 4$ submatrices (esto es, cuando {\tt s}=4).
 
-El código del Listado~\ref{lst:chol_tasks} muestra las anotaciones necesarias por parte del programador para explotar
-el paralelismo a nivel de tareas inherente a la factorización de Cholesky usando OmpSs; cabe destacar las líneas etiquetadas
-con  anotaciones (directivas) ``{\tt \#pragma omp task}''.
-Las cláusulas {\tt in}, {\tt out} e {\tt inout} denotan la direccionalidad de los datos, y ayudan al planificador
-de tareas a mantener coherentemente las dependencias entre tareas durante la ejecución. 
-En esta implementación, los cuatro kernels anotados son implementados como invocaciones a 
-kernels computacionales básicos de álgebra lineal proporcionados por LAPACK
-({\tt dpotrf}) y BLAS ({\tt dtrsm}, {\tt dgemm} y {\tt dsyrk}).
+El código del Listado~\ref{lst:chol_tasks} muestra las anotaciones
+necesarias por parte del programador para explotar el paralelismo a nivel
+de tareas inherente a la factorización de Cholesky usando OmpSs; cabe
+destacar las líneas etiquetadas con anotaciones (directivas) ``{\tt
+  \#pragma omp task}''.  Las cláusulas {\tt in}, {\tt out} e {\tt inout}
+denotan la direccionalidad de los datos, y ayudan al planificador de tareas
+a mantener coherentemente las dependencias entre tareas durante la
+ejecución.  En esta implementación, los cuatro kernels anotados son
+implementados como invocaciones a kernels computacionales básicos de
+álgebra lineal proporcionados por LAPACK ({\tt dpotrf}) y BLAS ({\tt
+  dtrsm}, {\tt dgemm} y {\tt dsyrk}).
 
 \lstinputlisting[float=th!,frame=lines,caption=Tareas etiquetadas necesarias para la factorización de Cholesky por bloques.,label=lst:chol_tasks]{Codes/cholesky_tasks.c}
 
 \subsection{Adaptación de OmpSs a arquitecturas asimétricas}
 \label{s3:botlev}
 
-En servidores equipados con uno o más aceleradores --por ejemplo,
-procesadores gráficos--, versiones especializadas de los planificadores de
+En servidores equipados con uno o más aceleradores \mbox{--por} ejemplo,
+procesadores \mbox{gráficos--,} versiones especializadas de los planificadores de
 tareas que acompañan a OmpSs, StarPU, MAGMA, Kaapi y {\tt
   libflame}~\cite{libflameref} son capaces de planificar tareas a núcleos
 de propósito general (CPUs en adelante) o a aceleradores (por ejemplo,
@@ -306,7 +310,7 @@ para ejecución, y así intentar conseguir que nunca haya \wts ociosos a
 causa de que no existan tareas listas para ejecutar, lo cual disminuiría el
 rendimiento global de la aplicación. La principal diferencia entre \botlev
 y los planificadores tradicionales para sistemas heterogéneos es que
-\botlev toma las decisiones en tiempo dinámico sin necesidad de conocer de
+\botlev toma las decisiones de forma dinámica sin necesidad de conocer de
 antemano información sobre las tareas, o la forma del árbol de
 dependencias.
 
@@ -316,8 +320,8 @@ inserción en el grafo de dependencias, y la actualiza con la creación de
 nuevas tareas. Una vez que la tarea está lista para ser ejecutada (es
 decir, cuando todas las tareas que tenían relación con la tarea mediante el
 grafo de dependencias han finalizado su ejecución), a partir de su
-prioridad se realiza la decisión de si la tarea es considerada crítica o no.\\
-La prioridad de una tarea viene dada por un número entero positivo, el cuál
+prioridad se toma la decisión de si la tarea es considerada crítica o no.\\
+La prioridad de una tarea viene dada por un número entero positivo, el cual
 representa la longitud del camino más largo desde la tarea actual hasta una
 tarea hoja del grafo de dependencias. Cuando una tarea es introducida en el
 DAG asociado al problema, se le asigna una prioridad 0 ya que la longitud
@@ -523,23 +527,31 @@ de álgebra lineal) a una plataforma asimétrica:
 		capacidades de cómputo de cada tipo de núcleo disponible.
 \end{enumerate}
 
-Las ventajas de la utilización de un planificador de tareas son obvias: menor intervención por parte del programador o usuario,
-adaptación a pequeños cambios en el comportamiento dinámico de la arquitectura ante la ejecución de un código, o modificación
-de las políticas de planificación dinámicamente, entre otras. Sin embargo, en muchas ocasiones, el sobrecoste de este tipo de
-mecanismos no es desdeñable; además, su adaptación a arquitecturas heterogéneas o asimétricas, como es el caso, requiere
-un desarrollo específico de nuevas políticas de planificación que exploten los recursos disponibles de manera eficiente.
+Las ventajas de la utilización de un planificador de tareas son obvias:
+menor intervención por parte del programador o usuario, adaptación a
+pequeños cambios en el comportamiento dinámico de la arquitectura ante la
+ejecución de un código, o modificación de las políticas de planificación
+dinámicamente, entre otras. Sin embargo, en muchas ocasiones, el sobrecoste
+de este tipo de mecanismos no es desdeñable; además, su adaptación a
+arquitecturas heterogéneas o asimétricas, como es el caso, requiere un
+desarrollo específico de nuevas políticas de planificación que exploten los
+recursos disponibles de manera eficiente.
 
-Una biblioteca de funciones específicamente desarrollada para una arquitectura asimétrica (por ejemplo, BLIS en el ámbito del álgebra lineal) elimina gran parte
-de este sobrecoste y suele conseguir mejores y más predecibles rendimientos, especialmente en arquitecturas no homogéneas. Sin
-embargo, su desarrollo conlleva implementaciones específicas para cada tipo de arquitectura, lo que supone un esfuerzo no despreciable.
+Una biblioteca de funciones específicamente desarrollada para una
+arquitectura asimétrica (por ejemplo, BLIS en el ámbito del álgebra lineal)
+elimina gran parte de este sobrecoste y suele conseguir mejores y más
+predecibles rendimientos, especialmente en arquitecturas no homogéneas. Sin
+embargo, su desarrollo conlleva implementaciones específicas para cada tipo
+de arquitectura, lo que supone un esfuerzo no despreciable.
 
 En el siguiente capítulo, se propone una solución que combina las ventajas
 de cada uno de los dos enfoques: combinando un planificador no consciente
 de la asimetría (es decir, convencional) con una biblioteca para la
 ejecución de tareas optimizada para arquitecturas asimétricas, se consigue
-aunar facilidad de programación y uso --derivado del uso de un planificador
-de tareas estándar-- con altas prestaciones --derivadas de la utilización
-de una biblioteca desarrollada ad-hoc para este tipo de arquitecturas--.
+aunar facilidad de programación y uso --debido a la utilización de un
+planificador de tareas estándar-- con altas prestaciones --derivadas de la
+utilización de una biblioteca desarrollada ad-hoc para este tipo de
+arquitecturas--.
 
 %-- Configuraciones para emacs --
 %%% Local Variables:

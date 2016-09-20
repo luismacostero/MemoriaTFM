@@ -67,7 +67,7 @@ frecuencias en las que cada cluster puede trabajar.
 \end{table}
 
 El acceso a esta característica de los procesadores en el kernel Linux se
-realiza a través del subsistema \emph{cpufreq}, el cuál proporciona la
+realiza a través del subsistema \emph{cpufreq}, el cual proporciona la
 librería \texttt{libcpufreq} y los ejecutables \texttt{cpufreq-set} y
 \texttt{cpufreq-info} que permiten obtener y modificar la frecuencia de
 cada núcleo en tiempo de ejecución.
@@ -219,7 +219,7 @@ Durante la ejecución de un programa paralelo mediante un paradigma basado
 en tareas, es común que, en cierto punto de la ejecución paralela, la mayor
 parte de tareas listas para ser ejecutadas sean tareas pertenecientes al
 {\em camino crítico}, provocando que nuevas tareas no puedan pasar a
-considerarte listas para ejecución hasta que las tareas críticas finalicen.
+considerarse listas para ejecución hasta que las tareas críticas finalicen.
 
 Este comportamiento puede observarse en una aplicación cuyo grafo de
 dependencias se encoja muy rápidamente en algún punto intermedio de la
@@ -341,7 +341,7 @@ frecuencia sobre una arquitectura asimétrica es la de pensar que debido a
 la gran diferencia de rendimiento entre los núcleos \BIG y \LITTLE (como
 muestra la Figura~\ref{fig:modelo_consumo}), aplicar una reducción de
 frecuencia a los núcleos \BIG puede suponer una pérdida significativa de
-rendimiento, lo cuál puede provocar incluso un aumento en el consumo
+rendimiento, lo cual puede provocar incluso un aumento en el consumo
 energético al acarrear un mayor tiempo global de ejecución; es decir, esta
 técnica podría llegar a empeorar tanto el rendimiento como el consumo
 energético. Para evitar que suceda este hecho, las políticas P2 y P2' han
@@ -693,8 +693,8 @@ conlleva que en cualquier momento de la ejecución se pueda desactivar uno
 de los dos cluster de la máquina, convirtiendo la arquitectura en una
 plataforma totalmente simétrica \footnote{En la práctica, no todas las
   versiones del kernel permiten apagar el núcleo 0, por lo que en estos
-  casos, no es posible apagar el completamente el cluster que contiene a
-  este núcleo}.
+  casos, no es posible apagar completamente el cluster que contiene a este
+  núcleo}.
 
 Para realizar un estudio del efecto del apagado selectivo de núcleos sobre
 el consumo energético, se ha realizado el experimento de desactivar, uno a
@@ -965,15 +965,17 @@ sobre la plataforma \juno.
 \end{table}
 
 
-Como se observa en la figura, la política que mayor rendimiento energético
-alcanza, incluso superando a una ejecución normal con \botlev es la política
-P3. Esta política, caracterizada por disminuir frecuencia sobre el cluster de
-núcleos \BIG consigue, a costa de obtener un menor rendimiento, una mejora
-elevada de rendimiento energético frente al resto de políticas y a la
-ejecución normal. La Tabla~\ref{s5:table:mejora-gflopsw} indica la mejora
-en términos gflops/watio de cada política y para cada configuración de tamaño tanto
-en la plataforma \juno como en la plataforma \odroid. Como se puede
-observar, la mejora es muy significativa para matrices de tamaño mayor a 2048,
+Como se observa en las
+Figuras~\ref{fig:resultados:all-0-3:juno}~y~\ref{fig:resultados:all-0-3:odroid},
+la política que mayor rendimiento energético alcanza, incluso superando a
+una ejecución normal con \botlev es la política P3. Esta política,
+caracterizada por disminuir frecuencia sobre el cluster de núcleos \BIG
+consigue, a costa de obtener un menor rendimiento, una mejora elevada de
+rendimiento energético frente al resto de políticas y a la ejecución
+normal. La Tabla~\ref{s5:table:mejora-gflopsw} indica la mejora en términos
+gflops/watio de cada política y para cada configuración de tamaño tanto en
+la plataforma \juno como en la plataforma \odroid. Como se puede observar,
+la mejora es muy significativa para matrices de tamaño mayor a 2048,
 alcanzando una mejora aproximada de 1 GFLOP/watio en la plataforma \juno, y
 una mejora entorno a 0.4 GFLOP/watio en la plataforma
 \odroid. Adicionalmente a esta mejora, la política P3 también consigue
@@ -1167,7 +1169,7 @@ dos núcleos, mientras que el cluster \LITTLE se encuentra formado por
 cuatro. Al desactivar el cluster \LITTLE, únicamente se dispone de dos
 núcleos donde ejecutar las tareas, por lo que el grado de paralelismo
 explotado es menor que si se desactiva el cluster \BIG. Como conclusión
-adicional, se puede observar cómo, a pesar de que el rendimiento de un core
+adicional, se puede observar como, a pesar de que el rendimiento de un core
 \BIG (Cortex-A57 en este caso) es más elevado que el rendimiento de un core
 \LITTLE (\mbox{Cortex-A53}), realizar la ejecución sobre cuatro núcleos
 \LITTLE obtiene un rendimiento mayor que realizarla sobre únicamente dos
@@ -1225,15 +1227,15 @@ Tabla~\ref{tab:mejora-gflopsw-p5} muestra con detalle la diferencia de
 rendimiento energético con la ejecución de referencia con \botlev para la
 política P5 con cada configuración de tamaño.
 
-A la vista de los resultados, y aunque la política P5 no consiga obtener mejoras
-en el rendimiento energético, señalar que consigue resultados similares a
-la ejecución convencional reduciendo la potencia instantánea consumida, aunque a
-costa de reducir el rendimiento computacional. Sin embargo, esta política
-puede tener su utilidad en problemas donde su ejecución esté limitada por
-la potencia consumida y no tanto por el rendimiento conseguido, pudiendo
-alcanzar un compromiso entre rendimiento y potencia sin afectar al
-rendimiento energético final escogiendo el valor adecuado para determinar
-cuándo desactivar el cluster.
+A la vista de los resultados, y aunque la política P5 no consiga obtener
+mejoras en el rendimiento energético, señalar que consigue resultados
+similares a la ejecución convencional reduciendo la potencia instantánea
+consumida, aunque a costa de reducir el rendimiento computacional. Sin
+embargo, esta política puede tener su utilidad en problemas donde la
+ejecución esté limitada por la potencia consumida y no tanto por el
+rendimiento conseguido, pudiendo alcanzar un compromiso entre rendimiento y
+potencia sin afectar al rendimiento energético final escogiendo el valor
+adecuado para determinar cuándo desactivar el cluster.
 
 %%% GFLOPSW %%%%
 \begin{table}
@@ -1296,7 +1298,7 @@ energético mostrado en la tabla~\ref{tab:mejora-gflopsw-p6}. Como se puede
 apreciar, la mejora en el consumo de potencia es superior a la pérdida de
 rendimiento, consiguiendo ganancias en el rendimiento energético, haciendo
 a esta política una solución válida para obtener una mejora de rendimiento
-energético consiguiendo reducciones considerables de la potencia disipada
+energético obteniendo reducciones considerables de la potencia disipada
 durante la ejecución.
 
 \begin{figure}

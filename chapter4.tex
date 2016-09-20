@@ -84,16 +84,22 @@ con una biblioteca asimétrica para la ejecución de tareas, como se describe a 
 
 \subsection{Visión general de la propuesta}
 
-La propuesta de operación introducida en el presente capítulo opera bajo el modelo GTS, pero está en cierto modo 
-inspirada en el modelo CPUM (véase Sección~\ref{sec:models}). Más concretamente, el objetivo es que el planificador
-de tareas considere la arquitectura \odroid (por ejemplo) como una arquitectura verdaderamente simétrica, formada por 
-cuatro VCs (núcleos virtuales, o {\em Virtual Cores}), cada uno de ellos compuesto por un núcleo rápido y un núcleo
-lento. Para ello, a diferencia del modelo CPUM, {\em ambos} núcleos físicos dentro de cada VC se mantendrán activos y 
-colaborarán en la ejecución de una determinada tarea. Así, la propuesta explota dos niveles de concurrencia: el {\em paralelismo
-a nivel de tareas} es extraído por el planificador para asignar tareas a cada uno de los cuatro VCs idénticos disponibles en
-el sistema, e internamente, cada tarea/kernel divide su carga de forma correcta para exponer {\em paralelismo a nivel de datos}, 
-distribuyendo la carga de trabajo entre los dos núcleos físicos asimétricos dentro del VC que está a cargo de la ejecución
-de dicha tarea.
+La propuesta de operación introducida en el presente capítulo se ejecuta
+bajo el modelo GTS, pero está en cierto modo inspirada en el modelo CPUM
+(véase Sección~\ref{sec:models}). Más concretamente, el objetivo es que el
+planificador de tareas considere la arquitectura \odroid (por ejemplo) como
+una arquitectura verdaderamente simétrica, formada por cuatro VCs (núcleos
+virtuales, o {\em Virtual Cores}), cada uno de ellos compuesto por un
+núcleo rápido y un núcleo lento. Para ello, a diferencia del modelo CPUM,
+{\em ambos} núcleos físicos dentro de cada VC se mantendrán activos y
+colaborarán en la ejecución de una determinada tarea. Así, la propuesta
+explota dos niveles de concurrencia: el {\em paralelismo a nivel de tareas}
+es extraído por el planificador para asignar tareas a cada uno de los
+cuatro VCs idénticos disponibles en el sistema, e internamente, cada
+tarea/kernel divide su carga de forma correcta para exponer {\em
+  paralelismo a nivel de datos}, distribuyendo la carga de trabajo entre
+los dos núcleos físicos asimétricos dentro del VC que está a cargo de la
+ejecución de dicha tarea.
 
 Esta solución requiere únicamente un planificador de tareas convencional (es decir, no consciente de la asimetría de la arquitectura, o lo
 que es lo mismo, orientado a arquitecturas SMT), como por ejemplo el planificador de tareas convencional proporcionado por OmpSs, donde, 
@@ -356,9 +362,9 @@ se añaden los 4~núcleos lentos para dar soporte a los 4~núcleos
 Cortex-A15. Este hecho se traduce en una ganancia de rendimiento de 0.243
 GFLOPS por core lento, ligeramente por debajo de la mejora que podría
 esperarse a partir de los resultados experimentales observados en la
-anterior sección. Nótese, sin embargo, cómo el rendimiento por Cortex-A7
-añadido se reduce desde 0.340~GFLOPS al añadir únicamente un núcleo, hasta
-0.243~GFLOPS, al utilizar los cuatro núcleos lentos, por lo que el
+anterior sección. Nótese, sin embargo, como el rendimiento por Cortex-A7
+añadido se reduce desde 0.340~GFLOPS al incorporar únicamente un núcleo,
+hasta 0.243~GFLOPS, al utilizar los cuatro núcleos lentos, por lo que el
 rendimiento por core lento añadido decrece al aumentar el número de
 \wts. Esperamos averiguar las causas en un futuro.
 
@@ -667,7 +673,7 @@ usando BLIS secuencial. Se ha observado un comportamiento similar para el resto 
 \begin{table}%[t]
 \centering
 	\caption{Tiempo medio (en ms) por tarea y \wt en la factorización de Cholesky ({\tt n}~=~6,144, 
-{\tt b}~=~448), para las tres configuraciones de runtime.}
+{\tt b}~=~448) para las tres configuraciones de runtime.}
 \label{tab:2dp_tasks}
 
 \ra{1.2}
@@ -710,7 +716,7 @@ su criticalidad, y las asigna, a ser posible, sobre núcleos rápidos. De acuerd
 orden se revela más frecuentemente en las líneas de tiempo para los núcleos rápidos que para los lentos. Con el planificador
 convencional, la ejecución fuera de orden sólo viene dictada por el cumplimiento de las dependencias de datos en tiempo de ejecución.
 
-A la vista de las trazas de ejecución, es posible observar cómo el planificador Botlev-OmpSs muestra una penalización
+A la vista de las trazas de ejecución, es posible observar como el planificador \mbox{Botlev-OmpSs} muestra una penalización
 en el rendimiento muy apreciable debida a la existencia de periodos ociosos en la parte final de la factorización, cuando
 la concurrencia disponible disminuye. Este problema no se da utilizando políticas de planificación convencionales. Sin embargo,
 en las primeras fases de la factorización, el uso de una política consciente de la criticalidad de las tareas (implementada en 
